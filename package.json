@@ -1,7 +1,13 @@
 {
+    "name": "trans-protocol",
+    "version": "0.1.0",
+    "author": "github.com/matzayonc & github.com/tommysr",
     "scripts": {
         "lint:fix": "prettier */*.js \"*/**/*{.js,.ts}\" -w",
-        "lint": "prettier */*.js \"*/**/*{.js,.ts}\" --check"
+        "lint": "prettier */*.js \"*/**/*{.js,.ts}\" --check",
+        "build:anchor": "anchor build",
+        "test:anchor": "yarn test:basic",
+        "test:basic": "anchor test --skip-build tests/anchor/basic.ts" 
     },
     "dependencies": {
         "@coral-xyz/anchor": "^0.29.0"
