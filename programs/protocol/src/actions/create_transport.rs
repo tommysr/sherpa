@@ -21,9 +21,11 @@ pub struct CreateTransport<'info> {
 }
 
 pub fn handler(ctx: Context<CreateTransport>, transport: Transport) -> Result<()> {
+    let shipper = &mut ctx.accounts.shipper.load_mut()?;
     let account = &mut ctx.accounts.transport.load_init()?;
 
     **account = transport;
+    shipper.count += 1;
 
     Ok(())
 }

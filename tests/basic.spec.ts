@@ -113,4 +113,63 @@ describe('protocol', () => {
     expect(transportAccount.when.eq(transportData.when)).true
     expect(transportAccount.transportDetails).to.deep.equal(transportData.transportDetails)
   })
+
+  it('create second transport', async () => {
+    const indexBuffer = Buffer.alloc(4)
+    indexBuffer.writeInt32LE(1)
+    const [transportAddress, transportBump] = PublicKey.findProgramAddressSync(
+      [
+        Buffer.from(anchor.utils.bytes.utf8.encode(TRANSPORT_SEED)),
+        shipper.publicKey.toBuffer(),
+        indexBuffer
+      ],
+      program.programId
+    )
+
+    const transportData = {
+      from: {
+        latitude: 1,
+        longitude: 1
+      },
+      to: {
+        latitude: 1,
+        longitude: 1
+      },
+      dimensions: {
+        weight: 1,
+        volume: 1
+      },
+      when: new BN(1),
+      transportDetails: {
+        priority: 1,
+        fragility: 1,
+        reserved: [1, 1, 1, 1, 1, 1]
+      }
+    }
+
+    await program.methods
+      .createTransport(transportData)
+      .accounts({
+        transport: transportAddress,
+        shipper: shipperAddress,
+        signer: shipper.publicKey,
+        systemProgram: SystemProgram.programId
+      })
+      .signers([shipper])
+      .rpc()
+
+    const transportAccount = await program.account.transport.fetch(transportAddress)
+    expect(transportAccount.from).to.deep.equal(transportData.from)
+    expect(transportAccount.to).to.deep.equal(transportData.to)
+    expect(transportAccount.dimensions).to.deep.equal(transportData.dimensions)
+    expect(transportAccount.when.eq(transportData.when)).true
+    expect(transportAccount.transportDetails).to.deep.equal(transportData.transportDetails)
+
+    const firstTransportAccount = await program.account.transport.fetch(transportAddress)
+    expect(firstTransportAccount.from).to.deep.equal(transportData.from)
+    expect(firstTransportAccount.to).to.deep.equal(transportData.to)
+    expect(firstTransportAccount.dimensions).to.deep.equal(transportData.dimensions)
+    expect(firstTransportAccount.when.eq(transportData.when)).true
+    expect(firstTransportAccount.transportDetails).to.deep.equal(transportData.transportDetails)
+  })
 })
