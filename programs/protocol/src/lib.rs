@@ -1,15 +1,19 @@
+mod actions;
+mod data;
+
+use actions::*;
+use data::*;
+
 use anchor_lang::prelude::*;
 
-declare_id!("5QBudxMGUXjZ4kQHEa7XvsG8m2bZA19xoPJqwJ7QnW7R");
+declare_id!("91kcQgtnkTYUAddsMZJtMMhifxQgfZEVPqyEMzEaoFT5");
 
 #[program]
 pub mod protocol {
     use super::*;
 
     pub fn initialize(ctx: Context<Initialize>) -> Result<()> {
-        Ok(())
+        actions::initialize::handler(ctx)
+        // Ok(())
     }
 }
-
-#[derive(Accounts)]
-pub struct Initialize {}
