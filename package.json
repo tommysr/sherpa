@@ -6,8 +6,9 @@
         "lint:fix": "prettier */*.js \"*/**/*{.js,.ts}\" -w",
         "lint": "prettier */*.js \"*/**/*{.js,.ts}\" --check",
         "build:anchor": "anchor build",
+        "test": "yarn test:anchor",
         "test:anchor": "yarn test:basic",
-        "test:basic": "anchor test --skip-build tests/anchor/basic.ts" 
+        "test:basic": "anchor test --skip-build tests/basic.spec.ts"
     },
     "dependencies": {
         "@coral-xyz/anchor": "^0.29.0"
