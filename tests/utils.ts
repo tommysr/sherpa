@@ -1,16 +1,4 @@
-import { Connection, PublicKey } from '@solana/web3.js'
-
-export async function waitFor(connection: Connection, sig: string) {
-  const { blockhash, lastValidBlockHeight } = await connection.getLatestBlockhash()
-  await connection.confirmTransaction(
-    {
-      signature: sig,
-      blockhash,
-      lastValidBlockHeight
-    },
-    'confirmed'
-  )
-}
+import { Connection, Keypair, PublicKey } from '@solana/web3.js'
 
 export const awaitedAirdrop = async (
   connection: Connection,
@@ -34,4 +22,10 @@ export const sleep = async (arg0: number) => {
   return new Promise(resolve => {
     setTimeout(resolve, arg0)
   })
+}
+
+export const prefunded = async (connection: Connection) => {
+  const keypair = Keypair.generate()
+  await awaitedAirdrop(connection, keypair.publicKey, 1e9)
+  return keypair
 }

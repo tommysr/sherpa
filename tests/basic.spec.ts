@@ -2,8 +2,8 @@ import * as anchor from '@coral-xyz/anchor'
 import { Program } from '@coral-xyz/anchor'
 import { Protocol } from '../target/types/protocol'
 import { Keypair, PublicKey, SystemProgram } from '@solana/web3.js'
-import { awaitedAirdrop, waitFor } from './utils'
-import { STATE_SEED } from './sdk'
+import { awaitedAirdrop, prefunded } from './utils'
+import { SHIPPER_SEED, STATE_SEED } from './sdk'
 import { expect } from 'chai'
 
 describe('protocol', () => {
@@ -23,9 +23,9 @@ describe('protocol', () => {
     await awaitedAirdrop(program.provider.connection, admin.publicKey, 1e9)
   })
 
-  it('Is initialized!', async () => {
+  it('init state', async () => {
     await program.methods
-      .initialize()
+      .initializeState()
       .accounts({
         state,
         admin: admin.publicKey,
@@ -36,5 +36,27 @@ describe('protocol', () => {
 
     const stateAccount = await program.account.state.fetch(state)
     expect(stateAccount.admin.equals(admin.publicKey)).true
+  })
+
+  it('register shipper', async () => {
+    const shipper = await prefunded(connection)
+
+    const [shipperAddress, bump] = PublicKey.findProgramAddressSync(
+      [Buffer.from(anchor.utils.bytes.utf8.encode(SHIPPER_SEED)), shipper.publicKey.toBuffer()],
+      program.programId
+    )
+
+    await program.methods
+      .registerShipper()
+      .accounts({
+        shipper: shipperAddress,
+        signer: shipper.publicKey,
+        systemProgram: SystemProgram.programId
+      })
+      .signers([shipper])
+      .rpc()
+
+    const stateAccount = await program.account.shipper.fetch(shipperAddress)
+    expect(stateAccount).not.undefined
   })
 })
