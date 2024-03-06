@@ -3,11 +3,12 @@ use anchor_lang::prelude::{
     *,
 };
 
-#[derive(Debug, Clone, Default, Copy, PartialEq, Eq, PartialOrd, Ord)]
-#[repr(u8)]
-pub enum TransportType {
-    #[default]
-    Regular = 0,
+#[zero_copy]
+#[derive(Debug, Default, PartialEq, BorshSerialize, BorshDeserialize)]
+pub struct TransportDetails {
+    priority: u8,
+    fragility: u8,
+    reserved: [u8; 6], // size is excessive, but required for bytemuck
 }
 
 #[zero_copy]
@@ -31,5 +32,5 @@ pub struct Transport {
     pub to: Coordinates,
     pub dimensions: TransportDimensions,
     pub when: u64,
-    pub transport_type: [u8; 8], // size is excessive, but required for bytemuck
+    pub transport_details: TransportDetails,
 }

@@ -87,7 +87,11 @@ describe('protocol', () => {
         volume: 0
       },
       when: new BN(0),
-      transportType: [0, 0, 0, 0, 0, 0, 0, 0]
+      transportDetails: {
+        priority: 0,
+        fragility: 0,
+        reserved: [0, 0, 0, 0, 0, 0]
+      }
     }
 
     await program.methods
@@ -103,13 +107,10 @@ describe('protocol', () => {
 
     const transportAccount = await program.account.transport.fetch(transportAddress)
 
-    expect(transportAccount.from.latitude).to.equal(transportData.from.latitude)
-    expect(transportAccount.from.longitude).to.equal(transportData.from.longitude)
-    expect(transportAccount.to.latitude).to.equal(transportData.to.latitude)
-    expect(transportAccount.to.longitude).to.equal(transportData.to.longitude)
-    expect(transportAccount.dimensions.weight).to.equal(transportData.dimensions.weight)
-    expect(transportAccount.dimensions.volume).to.equal(transportData.dimensions.volume)
+    expect(transportAccount.from).to.deep.equal(transportData.from)
+    expect(transportAccount.to).to.deep.equal(transportData.to)
+    expect(transportAccount.dimensions).to.deep.equal(transportData.dimensions)
     expect(transportAccount.when.eq(transportData.when)).true
-    expect(transportAccount.transportType).to.deep.equal(transportData.transportType)
+    expect(transportAccount.transportDetails).to.deep.equal(transportData.transportDetails)
   })
 })
