@@ -12,9 +12,9 @@ pub struct InitializeState<'info> {
 }
 
 pub fn handler(ctx: Context<InitializeState>) -> Result<()> {
-    let state = &mut ctx.accounts.state.load_init()?;
+    let account = &mut ctx.accounts.state.load_init()?;
 
-    **state = State {
+    **account = State {
         admin: *ctx.accounts.admin.key,
     };
 

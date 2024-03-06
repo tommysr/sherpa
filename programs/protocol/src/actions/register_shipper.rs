@@ -16,9 +16,12 @@ pub struct RegisterShipper<'info> {
 }
 
 pub fn handler(ctx: Context<RegisterShipper>) -> Result<()> {
-    let state = &mut ctx.accounts.shipper.load_init()?;
+    let account = &mut ctx.accounts.shipper.load_init()?;
 
-    **state = Shipper {};
+    **account = Shipper {
+        authority: *ctx.accounts.signer.key,
+        count: 0,
+    };
 
     Ok(())
 }

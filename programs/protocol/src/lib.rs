@@ -1,8 +1,10 @@
 mod actions;
 mod data;
+mod errors;
 
 use actions::*;
 use data::*;
+use errors::Error;
 
 use anchor_lang::prelude::*;
 
@@ -17,6 +19,10 @@ pub mod protocol {
     }
 
     pub fn register_shipper(ctx: Context<RegisterShipper>) -> Result<()> {
-        crate::actions::register_shipper::handler(ctx)
+        actions::register_shipper::handler(ctx)
+    }
+
+    pub fn create_transport(ctx: Context<CreateTransport>, transport: Transport) -> Result<()> {
+        actions::create_transport::handler(ctx, transport)
     }
 }

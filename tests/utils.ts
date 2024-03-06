@@ -18,6 +18,14 @@ export const awaitedAirdrop = async (
   }
 }
 
+export const awaitedAirdrops = async (
+  connection: Connection,
+  publicKey: PublicKey[],
+  amount: number
+) => {
+  await Promise.all(publicKey.map(async pk => awaitedAirdrop(connection, pk, amount)))
+}
+
 export const sleep = async (arg0: number) => {
   return new Promise(resolve => {
     setTimeout(resolve, arg0)
