@@ -31,6 +31,7 @@ pub struct Coordinates {
 #[account(zero_copy)]
 #[derive(Debug, Default, PartialEq, BorshSerialize, BorshDeserialize)]
 pub struct Shipment {
+    pub price: u64,
     pub from: Coordinates,
     pub to: Coordinates,
     pub dimensions: ShipmentDimensions,

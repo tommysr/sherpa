@@ -2,7 +2,7 @@ import * as anchor from '@coral-xyz/anchor'
 import { BN, Program } from '@coral-xyz/anchor'
 import { Protocol } from '../target/types/protocol'
 import { Keypair, PublicKey, SystemProgram } from '@solana/web3.js'
-import { awaitedAirdrop, awaitedAirdrops, prefunded } from './utils'
+import { ONE_SOL, awaitedAirdrop, awaitedAirdrops, prefunded } from './utils'
 import { SHIPPER_SEED, STATE_SEED, TRANSPORT_SEED } from './sdk'
 import { expect } from 'chai'
 
@@ -74,6 +74,7 @@ describe('protocol', () => {
     )
 
     const shipmentData = {
+      price: new BN(4200).mul(ONE_SOL),
       from: {
         latitude: 0,
         longitude: 0
@@ -93,7 +94,8 @@ describe('protocol', () => {
       shipmentDetails: {
         priority: 0,
         fragility: 0,
-        reserved: [0, 0, 0, 0, 0, 0]
+        access: 0,
+        reserved: [0, 0, 0, 0, 0]
       }
     }
 
@@ -110,6 +112,7 @@ describe('protocol', () => {
 
     const shipmentAccount = await program.account.shipment.fetch(shipmentAddress)
 
+    expect(shipmentAccount.price.eq(shipmentData.price)).true
     expect(shipmentAccount.from).to.deep.equal(shipmentData.from)
     expect(shipmentAccount.to).to.deep.equal(shipmentData.to)
     expect(shipmentAccount.dimensions).to.deep.equal(shipmentData.dimensions)
@@ -131,6 +134,7 @@ describe('protocol', () => {
     )
 
     const shipmentData = {
+      price: new BN(2100).mul(ONE_SOL),
       from: {
         latitude: 1,
         longitude: 1
@@ -150,7 +154,8 @@ describe('protocol', () => {
       shipmentDetails: {
         priority: 1,
         fragility: 1,
-        reserved: [1, 1, 1, 1, 1, 1]
+        access: 1,
+        reserved: [1, 1, 1, 1, 1]
       }
     }
 
@@ -166,6 +171,7 @@ describe('protocol', () => {
       .rpc()
 
     const shipmentAccount = await program.account.shipment.fetch(shipmentAddress)
+    expect(shipmentAccount.price.eq(shipmentData.price)).true
     expect(shipmentAccount.from).to.deep.equal(shipmentData.from)
     expect(shipmentAccount.to).to.deep.equal(shipmentData.to)
     expect(shipmentAccount.dimensions).to.deep.equal(shipmentData.dimensions)
@@ -174,6 +180,7 @@ describe('protocol', () => {
     expect(shipmentAccount.shipmentDetails).to.deep.equal(shipmentData.shipmentDetails)
 
     const firstShipmentAccount = await program.account.shipment.fetch(shipmentAddress)
+    expect(firstShipmentAccount.price.eq(shipmentData.price)).true
     expect(firstShipmentAccount.from).to.deep.equal(shipmentData.from)
     expect(firstShipmentAccount.to).to.deep.equal(shipmentData.to)
     expect(firstShipmentAccount.dimensions).to.deep.equal(shipmentData.dimensions)

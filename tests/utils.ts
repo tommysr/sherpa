@@ -1,4 +1,7 @@
 import { Connection, Keypair, PublicKey } from '@solana/web3.js'
+import BN from 'bn.js'
+
+export const ONE_SOL = new BN('1000000000')
 
 export const awaitedAirdrop = async (
   connection: Connection,
