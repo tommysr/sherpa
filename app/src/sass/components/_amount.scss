@@ -1,0 +1,35 @@
+@use 'sass:map';
+
+[data-type='amount'] {
+	display: flex;
+	flex-direction: column;
+
+	[data-type='btc'],
+	[data-type='usd'] {
+		&:empty {
+			display: inline-block;
+			opacity: 0.25;
+
+			&:after {
+				display: inline-block;
+				width: 4rem;
+				height: 50%;
+				transform: translateY(50%);
+				border-radius: 0.25rem;
+				background-color: currentColor;
+				content: '\00a0 ';
+				animation-duration: 2s;
+				animation-iteration-count: infinite;
+				animation-fill-mode: both;
+				animation-name: opacity-pulse;
+				opacity: 1;
+			}
+		}
+
+		// @keyframes opacity-pulse {
+		// 	50% {
+		// 		opacity: 0.5;
+		// 	}
+		// }
+	}
+}

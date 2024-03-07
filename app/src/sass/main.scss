@@ -1,12 +1,51 @@
-// @import 'abstracts/functions';
-// @import 'abstracts/mixins';
-// @import 'abstracts/variables';
+@use '@picocss/pico/scss/pico' with (
+	$enable-semantic-container: true,
+	$enable-viewport: false,
+	//$enable-classes: false,
+	$modules:
+		(
+			// // Theme
+			// 'themes/default': false,
+			// // Layout
+			// 'layout/document': true,
+			// 'layout/landmarks': true,
+			// 'layout/section': false,
+			// 'layout/container': false,
+			// 'layout/grid': false,
+			// 'layout/overflow-auto': false,
+			// // Content
+			// 'content/typography': true,
+			// 'content/link': true,
+			// 'content/button': true,
+			// 'content/table': true,
+			// 'content/embedded': false,
+			// 'content/code': false,
+			// 'content/miscs': false,
+			// // Forms
+			'forms/basics': true,
+			// 'forms/checkbox-radio-switch': false,
+			//'forms/input-color': false,
+			//'forms/input-date': false,
+			//'forms/input-file': false,
+			// 'forms/input-range': true,
+			// 'forms/input-search': false,
+			// // Components
+			// 'components/accordion': false,
+			// 'components/card': false,
+			// 'components/dropdown': false,
+			// 'components/group': false,
+			// 'components/loading': false,
+			// 'components/modal': false,
+			// 'components/nav': false,
+			// 'components/progress': false,
+			// 'components/tooltip': false,
+			// // Utilities
+			// 'utilities/accessibility': false,
+			// 'utilities/reduce-motion': false
+		)
+);
 
-// @import 'base/base';
-// @import 'base/animations';
-// @import 'base/topography';
-// @import 'base/utilities';
-
-@use '@picocss/pico/scss/pico';
+@use 'components/_amount';
+@use 'components/input-amount';
 
 @import '../components/Wallet/wallet';
