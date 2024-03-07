@@ -8,7 +8,8 @@ use anchor_lang::prelude::{
 pub struct ShipmentDetails {
     priority: u8,
     fragility: u8,
-    reserved: [u8; 6], // size is excessive, but required for bytemuck
+    access: u8,
+    reserved: [u8; 5], // size is excessive, but required for bytemuck
 }
 
 #[zero_copy]
