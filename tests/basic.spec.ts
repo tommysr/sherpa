@@ -57,8 +57,8 @@ describe('protocol', () => {
       .signers([shipper])
       .rpc()
 
-    const stateAccount = await program.account.shipper.fetch(shipperAddress)
-    expect(stateAccount).not.undefined
+    const shipperAccount = await program.account.shipper.fetch(shipperAddress)
+    expect(shipperAccount).not.undefined
   })
 
   it('create shipment', async () => {
