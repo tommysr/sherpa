@@ -5,7 +5,7 @@ use anchor_lang::prelude::{
 
 #[zero_copy]
 #[derive(Debug, Default, PartialEq, BorshSerialize, BorshDeserialize)]
-pub struct TransportDetails {
+pub struct ShipmentDetails {
     priority: u8,
     fragility: u8,
     reserved: [u8; 6], // size is excessive, but required for bytemuck
@@ -13,7 +13,7 @@ pub struct TransportDetails {
 
 #[zero_copy]
 #[derive(Debug, Default, PartialEq, BorshSerialize, BorshDeserialize)]
-pub struct TransportDimensions {
+pub struct ShipmentDimensions {
     pub weight: u32,
     pub width: u32,  // interpret as volume of other dimensions are 0
     pub height: u32, // [cm]
@@ -29,11 +29,11 @@ pub struct Coordinates {
 
 #[account(zero_copy)]
 #[derive(Debug, Default, PartialEq, BorshSerialize, BorshDeserialize)]
-pub struct Transport {
+pub struct Shipment {
     pub from: Coordinates,
     pub to: Coordinates,
-    pub dimensions: TransportDimensions,
+    pub dimensions: ShipmentDimensions,
     pub when: u64,
     pub deadline: u64,
-    pub transport_details: TransportDetails,
+    pub shipment_details: ShipmentDetails,
 }

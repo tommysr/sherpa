@@ -61,10 +61,10 @@ describe('protocol', () => {
     expect(stateAccount).not.undefined
   })
 
-  it('create transport', async () => {
+  it('create shipment', async () => {
     const indexBuffer = Buffer.alloc(4)
     indexBuffer.writeInt32LE(0)
-    const [transportAddress, transportBump] = PublicKey.findProgramAddressSync(
+    const [shipmentAddress, shipmentBump] = PublicKey.findProgramAddressSync(
       [
         Buffer.from(anchor.utils.bytes.utf8.encode(TRANSPORT_SEED)),
         shipper.publicKey.toBuffer(),
@@ -73,7 +73,7 @@ describe('protocol', () => {
       program.programId
     )
 
-    const transportData = {
+    const shipmentData = {
       from: {
         latitude: 0,
         longitude: 0
@@ -90,7 +90,7 @@ describe('protocol', () => {
       },
       when: new BN(0),
       deadline: new BN(0),
-      transportDetails: {
+      shipmentDetails: {
         priority: 0,
         fragility: 0,
         reserved: [0, 0, 0, 0, 0, 0]
@@ -98,9 +98,9 @@ describe('protocol', () => {
     }
 
     await program.methods
-      .createTransport(transportData)
+      .createShipment(shipmentData)
       .accounts({
-        transport: transportAddress,
+        shipment: shipmentAddress,
         shipper: shipperAddress,
         signer: shipper.publicKey,
         systemProgram: SystemProgram.programId
@@ -108,20 +108,20 @@ describe('protocol', () => {
       .signers([shipper])
       .rpc()
 
-    const transportAccount = await program.account.transport.fetch(transportAddress)
+    const shipmentAccount = await program.account.shipment.fetch(shipmentAddress)
 
-    expect(transportAccount.from).to.deep.equal(transportData.from)
-    expect(transportAccount.to).to.deep.equal(transportData.to)
-    expect(transportAccount.dimensions).to.deep.equal(transportData.dimensions)
-    expect(transportAccount.when.eq(transportData.when)).true
-    expect(transportAccount.deadline.eq(transportData.deadline)).true
-    expect(transportAccount.transportDetails).to.deep.equal(transportData.transportDetails)
+    expect(shipmentAccount.from).to.deep.equal(shipmentData.from)
+    expect(shipmentAccount.to).to.deep.equal(shipmentData.to)
+    expect(shipmentAccount.dimensions).to.deep.equal(shipmentData.dimensions)
+    expect(shipmentAccount.when.eq(shipmentData.when)).true
+    expect(shipmentAccount.deadline.eq(shipmentData.deadline)).true
+    expect(shipmentAccount.shipmentDetails).to.deep.equal(shipmentData.shipmentDetails)
   })
 
-  it('create second transport', async () => {
+  it('create second shipment', async () => {
     const indexBuffer = Buffer.alloc(4)
     indexBuffer.writeInt32LE(1)
-    const [transportAddress, transportBump] = PublicKey.findProgramAddressSync(
+    const [shipmentAddress, shipmentBump] = PublicKey.findProgramAddressSync(
       [
         Buffer.from(anchor.utils.bytes.utf8.encode(TRANSPORT_SEED)),
         shipper.publicKey.toBuffer(),
@@ -130,7 +130,7 @@ describe('protocol', () => {
       program.programId
     )
 
-    const transportData = {
+    const shipmentData = {
       from: {
         latitude: 1,
         longitude: 1
@@ -147,7 +147,7 @@ describe('protocol', () => {
       },
       when: new BN(1),
       deadline: new BN(1),
-      transportDetails: {
+      shipmentDetails: {
         priority: 1,
         fragility: 1,
         reserved: [1, 1, 1, 1, 1, 1]
@@ -155,9 +155,9 @@ describe('protocol', () => {
     }
 
     await program.methods
-      .createTransport(transportData)
+      .createShipment(shipmentData)
       .accounts({
-        transport: transportAddress,
+        shipment: shipmentAddress,
         shipper: shipperAddress,
         signer: shipper.publicKey,
         systemProgram: SystemProgram.programId
@@ -165,20 +165,20 @@ describe('protocol', () => {
       .signers([shipper])
       .rpc()
 
-    const transportAccount = await program.account.transport.fetch(transportAddress)
-    expect(transportAccount.from).to.deep.equal(transportData.from)
-    expect(transportAccount.to).to.deep.equal(transportData.to)
-    expect(transportAccount.dimensions).to.deep.equal(transportData.dimensions)
-    expect(transportAccount.when.eq(transportData.when)).true
-    expect(transportAccount.deadline.eq(transportData.deadline)).true
-    expect(transportAccount.transportDetails).to.deep.equal(transportData.transportDetails)
+    const shipmentAccount = await program.account.shipment.fetch(shipmentAddress)
+    expect(shipmentAccount.from).to.deep.equal(shipmentData.from)
+    expect(shipmentAccount.to).to.deep.equal(shipmentData.to)
+    expect(shipmentAccount.dimensions).to.deep.equal(shipmentData.dimensions)
+    expect(shipmentAccount.when.eq(shipmentData.when)).true
+    expect(shipmentAccount.deadline.eq(shipmentData.deadline)).true
+    expect(shipmentAccount.shipmentDetails).to.deep.equal(shipmentData.shipmentDetails)
 
-    const firstTransportAccount = await program.account.transport.fetch(transportAddress)
-    expect(firstTransportAccount.from).to.deep.equal(transportData.from)
-    expect(firstTransportAccount.to).to.deep.equal(transportData.to)
-    expect(firstTransportAccount.dimensions).to.deep.equal(transportData.dimensions)
-    expect(firstTransportAccount.when.eq(transportData.when)).true
-    expect(firstTransportAccount.deadline.eq(firstTransportAccount.deadline)).true
-    expect(firstTransportAccount.transportDetails).to.deep.equal(transportData.transportDetails)
+    const firstShipmentAccount = await program.account.shipment.fetch(shipmentAddress)
+    expect(firstShipmentAccount.from).to.deep.equal(shipmentData.from)
+    expect(firstShipmentAccount.to).to.deep.equal(shipmentData.to)
+    expect(firstShipmentAccount.dimensions).to.deep.equal(shipmentData.dimensions)
+    expect(firstShipmentAccount.when.eq(shipmentData.when)).true
+    expect(firstShipmentAccount.deadline.eq(firstShipmentAccount.deadline)).true
+    expect(firstShipmentAccount.shipmentDetails).to.deep.equal(shipmentData.shipmentDetails)
   })
 })

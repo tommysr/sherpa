@@ -1,7 +1,7 @@
+mod shipment;
 mod shipper;
 mod state;
-mod transport;
 
+pub use shipment::*;
 pub use shipper::*;
 pub use state::*;
-pub use transport::*;
