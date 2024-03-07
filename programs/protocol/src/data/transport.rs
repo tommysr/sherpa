@@ -15,7 +15,9 @@ pub struct TransportDetails {
 #[derive(Debug, Default, PartialEq, BorshSerialize, BorshDeserialize)]
 pub struct TransportDimensions {
     pub weight: u32,
-    pub volume: u32,
+    pub width: u32,  // interpret as volume of other dimensions are 0
+    pub height: u32, // [cm]
+    pub depth: u32,  // [cm]
 }
 
 #[zero_copy]
@@ -32,5 +34,6 @@ pub struct Transport {
     pub to: Coordinates,
     pub dimensions: TransportDimensions,
     pub when: u64,
+    pub deadline: u64,
     pub transport_details: TransportDetails,
 }

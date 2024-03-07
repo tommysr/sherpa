@@ -84,9 +84,12 @@ describe('protocol', () => {
       },
       dimensions: {
         weight: 0,
-        volume: 0
+        width: 0,
+        depth: 0,
+        height: 0
       },
       when: new BN(0),
+      deadline: new BN(0),
       transportDetails: {
         priority: 0,
         fragility: 0,
@@ -111,6 +114,7 @@ describe('protocol', () => {
     expect(transportAccount.to).to.deep.equal(transportData.to)
     expect(transportAccount.dimensions).to.deep.equal(transportData.dimensions)
     expect(transportAccount.when.eq(transportData.when)).true
+    expect(transportAccount.deadline.eq(transportData.deadline)).true
     expect(transportAccount.transportDetails).to.deep.equal(transportData.transportDetails)
   })
 
@@ -137,9 +141,12 @@ describe('protocol', () => {
       },
       dimensions: {
         weight: 1,
-        volume: 1
+        width: 1,
+        depth: 1,
+        height: 1
       },
       when: new BN(1),
+      deadline: new BN(1),
       transportDetails: {
         priority: 1,
         fragility: 1,
@@ -163,6 +170,7 @@ describe('protocol', () => {
     expect(transportAccount.to).to.deep.equal(transportData.to)
     expect(transportAccount.dimensions).to.deep.equal(transportData.dimensions)
     expect(transportAccount.when.eq(transportData.when)).true
+    expect(transportAccount.deadline.eq(transportData.deadline)).true
     expect(transportAccount.transportDetails).to.deep.equal(transportData.transportDetails)
 
     const firstTransportAccount = await program.account.transport.fetch(transportAddress)
@@ -170,6 +178,7 @@ describe('protocol', () => {
     expect(firstTransportAccount.to).to.deep.equal(transportData.to)
     expect(firstTransportAccount.dimensions).to.deep.equal(transportData.dimensions)
     expect(firstTransportAccount.when.eq(transportData.when)).true
+    expect(firstTransportAccount.deadline.eq(firstTransportAccount.deadline)).true
     expect(firstTransportAccount.transportDetails).to.deep.equal(transportData.transportDetails)
   })
 })
