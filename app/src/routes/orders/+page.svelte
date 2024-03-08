@@ -65,6 +65,8 @@
 	function handleSearchKeydown(e: KeyboardEvent) {
 		if ($searchStore.searchString && e.key == 'Enter') {
 			searchStore.performSearch();
+		} else {
+			searchStore.purgeFiltered();
 		}
 	}
 </script>
@@ -84,7 +86,7 @@
 
 	<div class="grid">
 		<div>
-			{#if $searchStore.searchString == ''}
+			{#if $searchStore.searchState == 'none'}
 				{#each $searchStore.data as order}
 					<div class="card">
 						<article>
@@ -124,9 +126,7 @@
 						</article>
 					</div>
 				{/each}
-			{:else if $searchStore.filtered.length == 0 && $searchStore.searchString}
-				<p>No orders found</p>
-			{:else}
+			{:else if $searchStore.searchState == 'performed' && $searchStore.filtered.length != 0}
 				{#each $searchStore.filtered as order}
 					<div class="card">
 						<article>
@@ -165,7 +165,8 @@
 							</footer>
 						</article>
 					</div>{/each}
-			{/if}
+			{:else}
+				<p>Nothing found</p>{/if}
 		</div>
 		<!-- Map should be fixed or floating, and on mobile in some access menu from the right side, to allow quick preview -->
 		<div><ShipmentMap /></div>
