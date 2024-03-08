@@ -39,6 +39,7 @@
 		"@solana/wallet-adapter-wallets": "^0.19.26",
 		"@solana/web3.js": "^1.90.0",
 		"buffer": "^6.0.3",
+		"deck.gl": "^8.9.35",
 		"svelte-maplibre": "^0.8.2"
 	}
 }

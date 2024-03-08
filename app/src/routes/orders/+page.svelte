@@ -1,6 +1,6 @@
 <script lang="ts">
 	import type { MockTransportOrder } from '$src/utils/types/mockTransport';
-	import image from '$lib/images/logo.png';
+	import LogoPath from '$lib/images/logo.png';
 	import ShipmentMap from '$components/ShipmentMap/ShipmentMap.svelte';
 	import ScrollableMenu from '$src/components/Navigation/ScrollableMenu.svelte';
 	import CategoryButton from '$src/components/Navigation/CategoryButton.svelte';
@@ -8,6 +8,9 @@
 	import type { PageData } from './$types';
 	import { createSearchStore, type SearchItem } from '$stores/search';
 	import { getContext, hasContext, onDestroy, setContext } from 'svelte';
+	import Card from '$src/components/Shipment/Card.svelte';
+	import OrderCard from '$src/components/Shipment/OrderCard.svelte';
+	import ShipmentsMap from '$src/components/ShipmentMap/ShipmentsMap.svelte';
 
 	type SearchableOrder = MockTransportOrder & SearchItem;
 
@@ -20,7 +23,7 @@
 		return { ...order, searchParams: order.details.priority.toString() };
 	});
 
-	// TODO: consider placing in context to avoid creating orders, when we
+	// TODO: consider placing in context to avoid creating order stores, when we
 	// shouldn't
 	const searchStore = createSearchStore(searchableOrders);
 
@@ -88,94 +91,21 @@
 		<div>
 			{#if $searchStore.searchState == 'none'}
 				{#each $searchStore.data as order}
-					<div class="card">
-						<article>
-							<header>Name of the thing to transport</header>
-							<div class="grid">
-								<div>
-									<img alt="img" src={image} />
-								</div>
-								<div>
-									Volume: {order.dimensions.volume.toFixed(2)}
-									Weight: {order.dimensions.weight.toFixed(2)}
-									Fragile: {order.details.fragility.toFixed(0)}
-								</div>
-								<div>Location: Krakow</div>
-							</div>
-						</article>
-						<article>
-							<details>
-								<summary>Precise location</summary>
-								<ul>
-									<li>Source: {Object.values(order.from)}</li>
-									<li>Destination: {Object.values(order.to)}</li>
-								</ul>
-							</details>
-							<details>
-								<summary>Other informations</summary>
-								<ul>
-									<li>Source: {Object.values(order.from)}</li>
-									<li>Destination: {Object.values(order.to)}</li>
-								</ul>
-							</details>
-
-							<footer>
-								Date of shipment: {new Date(order.when).toDateString()}
-								{order.details.priority}
-							</footer>
-						</article>
-					</div>
+					<OrderCard date={new Date(order.when)} {...order} />
 				{/each}
 			{:else if $searchStore.searchState == 'performed' && $searchStore.filtered.length != 0}
 				{#each $searchStore.filtered as order}
-					<div class="card">
-						<article>
-							<header>Name of the thing to transport</header>
-							<div class="grid">
-								<div>
-									<img alt="img" src={image} />
-								</div>
-								<div>
-									Volume: {order.dimensions.volume.toFixed(2)}
-									Weight: {order.dimensions.weight.toFixed(2)}
-									Fragile: {order.details.fragility.toFixed(0)}
-								</div>
-								<div>Location: Krakow</div>
-							</div>
-						</article>
-						<article>
-							<details>
-								<summary>Precise location</summary>
-								<ul>
-									<li>Source: {Object.values(order.from)}</li>
-									<li>Destination: {Object.values(order.to)}</li>
-								</ul>
-							</details>
-							<details>
-								<summary>Other informations</summary>
-								<ul>
-									<li>Source: {Object.values(order.from)}</li>
-									<li>Destination: {Object.values(order.to)}</li>
-								</ul>
-							</details>
-
-							<footer>
-								Date of shipment: {new Date(order.when).toDateString()}
-								{order.details.priority}
-							</footer>
-						</article>
-					</div>{/each}
+					<OrderCard date={new Date(order.when)} {...order} />
+				{/each}
 			{:else}
-				<p>Nothing found</p>{/if}
+				<p>Nothing found</p>
+			{/if}
 		</div>
 		<!-- Map should be fixed or floating, and on mobile in some access menu from the right side, to allow quick preview -->
-		<div><ShipmentMap /></div>
+		<!-- need to rework it to include filtering -->
+		<div><ShipmentsMap shipments={$searchStore.data} /></div>
 	</div>
 </main>
 
 <style lang="scss">
-	.card {
-		padding: 10px;
-		margin-bottom: 20px;
-	}
 </style>

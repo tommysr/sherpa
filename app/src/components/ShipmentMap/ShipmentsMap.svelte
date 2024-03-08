@@ -1,0 +1,62 @@
+<script lang="ts">
+	import { createEventDispatcher } from 'svelte';
+	import {
+		DefaultMarker,
+		MapLibre,
+		Marker,
+		Popup,
+		type LngLatBoundsLike,
+		DeckGlLayer
+	} from 'svelte-maplibre';
+
+	import type { MockTransportOrder } from '$utils/types/mockTransport';
+
+	import { ArcLayer } from '@deck.gl/layers/typed';
+
+	export let shipments: MockTransportOrder[];
+	let hovered: MockTransportOrder;
+
+	// TODO: render based by current map borders?
+	let bounds: LngLatBoundsLike;
+	$: console.log(bounds);
+</script>
+
+<MapLibre
+	style="https://basemaps.cartocdn.com/gl/positron-gl-style/style.json"
+	class="map relative aspect-[9/16] max-h-[70vh] w-full sm:aspect-video sm:max-h-full"
+	standardControls
+	zoom={10}
+	center={[19, 50]}
+	bind:bounds
+>
+	{#each shipments as shipment}
+		<DefaultMarker lngLat={[shipment.from.longitude, shipment.from.latitude]}>
+			<Popup offset={[0, -10]}>
+				<div class="text-lg font-bold">Package source</div>
+			</Popup>
+		</DefaultMarker>
+
+		<DefaultMarker lngLat={[shipment.to.longitude, shipment.to.latitude]}>
+			<Popup offset={[0, -10]}>
+				<div class="text-lg font-bold">Package source</div>
+			</Popup>
+		</DefaultMarker>
+
+		<DeckGlLayer
+			type={ArcLayer}
+			data={shipments}
+			bind:hovered
+			getSourcePosition={(d) => [d.from.longitude, d.from.latitude]}
+			getTargetPosition={(d) => [d.to.longitude, d.to.latitude]}
+			getSourceColor={(d) => [222, 121, 70]}
+			getTargetColor={(d) => [222, 121, 70]}
+			getWidth={1}
+		></DeckGlLayer>
+	{/each}
+</MapLibre>
+
+<style>
+	:global(.map) {
+		height: 500px;
+	}
+</style>

@@ -6,6 +6,8 @@ export function generateMockTransportOrders(numOrders: number): MockTransportOrd
 
 	for (let i = 0; i < numOrders; i++) {
 		const mockOrder: MockTransportOrder = {
+			name: 'item' + i.toString(),
+			price: Math.random() * 1000,
 			from: {
 				latitude: Math.random() * 90,
 				longitude: Math.random() * 180
