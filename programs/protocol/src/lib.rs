@@ -22,7 +22,11 @@ pub mod protocol {
         actions::register_shipper::handler(ctx)
     }
 
-    pub fn create_shipment(ctx: Context<CreateShipment>, shipment: Shipment) -> Result<()> {
-        actions::create_shipment::handler(ctx, shipment)
+    pub fn create_shipment(
+        ctx: Context<CreateShipment>,
+        price: u64,
+        shipment: ShipmentData,
+    ) -> Result<()> {
+        actions::create_shipment::handler(ctx, price, shipment)
     }
 }

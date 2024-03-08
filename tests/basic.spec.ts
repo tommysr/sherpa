@@ -73,15 +73,17 @@ describe('protocol', () => {
       program.programId
     )
 
+    const shipmentPrice = new BN(4200).mul(ONE_SOL)
     const shipmentData = {
-      price: new BN(4200).mul(ONE_SOL),
-      from: {
-        latitude: 0,
-        longitude: 0
-      },
-      to: {
-        latitude: 0,
-        longitude: 0
+      geography: {
+        from: {
+          latitude: 0,
+          longitude: 0
+        },
+        to: {
+          latitude: 0,
+          longitude: 0
+        }
       },
       dimensions: {
         weight: 0,
@@ -91,16 +93,17 @@ describe('protocol', () => {
       },
       when: new BN(0),
       deadline: new BN(0),
-      shipmentDetails: {
+      details: {
+        count: 0,
         priority: 0,
         fragility: 0,
         access: 0,
-        reserved: [0, 0, 0, 0, 0]
+        reserved: [0, 0, 0]
       }
     }
 
     await program.methods
-      .createShipment(shipmentData)
+      .createShipment(shipmentPrice, shipmentData)
       .accounts({
         shipment: shipmentAddress,
         shipper: shipperAddress,
@@ -112,13 +115,14 @@ describe('protocol', () => {
 
     const shipmentAccount = await program.account.shipment.fetch(shipmentAddress)
 
-    expect(shipmentAccount.price.eq(shipmentData.price)).true
-    expect(shipmentAccount.from).to.deep.equal(shipmentData.from)
-    expect(shipmentAccount.to).to.deep.equal(shipmentData.to)
-    expect(shipmentAccount.dimensions).to.deep.equal(shipmentData.dimensions)
-    expect(shipmentAccount.when.eq(shipmentData.when)).true
-    expect(shipmentAccount.deadline.eq(shipmentData.deadline)).true
-    expect(shipmentAccount.shipmentDetails).to.deep.equal(shipmentData.shipmentDetails)
+    expect(shipmentAccount.shipper.equals(shipper.publicKey)).true
+    expect(shipmentAccount.price.eq(shipmentPrice)).true
+    expect(shipmentAccount.no).eq(0)
+    expect(shipmentAccount.shipment.geography).to.deep.equal(shipmentData.geography)
+    expect(shipmentAccount.shipment.details).to.deep.equal(shipmentData.details)
+    expect(shipmentAccount.shipment.dimensions).to.deep.equal(shipmentData.dimensions)
+    expect(shipmentAccount.shipment.when.eq(shipmentData.when)).true
+    expect(shipmentAccount.shipment.deadline.eq(shipmentData.deadline)).true
   })
 
   it('create second shipment', async () => {
@@ -133,15 +137,17 @@ describe('protocol', () => {
       program.programId
     )
 
+    const shipmentPrice = new BN(2100).mul(ONE_SOL)
     const shipmentData = {
-      price: new BN(2100).mul(ONE_SOL),
-      from: {
-        latitude: 1,
-        longitude: 1
-      },
-      to: {
-        latitude: 1,
-        longitude: 1
+      geography: {
+        from: {
+          latitude: 1,
+          longitude: 1
+        },
+        to: {
+          latitude: 1,
+          longitude: 1
+        }
       },
       dimensions: {
         weight: 1,
@@ -149,18 +155,19 @@ describe('protocol', () => {
         depth: 1,
         height: 1
       },
-      when: new BN(1),
-      deadline: new BN(1),
-      shipmentDetails: {
+      details: {
+        count: 1,
         priority: 1,
         fragility: 1,
         access: 1,
-        reserved: [1, 1, 1, 1, 1]
-      }
+        reserved: [1, 1, 1]
+      },
+      when: new BN(1),
+      deadline: new BN(1)
     }
 
     await program.methods
-      .createShipment(shipmentData)
+      .createShipment(shipmentPrice, shipmentData)
       .accounts({
         shipment: shipmentAddress,
         shipper: shipperAddress,
@@ -171,21 +178,13 @@ describe('protocol', () => {
       .rpc()
 
     const shipmentAccount = await program.account.shipment.fetch(shipmentAddress)
-    expect(shipmentAccount.price.eq(shipmentData.price)).true
-    expect(shipmentAccount.from).to.deep.equal(shipmentData.from)
-    expect(shipmentAccount.to).to.deep.equal(shipmentData.to)
-    expect(shipmentAccount.dimensions).to.deep.equal(shipmentData.dimensions)
-    expect(shipmentAccount.when.eq(shipmentData.when)).true
-    expect(shipmentAccount.deadline.eq(shipmentData.deadline)).true
-    expect(shipmentAccount.shipmentDetails).to.deep.equal(shipmentData.shipmentDetails)
-
-    const firstShipmentAccount = await program.account.shipment.fetch(shipmentAddress)
-    expect(firstShipmentAccount.price.eq(shipmentData.price)).true
-    expect(firstShipmentAccount.from).to.deep.equal(shipmentData.from)
-    expect(firstShipmentAccount.to).to.deep.equal(shipmentData.to)
-    expect(firstShipmentAccount.dimensions).to.deep.equal(shipmentData.dimensions)
-    expect(firstShipmentAccount.when.eq(shipmentData.when)).true
-    expect(firstShipmentAccount.deadline.eq(firstShipmentAccount.deadline)).true
-    expect(firstShipmentAccount.shipmentDetails).to.deep.equal(shipmentData.shipmentDetails)
+    expect(shipmentAccount.shipper.equals(shipper.publicKey)).true
+    expect(shipmentAccount.price.eq(shipmentPrice)).true
+    expect(shipmentAccount.no).eq(1)
+    expect(shipmentAccount.shipment.geography).to.deep.equal(shipmentData.geography)
+    expect(shipmentAccount.shipment.details).to.deep.equal(shipmentData.details)
+    expect(shipmentAccount.shipment.dimensions).to.deep.equal(shipmentData.dimensions)
+    expect(shipmentAccount.shipment.when.eq(shipmentData.when)).true
+    expect(shipmentAccount.shipment.deadline.eq(shipmentData.deadline)).true
   })
 })
