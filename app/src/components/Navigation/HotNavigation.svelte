@@ -1,6 +1,8 @@
 <script lang="ts">
 	import { page } from '$app/stores';
 
+	export let searchValue: string = '';
+
 	$: ({ url } = $page);
 
 	// TODO: consider how to do it, if it should be final component or reusable one
@@ -28,7 +30,16 @@
 			</ul>
 		</nav>
 	</div>
-	<div><input type="search" name="search" placeholder="Search" aria-label="Search" /></div>
+	<div>
+		<input
+			type="search"
+			name="search"
+			placeholder="Search"
+			aria-label="Search"
+			bind:value={searchValue}
+			on:keydown
+		/>
+	</div>
 </div>
 
 <style lang="scss">

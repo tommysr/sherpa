@@ -5,10 +5,24 @@
 	import ScrollableMenu from '$src/components/Navigation/ScrollableMenu.svelte';
 	import CategoryButton from '$src/components/Navigation/CategoryButton.svelte';
 	import HotNavigation from '$src/components/Navigation/HotNavigation.svelte';
+	import type { PageData } from './$types';
+	import { createSearchStore, type SearchItem } from '$stores/search';
+	import { getContext, hasContext, onDestroy, setContext } from 'svelte';
 
-	/** @type {import('./$types').PageData} */
-	export let data: any;
+	type SearchableOrder = MockTransportOrder & SearchItem;
+
+	export let data: PageData;
+
+	let searchValue: string = '';
 	$: orders = data.orders as MockTransportOrder[];
+
+	const searchableOrders: SearchableOrder[] = data.orders.map((order: MockTransportOrder) => {
+		return { ...order, searchParams: order.details.priority.toString() };
+	});
+
+	// TODO: consider placing in context to avoid creating orders, when we
+	// shouldn't
+	const searchStore = createSearchStore(searchableOrders);
 
 	// TODO: make it dynamic?
 	const categories: string[] = [
@@ -47,6 +61,12 @@
 	// 		return 'high';
 	// 	}
 	// }
+
+	function handleSearchKeydown(e: KeyboardEvent) {
+		if ($searchStore.searchString && e.key == 'Enter') {
+			searchStore.performSearch();
+		}
+	}
 </script>
 
 <svelte:head><title>Orders</title></svelte:head>
@@ -60,46 +80,92 @@
 		{/each}
 	</ScrollableMenu>
 
-	<HotNavigation />
+	<HotNavigation bind:searchValue={$searchStore.searchString} on:keydown={handleSearchKeydown} />
 
 	<div class="grid">
 		<div>
-			{#each orders as order}
-				<div class="card">
-					<article>
-						<header>Name of the thing to transport</header>
-						<div class="grid">
-							<div>
-								<img alt="img" src={image} />
+			{#if $searchStore.searchString == ''}
+				{#each $searchStore.data as order}
+					<div class="card">
+						<article>
+							<header>Name of the thing to transport</header>
+							<div class="grid">
+								<div>
+									<img alt="img" src={image} />
+								</div>
+								<div>
+									Volume: {order.dimensions.volume.toFixed(2)}
+									Weight: {order.dimensions.weight.toFixed(2)}
+									Fragile: {order.details.fragility.toFixed(0)}
+								</div>
+								<div>Location: Krakow</div>
 							</div>
-							<div>
-								Volume: {order.dimensions.volume.toFixed(2)}
-								Weight: {order.dimensions.weight.toFixed(2)}
-								Fragile: {order.details.fragility.toFixed(0)}
-							</div>
-							<div>Location: Krakow</div>
-						</div>
-					</article>
-					<article>
-						<details>
-							<summary>Precise location</summary>
-							<ul>
-								<li>Source: {Object.values(order.from)}</li>
-								<li>Destination: {Object.values(order.to)}</li>
-							</ul>
-						</details>
-						<details>
-							<summary>Other informations</summary>
-							<ul>
-								<li>Source: {Object.values(order.from)}</li>
-								<li>Destination: {Object.values(order.to)}</li>
-							</ul>
-						</details>
+						</article>
+						<article>
+							<details>
+								<summary>Precise location</summary>
+								<ul>
+									<li>Source: {Object.values(order.from)}</li>
+									<li>Destination: {Object.values(order.to)}</li>
+								</ul>
+							</details>
+							<details>
+								<summary>Other informations</summary>
+								<ul>
+									<li>Source: {Object.values(order.from)}</li>
+									<li>Destination: {Object.values(order.to)}</li>
+								</ul>
+							</details>
 
-						<footer>Date of shipment: {new Date(order.when).toDateString()}</footer>
-					</article>
-				</div>
-			{/each}
+							<footer>
+								Date of shipment: {new Date(order.when).toDateString()}
+								{order.details.priority}
+							</footer>
+						</article>
+					</div>
+				{/each}
+			{:else if $searchStore.filtered.length == 0 && $searchStore.searchString}
+				<p>No orders found</p>
+			{:else}
+				{#each $searchStore.filtered as order}
+					<div class="card">
+						<article>
+							<header>Name of the thing to transport</header>
+							<div class="grid">
+								<div>
+									<img alt="img" src={image} />
+								</div>
+								<div>
+									Volume: {order.dimensions.volume.toFixed(2)}
+									Weight: {order.dimensions.weight.toFixed(2)}
+									Fragile: {order.details.fragility.toFixed(0)}
+								</div>
+								<div>Location: Krakow</div>
+							</div>
+						</article>
+						<article>
+							<details>
+								<summary>Precise location</summary>
+								<ul>
+									<li>Source: {Object.values(order.from)}</li>
+									<li>Destination: {Object.values(order.to)}</li>
+								</ul>
+							</details>
+							<details>
+								<summary>Other informations</summary>
+								<ul>
+									<li>Source: {Object.values(order.from)}</li>
+									<li>Destination: {Object.values(order.to)}</li>
+								</ul>
+							</details>
+
+							<footer>
+								Date of shipment: {new Date(order.when).toDateString()}
+								{order.details.priority}
+							</footer>
+						</article>
+					</div>{/each}
+			{/if}
 		</div>
 		<!-- Map should be fixed or floating, and on mobile in some access menu from the right side, to allow quick preview -->
 		<div><ShipmentMap /></div>
