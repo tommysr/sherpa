@@ -4,18 +4,16 @@
 
 <svelte:head>
 	<title>Home</title>
-	<meta name="description" content="Svelte demo app" />
+	<meta name="description" content="Trans hub" />
 </svelte:head>
 
-<section class="container">
+<main class="container">
 	<div>
 		<p>Trans hub</p>
-
-		demo app
 	</div>
 	<div>
 		<p>
 			Powered by Solana <img src={image} alt="Solana" />
 		</p>
 	</div>
-</section>
+</main>

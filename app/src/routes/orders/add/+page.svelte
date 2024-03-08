@@ -2,7 +2,6 @@
 	import ShipmentMap from '$components/ShipmentMap/ShipmentMap.svelte';
 	import type { MockTransportOrder } from '$src/utils/types/mockTransport';
 	import Geolocation from 'svelte-geolocation';
-	import type { GeolocationCoords } from 'svelte-geolocation/types/Geolocation.svelte';
 
 	const START_POSITION: [number, number] = [15, 50];
 	const OFFSET_START_POSITION: [number, number] = [START_POSITION[0] + 1, START_POSITION[1] + 1];
@@ -11,7 +10,6 @@
 	let shipmentDestinationCoord: [number, number] = OFFSET_START_POSITION;
 
 	function handleBrowserPosition(e: any) {
-		console.log(e.detail);
 		const coords = e.detail.coords;
 		shipmentSourceCoord = [coords.longitude, coords.latitude];
 	}
@@ -156,7 +154,7 @@
 				<button type="submit">Create</button>
 			</form>
 		</div>
-		<div id="map">
+		<div>
 			<Geolocation getPosition watch on:position={handleBrowserPosition} />
 			<ShipmentMap
 				bind:sourceLocation={shipmentSourceCoord}

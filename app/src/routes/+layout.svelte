@@ -10,7 +10,6 @@
 	import { PhantomWalletAdapter } from '@solana/wallet-adapter-wallets';
 
 	//wallet components
-	import WalletMultiButton from '$src/components/Wallet/WalletMultiButton.svelte';
 	import AnchorConnectionProvider from '$src/components/Wallet/AnchorConnectionProvider.svelte';
 	import ConnectionProvider from '$src/components/Wallet/ConnectionProvider.svelte';
 	import WalletProvider from '$src/components/Wallet/WalletProvider.svelte';

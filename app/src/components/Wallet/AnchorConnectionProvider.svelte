@@ -40,4 +40,4 @@
 	$: $walletStore && $walletStore.publicKey && defineProgramAndProvider($walletStore);
 </script>
 
-<slot /> -->
+<slot />
