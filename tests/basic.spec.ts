@@ -3,7 +3,7 @@ import { BN, Program } from '@coral-xyz/anchor'
 import { Protocol } from '../target/types/protocol'
 import { Keypair, PublicKey, SystemProgram } from '@solana/web3.js'
 import { ONE_SOL, awaitedAirdrop, awaitedAirdrops, prefunded } from './utils'
-import { SHIPPER_SEED, STATE_SEED, TRANSPORT_SEED } from './sdk'
+import { SHIPPER_SEED, STATE_SEED, TRANSPORT_SEED, getShipperAddress, getStateAddress } from './sdk'
 import { expect } from 'chai'
 
 describe('protocol', () => {
@@ -17,15 +17,8 @@ describe('protocol', () => {
   const shipper = Keypair.generate()
 
   // account addresses
-  const [stateAddress, stateBump] = PublicKey.findProgramAddressSync(
-    [Buffer.from(anchor.utils.bytes.utf8.encode(STATE_SEED))],
-    program.programId
-  )
-
-  const [shipperAddress, shipperBump] = PublicKey.findProgramAddressSync(
-    [Buffer.from(anchor.utils.bytes.utf8.encode(SHIPPER_SEED)), shipper.publicKey.toBuffer()],
-    program.programId
-  )
+  const stateAddress = getStateAddress(program)
+  const shipperAddress = getShipperAddress(program, shipper.publicKey)
 
   before(async () => {
     await awaitedAirdrops(program.provider.connection, [admin.publicKey, shipper.publicKey], 1e9)
