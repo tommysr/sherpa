@@ -28,7 +28,7 @@
 	});
 </script>
 
-<!-- <AnchorConnectionProvider {network} /> -->
+<AnchorConnectionProvider {network} />
 <ConnectionProvider {network} />
 <WalletProvider {localStorageKey} {wallets} autoConnect />
 <Navbar />
