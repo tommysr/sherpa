@@ -22,3 +22,27 @@ export const getShipperAddress = (program: Program<Protocol>, shipper: PublicKey
   )
   return shipperAddress
 }
+
+export const getShipmentAddress = (
+  program: Program<Protocol>,
+  shipper: PublicKey,
+  index: number
+) => {
+  const indexBuffer = Buffer.alloc(4)
+  indexBuffer.writeInt32LE(index)
+
+  const [shipmentAddress, shipmentBump] = PublicKey.findProgramAddressSync(
+    [Buffer.from(anchor.utils.bytes.utf8.encode(TRANSPORT_SEED)), shipper.toBuffer(), indexBuffer],
+    program.programId
+  )
+
+  return shipmentAddress
+}
+
+export const getShipmentAddresses = (
+  program: Program<Protocol>,
+  shipper: PublicKey,
+  count: number
+) => {
+  return Array.from({ length: count }, (_, i) => getShipmentAddress(program, shipper, i))
+}

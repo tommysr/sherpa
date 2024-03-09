@@ -1,9 +1,15 @@
-import { AnchorProvider, Program, Wallet } from '@coral-xyz/anchor'
+import { AnchorProvider, BN, Program, Wallet } from '@coral-xyz/anchor'
 import { Protocol } from '../target/types/protocol'
 import * as anchor from '@coral-xyz/anchor'
 import { Connection, PublicKey, clusterApiUrl } from '@solana/web3.js'
-import { SHIPPER_SEED, TRANSPORT_SEED, getStateAddress } from '../tests/sdk'
-import { ONE_SOL, awaitedAirdrops } from '../tests/utils'
+import {
+  SHIPPER_SEED,
+  TRANSPORT_SEED,
+  getShipmentAddress,
+  getShipperAddress,
+  getStateAddress
+} from '../tests/sdk'
+import { ONE_SOL } from '../tests/utils'
 import { crateFromSchoolToAirport } from './mocks/shipments'
 import { ANDREW } from './mocks/shippers'
 
@@ -19,7 +25,8 @@ const run = async () => {
 
   // State
   const stateAddress = await getStateAddress(program)
-  const stateExists = (await program.account.state.fetch(stateAddress)) !== undefined
+  let stateExists = (await program.account.state.fetchNullable(stateAddress)) !== null
+
   if (!stateExists) {
     console.log('Creating state account')
     await program.methods.initializeState().accounts({ state: stateAddress }).rpc()
@@ -30,48 +37,40 @@ const run = async () => {
 
   // Shipper
   const shipper = ANDREW
+  const shipperAddress = getShipperAddress(program, shipper.publicKey)
 
-  await awaitedAirdrops(program.provider.connection, [shipper.publicKey], 1e9)
-  const [shipperAddress, shipperBump] = PublicKey.findProgramAddressSync(
-    [Buffer.from(anchor.utils.bytes.utf8.encode(SHIPPER_SEED)), shipper.publicKey.toBuffer()],
-    program.programId
-  )
-
-  await program.methods
-    .registerShipper()
-    .accounts({
-      shipper: shipperAddress,
-      signer: shipper.publicKey
-    })
-    .signers([shipper])
-    .rpc()
+  const shipperExists = (await program.account.shipper.fetchNullable(shipperAddress)) !== null
+  if (!shipperExists) {
+    console.log('Creating shipper account')
+    await program.methods
+      .registerShipper()
+      .accounts({
+        shipper: shipperAddress,
+        signer: shipper.publicKey
+      })
+      .signers([shipper])
+      .rpc()
+  }
 
   const shipperAccount = await program.account.shipper.fetch(shipperAddress)
   console.log('Shipper', shipper.publicKey.toBase58(), shipperAccount)
 
   // Shipment
-  const indexBuffer = Buffer.alloc(4)
-  indexBuffer.writeInt32LE(0)
-  const [shipmentAddress, shipmentBump] = PublicKey.findProgramAddressSync(
-    [
-      Buffer.from(anchor.utils.bytes.utf8.encode(TRANSPORT_SEED)),
-      shipper.publicKey.toBuffer(),
-      indexBuffer
-    ],
-    program.programId
-  )
+  const shipmentAddress = getShipmentAddress(program, shipper.publicKey, 0)
+  const shipmentExists = (await program.account.shipment.fetchNullable(shipmentAddress)) !== null
 
-  const shipmentPrice = new anchor.BN(5).mul(ONE_SOL)
-
-  await program.methods
-    .createShipment(shipmentPrice, crateFromSchoolToAirport)
-    .accounts({
-      shipment: shipmentAddress,
-      shipper: shipperAddress,
-      signer: shipper.publicKey
-    })
-    .signers([shipper])
-    .rpc()
+  if (!shipmentExists) {
+    const shipmentPrice = new BN(5).mul(ONE_SOL)
+    await program.methods
+      .createShipment(shipmentPrice, crateFromSchoolToAirport)
+      .accounts({
+        shipment: shipmentAddress,
+        shipper: shipperAddress,
+        signer: shipper.publicKey
+      })
+      .signers([shipper])
+      .rpc()
+  }
 
   const shipmentAccount = await program.account.shipment.fetch(shipmentAddress)
   console.log('Shipment', shipmentAddress.toBase58(), shipmentAccount)
