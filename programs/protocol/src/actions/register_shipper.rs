@@ -5,7 +5,7 @@ use crate::Shipper;
 #[derive(Accounts)]
 pub struct RegisterShipper<'info> {
     #[account(init,
-        seeds = [b"shipper", signer.to_account_info().key.as_ref()], bump,
+        seeds = [b"shipper", signer.key.as_ref()], bump,
         payer = signer, 
         space = 8 + std::mem::size_of::<Shipper>()
     )]

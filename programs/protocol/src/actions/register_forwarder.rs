@@ -5,7 +5,7 @@ use crate::Forwarder;
 #[derive(Accounts)]
 pub struct RegisterForwarder<'info> {
     #[account(init,
-        seeds = [b"forwarder", signer.to_account_info().key.as_ref()], bump,
+        seeds = [b"forwarder", signer.key.as_ref()], bump,
         payer = signer, 
         space = 8 + std::mem::size_of::<Forwarder>()
     )]
