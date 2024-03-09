@@ -22,11 +22,19 @@ pub mod protocol {
         actions::register_shipper::handler(ctx)
     }
 
+    pub fn register_forwarder(ctx: Context<RegisterForwarder>) -> Result<()> {
+        actions::register_forwarder::handler(ctx)
+    }
+
     pub fn create_shipment(
         ctx: Context<CreateShipment>,
         price: u64,
         shipment: ShipmentData,
     ) -> Result<()> {
         actions::create_shipment::handler(ctx, price, shipment)
+    }
+
+    pub fn buy_shipment(ctx: Context<BuyShipment>) -> Result<()> {
+        actions::buy_shipment::handler(ctx)
     }
 }

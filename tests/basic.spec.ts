@@ -3,7 +3,13 @@ import { BN, Program } from '@coral-xyz/anchor'
 import { Protocol } from '../target/types/protocol'
 import { Keypair, PublicKey, SystemProgram } from '@solana/web3.js'
 import { ONE_SOL, awaitedAirdrops } from './utils'
-import { TRANSPORT_SEED, getShipperAddress, getStateAddress } from '../sdk/sdk'
+import {
+  SHIPMENT_SEED,
+  getForwarderAddress,
+  getShipmentAddress,
+  getShipperAddress,
+  getStateAddress
+} from '../sdk/sdk'
 import { expect } from 'chai'
 
 describe('protocol', () => {
@@ -15,13 +21,19 @@ describe('protocol', () => {
   // keypairs
   const admin = Keypair.generate()
   const shipper = Keypair.generate()
+  const forwarder = Keypair.generate()
 
   // account addresses
   const stateAddress = getStateAddress(program)
   const shipperAddress = getShipperAddress(program, shipper.publicKey)
+  const forwarderAddress = getForwarderAddress(program, forwarder.publicKey)
 
   before(async () => {
-    await awaitedAirdrops(program.provider.connection, [admin.publicKey, shipper.publicKey], 1e9)
+    await awaitedAirdrops(
+      program.provider.connection,
+      [admin.publicKey, shipper.publicKey, forwarder.publicKey],
+      1e9
+    )
   })
 
   it('init state', async () => {
@@ -51,21 +63,12 @@ describe('protocol', () => {
       .rpc()
 
     const shipperAccount = await program.account.shipper.fetch(shipperAddress)
-    expect(shipperAccount).not.undefined
+    expect(shipperAccount.authority.equals(shipper.publicKey)).true
+    expect(shipperAccount.count).eq(0)
   })
 
   it('create shipment', async () => {
-    const indexBuffer = Buffer.alloc(4)
-    indexBuffer.writeInt32LE(0)
-    const [shipmentAddress, shipmentBump] = PublicKey.findProgramAddressSync(
-      [
-        Buffer.from(anchor.utils.bytes.utf8.encode(TRANSPORT_SEED)),
-        shipper.publicKey.toBuffer(),
-        indexBuffer
-      ],
-      program.programId
-    )
-
+    const shipmentAddress = getShipmentAddress(program, shipper.publicKey, 0)
     const shipmentPrice = new BN(4200).mul(ONE_SOL)
     const shipmentData = {
       geography: {
@@ -109,6 +112,7 @@ describe('protocol', () => {
     const shipmentAccount = await program.account.shipment.fetch(shipmentAddress)
 
     expect(shipmentAccount.shipper.equals(shipper.publicKey)).true
+    expect(shipmentAccount.owner.equals(shipper.publicKey)).true
     expect(shipmentAccount.price.eq(shipmentPrice)).true
     expect(shipmentAccount.no).eq(0)
     expect(shipmentAccount.shipment.geography).to.deep.equal(shipmentData.geography)
@@ -116,20 +120,14 @@ describe('protocol', () => {
     expect(shipmentAccount.shipment.dimensions).to.deep.equal(shipmentData.dimensions)
     expect(shipmentAccount.shipment.when.eq(shipmentData.when)).true
     expect(shipmentAccount.shipment.deadline.eq(shipmentData.deadline)).true
+
+    const shipperAccount = await program.account.shipper.fetch(shipperAddress)
+    expect(shipperAccount.authority.equals(shipper.publicKey)).true
+    expect(shipperAccount.count).eq(1)
   })
 
   it('create second shipment', async () => {
-    const indexBuffer = Buffer.alloc(4)
-    indexBuffer.writeInt32LE(1)
-    const [shipmentAddress, shipmentBump] = PublicKey.findProgramAddressSync(
-      [
-        Buffer.from(anchor.utils.bytes.utf8.encode(TRANSPORT_SEED)),
-        shipper.publicKey.toBuffer(),
-        indexBuffer
-      ],
-      program.programId
-    )
-
+    const shipmentAddress = getShipmentAddress(program, shipper.publicKey, 1)
     const shipmentPrice = new BN(2100).mul(ONE_SOL)
     const shipmentData = {
       geography: {
@@ -172,6 +170,7 @@ describe('protocol', () => {
 
     const shipmentAccount = await program.account.shipment.fetch(shipmentAddress)
     expect(shipmentAccount.shipper.equals(shipper.publicKey)).true
+    expect(shipmentAccount.owner.equals(shipper.publicKey)).true
     expect(shipmentAccount.price.eq(shipmentPrice)).true
     expect(shipmentAccount.no).eq(1)
     expect(shipmentAccount.shipment.geography).to.deep.equal(shipmentData.geography)
@@ -179,5 +178,42 @@ describe('protocol', () => {
     expect(shipmentAccount.shipment.dimensions).to.deep.equal(shipmentData.dimensions)
     expect(shipmentAccount.shipment.when.eq(shipmentData.when)).true
     expect(shipmentAccount.shipment.deadline.eq(shipmentData.deadline)).true
+
+    const shipperAccount = await program.account.shipper.fetch(shipperAddress)
+    expect(shipperAccount.authority.equals(shipper.publicKey)).true
+    expect(shipperAccount.count).eq(2)
+  })
+
+  it('register forwarder', async () => {
+    await program.methods
+      .registerForwarder()
+      .accounts({
+        forwarder: forwarderAddress,
+        signer: forwarder.publicKey,
+        systemProgram: SystemProgram.programId
+      })
+      .signers([forwarder])
+      .rpc()
+
+    const forwarderAccount = await program.account.forwarder.fetch(forwarderAddress)
+    expect(forwarderAccount.authority.equals(forwarder.publicKey)).true
+  })
+
+  it('buy shipment', async () => {
+    const shipmentAddress = getShipmentAddress(program, shipper.publicKey, 0)
+    await program.methods
+      .buyShipment()
+      .accounts({
+        shipment: shipmentAddress,
+        shipper: shipperAddress,
+        forwarder: forwarderAddress,
+        signer: forwarder.publicKey,
+        systemProgram: SystemProgram.programId
+      })
+      .signers([forwarder])
+      .rpc()
+
+    const shipmentAccount = await program.account.shipment.fetch(shipmentAddress)
+    expect(shipmentAccount.owner.equals(forwarder.publicKey)).true
   })
 })

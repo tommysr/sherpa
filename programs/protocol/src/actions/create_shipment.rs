@@ -25,6 +25,7 @@ pub fn handler(ctx: Context<CreateShipment>, price: u64, shipment: ShipmentData)
     let account = &mut ctx.accounts.shipment.load_init()?;
     
     **account = Shipment {
+        owner: *ctx.accounts.signer.key,
         shipper: *ctx.accounts.signer.key,
         price,
         no: shipper.count,
