@@ -2,20 +2,11 @@
 // single deploy script that's invoked from the CLI, injecting a provider
 // configured from the workspace's Anchor.toml.
 
-import { AnchorProvider, Program, Provider, Wallet } from '@coral-xyz/anchor'
+import { AnchorProvider, Program, Wallet } from '@coral-xyz/anchor'
 import { Protocol } from '../target/types/protocol'
 import * as anchor from '@coral-xyz/anchor'
-import { Connection, Keypair, PublicKey } from '@solana/web3.js'
-import {
-  SHIPPER_SEED,
-  STATE_SEED,
-  TRANSPORT_SEED,
-  getShipmentAddresses,
-  getShipperAddress,
-  getStateAddress
-} from '../tests/sdk'
-import { awaitedAirdrops } from '../tests/utils'
-import { crateFromSchoolToAirport } from './mocks/shipments'
+import { Connection } from '@solana/web3.js'
+import { getShipmentAddresses, getShipperAddress, getStateAddress } from '../sdk/sdk'
 import { ANDREW } from './mocks/shippers'
 
 const connection = new Connection('https://api.devnet.solana.com', { commitment: 'confirmed' })

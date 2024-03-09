@@ -1,14 +1,8 @@
 import { AnchorProvider, BN, Program, Wallet } from '@coral-xyz/anchor'
 import { Protocol } from '../target/types/protocol'
 import * as anchor from '@coral-xyz/anchor'
-import { Connection, PublicKey, clusterApiUrl } from '@solana/web3.js'
-import {
-  SHIPPER_SEED,
-  TRANSPORT_SEED,
-  getShipmentAddress,
-  getShipperAddress,
-  getStateAddress
-} from '../tests/sdk'
+import { Connection, clusterApiUrl } from '@solana/web3.js'
+import { getShipmentAddress, getShipperAddress, getStateAddress } from '../sdk/sdk'
 import { ONE_SOL } from '../tests/utils'
 import { crateFromSchoolToAirport } from './mocks/shipments'
 import { ANDREW } from './mocks/shippers'

@@ -2,8 +2,8 @@ import * as anchor from '@coral-xyz/anchor'
 import { BN, Program } from '@coral-xyz/anchor'
 import { Protocol } from '../target/types/protocol'
 import { Keypair, PublicKey, SystemProgram } from '@solana/web3.js'
-import { ONE_SOL, awaitedAirdrop, awaitedAirdrops, prefunded } from './utils'
-import { SHIPPER_SEED, STATE_SEED, TRANSPORT_SEED, getShipperAddress, getStateAddress } from './sdk'
+import { ONE_SOL, awaitedAirdrops } from './utils'
+import { TRANSPORT_SEED, getShipperAddress, getStateAddress } from '../sdk/sdk'
 import { expect } from 'chai'
 
 describe('protocol', () => {
