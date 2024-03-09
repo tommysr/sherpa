@@ -1,6 +1,6 @@
 use anchor_lang::prelude::*;
 
-use crate::{Error, Shipper, Shipment};
+use crate::{Error, Shipment, ShipmentData, Shipper};
 
 #[derive(Accounts)]
 pub struct CreateShipment<'info> {
@@ -20,11 +20,18 @@ pub struct CreateShipment<'info> {
     pub system_program: Program<'info, System>,
 }
 
-pub fn handler(ctx: Context<CreateShipment>, shipment: Shipment) -> Result<()> {
+pub fn handler(ctx: Context<CreateShipment>, price: u64, shipment: ShipmentData) -> Result<()> {
     let shipper = &mut ctx.accounts.shipper.load_mut()?;
     let account = &mut ctx.accounts.shipment.load_init()?;
-
-    **account = shipment;
+    
+    **account = Shipment {
+        shipper: *ctx.accounts.signer.key,
+        price,
+        no: shipper.count,
+        reserved: [0; 4],
+        shipment,
+    };
+    
     shipper.count += 1;
 
     Ok(())

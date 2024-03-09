@@ -27,5 +27,5 @@
   },
   "include": [
     "tests/**/*"
-  ]
+, "sdk/sdk.ts"  ]
 }
