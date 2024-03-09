@@ -6,6 +6,7 @@ import type { Protocol } from '../target/types/protocol'
 export const STATE_SEED = 'state'
 export const SHIPPER_SEED = 'shipper'
 export const FORWARDER_SEED = 'forwarder'
+export const CARRIER_SEED = 'carrier'
 export const SHIPMENT_SEED = 'shipment'
 
 export const getStateAddress = (program: Program<Protocol>) => {
@@ -30,6 +31,14 @@ export const getForwarderAddress = (program: Program<Protocol>, forwarder: Publi
     program.programId
   )
   return forwarderAddress
+}
+
+export const getCarrierAddress = (program: Program<Protocol>, carrier: PublicKey) => {
+  const [carrierAddress, shipperBump] = PublicKey.findProgramAddressSync(
+    [Buffer.from(anchor.utils.bytes.utf8.encode(CARRIER_SEED)), carrier.toBuffer()],
+    program.programId
+  )
+  return carrierAddress
 }
 
 export const getShipmentAddress = (

@@ -26,6 +26,13 @@ pub mod protocol {
         actions::register_forwarder::handler(ctx)
     }
 
+    pub fn register_carrier(
+        ctx: Context<RegisterCarrier>,
+        availability: Option<Availability>,
+    ) -> Result<()> {
+        actions::register_carrier::handler(ctx, availability)
+    }
+
     pub fn create_shipment(
         ctx: Context<CreateShipment>,
         price: u64,

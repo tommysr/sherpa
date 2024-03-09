@@ -1,10 +1,10 @@
 import * as anchor from '@coral-xyz/anchor'
 import { BN, Program } from '@coral-xyz/anchor'
 import { Protocol } from '../target/types/protocol'
-import { Keypair, PublicKey, SystemProgram } from '@solana/web3.js'
+import { Keypair, SystemProgram } from '@solana/web3.js'
 import { ONE_SOL, awaitedAirdrops } from './utils'
 import {
-  SHIPMENT_SEED,
+  getCarrierAddress,
   getForwarderAddress,
   getShipmentAddress,
   getShipperAddress,
@@ -22,16 +22,18 @@ describe('protocol', () => {
   const admin = Keypair.generate()
   const shipper = Keypair.generate()
   const forwarder = Keypair.generate()
+  const carrier = Keypair.generate()
 
   // account addresses
   const stateAddress = getStateAddress(program)
   const shipperAddress = getShipperAddress(program, shipper.publicKey)
   const forwarderAddress = getForwarderAddress(program, forwarder.publicKey)
+  const carrierAddress = getCarrierAddress(program, carrier.publicKey)
 
   before(async () => {
     await awaitedAirdrops(
       program.provider.connection,
-      [admin.publicKey, shipper.publicKey, forwarder.publicKey],
+      [admin.publicKey, shipper.publicKey, forwarder.publicKey, carrier.publicKey],
       1e9
     )
   })
@@ -215,5 +217,30 @@ describe('protocol', () => {
 
     const shipmentAccount = await program.account.shipment.fetch(shipmentAddress)
     expect(shipmentAccount.owner.equals(forwarder.publicKey)).true
+  })
+
+  it('register carrier', async () => {
+    const availability = {
+      time: new BN(Date.now()),
+      location: {
+        latitude: 43,
+        longitude: 44
+      }
+    }
+
+    await program.methods
+      .registerCarrier(availability)
+      .accounts({
+        carrier: carrierAddress,
+        signer: carrier.publicKey,
+        systemProgram: SystemProgram.programId
+      })
+      .signers([carrier])
+      .rpc()
+
+    const carrierAccount = await program.account.carrier.fetch(carrierAddress)
+    expect(carrierAccount.authority.equals(carrier.publicKey)).true
+    expect(carrierAccount.availability.time.eq(availability.time)).true
+    expect(carrierAccount.availability.location).to.deep.equal(availability.location)
   })
 })
