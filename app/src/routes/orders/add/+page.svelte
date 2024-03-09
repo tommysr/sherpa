@@ -1,36 +1,140 @@
 <script lang="ts">
 	import ShipmentMap from '$components/ShipmentMap/ShipmentMap.svelte';
+	import {
+		getShipmentAddress,
+		getShipperAddress,
+		getStateAddressWithBump
+	} from '$src/lib/addresses';
+	import { anchorStore } from '$src/stores/anchor';
+	import { walletStore } from '$src/stores/wallet';
+	import { web3Store } from '$src/stores/web3';
 	import type { MockTransportOrder } from '$src/utils/types/mockTransport';
+	import { useSignAndSendTransaction } from '$src/utils/wallet/singAndSendTx';
+	import { Transaction, type PublicKey } from '@solana/web3.js';
+	import { BN } from 'bn.js';
 	import Geolocation from 'svelte-geolocation';
+	import { get } from 'svelte/store';
 
 	const START_POSITION: [number, number] = [15, 50];
 	const OFFSET_START_POSITION: [number, number] = [START_POSITION[0] + 1, START_POSITION[1] + 1];
 
 	let shipmentSourceCoord: [number, number] = START_POSITION;
 	let shipmentDestinationCoord: [number, number] = OFFSET_START_POSITION;
+	let price: number = 0.01;
+	let when: Date = new Date();
+	let deadline: Date = new Date();
 
 	function handleBrowserPosition(e: any) {
 		const coords = e.detail.coords;
 		shipmentSourceCoord = [coords.longitude, coords.latitude];
 	}
 
-	let shipmentOrder: MockTransportOrder;
+	async function registerShipper(shipper: PublicKey) {
+		const { program } = get(anchorStore);
+		const { connection } = get(web3Store);
+		const wallet = get(walletStore);
+
+		const registerShipperIx = await program.methods
+			.registerShipper()
+			.accounts({
+				shipper,
+				signer: wallet.publicKey!
+			})
+			.instruction();
+		const tx = new Transaction().add(registerShipperIx);
+
+		await useSignAndSendTransaction(connection, wallet, tx);
+	}
+
+	function validateOrderForm() {
+		console.log(price, when, deadline);
+
+		if (price <= 0) {
+			throw new Error('Price must be greater than 0');
+		}
+		if (when < new Date()) {
+			throw new Error('When must be in the future');
+		}
+		if (deadline < when) {
+			throw new Error('Deadline must be after when');
+		}
+	}
+
+	async function addOrder() {
+		const { program } = get(anchorStore);
+		const { connection } = get(web3Store);
+		const wallet = get(walletStore);
+		const [stateAddress, _] = getStateAddressWithBump(program);
+
+		// DEV
+		let stateExists = (await program.account.state.fetchNullable(stateAddress)) !== null;
+
+		if (!stateExists) {
+			throw new Error('State not initialized');
+		}
+		// END DEV
+
+		const shipper = getShipperAddress(program, wallet.publicKey!);
+		const shipperAccount = await program.account.shipper.fetchNullable(shipper);
+
+		if (!shipperAccount) {
+			await registerShipper(shipper);
+		}
+
+		const shipment = getShipmentAddress(program, shipper, shipperAccount?.count || 0);
+
+		const createShipmentIx = await program.methods
+			.createShipment(new BN(price * 10 ** 6), {
+				deadline: new BN(deadline.valueOf()),
+				// 0 for now, will be updated later
+				details: {
+					priority: 0,
+					access: 0,
+					count: 0,
+					fragility: 0,
+					reserved: [0, 0, 0, 0, 0]
+				},
+				// same as above, would be nice to implement logic used in protocol
+				// to avoid getting all the values from the user
+				dimensions: { depth: 0, height: 0, weight: 0, width: 0 },
+				// TODO: array is awful, should be an object
+				geography: {
+					from: { latitude: shipmentSourceCoord[0], longitude: shipmentSourceCoord[1] },
+					to: { latitude: shipmentDestinationCoord[0], longitude: shipmentDestinationCoord[1] }
+				},
+				when: new BN(when.valueOf())
+			})
+			.accounts({
+				shipper,
+				shipment,
+				signer: wallet.publicKey!
+			})
+			.instruction();
+
+		const tx = new Transaction().add(createShipmentIx);
+		await useSignAndSendTransaction(connection, wallet, tx);
+	}
+
+	async function handleOrderAdd(event: { currentTarget: EventTarget & HTMLFormElement }) {
+		validateOrderForm();
+		await addOrder();
+	}
 </script>
 
 <main class="container">
 	<div class="grid" id="maingrid">
 		<div id="order">
-			<form>
+			<form method="post" on:submit|preventDefault={handleOrderAdd}>
 				<label for="amount">Ship payment in SOL</label>
 				<input
 					id="amount"
 					name="amount"
 					type="number"
 					min="0.001"
-					value="0.01"
 					step="0.001"
 					placeholder="0.01"
 					required
+					bind:value={price}
 				/>
 				<table>
 					<tbody>
@@ -54,7 +158,7 @@
 							</td>
 						</tr>
 
-						<tr>
+						<!-- <tr>
 							<td>Weight</td>
 							<td>
 								<div class="grid">
@@ -76,7 +180,7 @@
 									</select>
 								</div>
 							</td></tr
-						>
+						> -->
 						<tr>
 							<td>Date</td><td>
 								<input
@@ -84,10 +188,22 @@
 									name="datetime-local"
 									aria-label="Datetime local"
 									required
+									bind:value={when}
 								/></td
 							>
 						</tr>
-						<tr
+						<tr>
+							<td>Deadline</td><td>
+								<input
+									type="datetime-local"
+									name="datetime-deadline"
+									aria-label="Datetime local"
+									required
+									bind:value={deadline}
+								/></td
+							>
+						</tr>
+						<!-- <tr
 							><td colspan="2">
 								<label for="priority">Priority</label>
 								<input
@@ -132,10 +248,10 @@
 									</label>
 								</fieldset></td
 							>
-						</tr>
+						</tr> -->
 					</tbody>
 					<tfoot>
-						<tr>
+						<!-- <tr>
 							<td colspan="2">
 								<fieldset>
 									<legend>Shipment preferences:</legend>
@@ -147,7 +263,7 @@
 									<label for="signature">Signature Required</label>
 								</fieldset></td
 							>
-						</tr>
+						</tr> -->
 					</tfoot>
 				</table>
 
