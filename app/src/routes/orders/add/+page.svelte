@@ -92,7 +92,7 @@
 					access: 0,
 					count: 0,
 					fragility: 0,
-					reserved: [0, 0, 0, 0, 0]
+					reserved: [0, 0, 0]
 				},
 				// same as above, would be nice to implement logic used in protocol
 				// to avoid getting all the values from the user

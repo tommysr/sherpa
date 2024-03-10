@@ -1,15 +1,13 @@
 import { anchorStore } from '$src/stores/anchor';
-import type { MockTransportOrder } from '$src/utils/types/mockTransport';
 import { error, json } from '@sveltejs/kit';
-import { generateMockTransportOrders } from './mockUtils';
 import { get } from 'svelte/store';
+import type { ShipmentAccount } from '$src/utils/idl/shipment';
+import { decodeIdlAccount } from '@coral-xyz/anchor/dist/cjs/idl';
 
 export async function GET() {
 	const { program } = get(anchorStore);
 
-	let shipments = await program.account.shipment.all();
-
-	console.log(shipments);
+	let shipments: ShipmentAccount[] = await program.account.shipment.all();
 
 	if (!shipments) {
 		// status 500 for now, because we want to retry or cache orders

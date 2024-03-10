@@ -1,10 +1,10 @@
 <script lang="ts">
-	import type { Coordinates } from '$src/utils/types/mockTransport';
+	import type { GeoLocation } from '$src/utils/idl/shipment';
 	import Card from './Card.svelte';
 
 	export let name: string;
-	export let from: Coordinates;
-	export let to: Coordinates;
+	export let from: GeoLocation;
+	export let to: GeoLocation;
 	export let date: Date;
 </script>
 
@@ -24,7 +24,7 @@
 			</ul>
 		</details>
 		<details>
-			<summary>Other informations</summary>
+			<summary>Other information</summary>
 			<ul>
 				<li>Source: {Object.values(from)}</li>
 				<li>Destination: {Object.values(to)}</li>
