@@ -1,20 +1,17 @@
 <script lang="ts">
-	import { createEventDispatcher } from 'svelte';
 	import {
 		DefaultMarker,
 		MapLibre,
-		Marker,
 		Popup,
 		type LngLatBoundsLike,
 		DeckGlLayer
 	} from 'svelte-maplibre';
 
-	import type { MockTransportOrder } from '$utils/types/mockTransport';
-
 	import { ArcLayer } from '@deck.gl/layers/typed';
+	import type { Geography } from '$src/utils/idl/shipment';
 
-	export let shipments: MockTransportOrder[];
-	let hovered: MockTransportOrder;
+	export let locations: Geography[];
+	let hovered: Geography;
 
 	// TODO: render based by current map borders?
 	let bounds: LngLatBoundsLike;
@@ -29,14 +26,14 @@
 	center={[19, 50]}
 	bind:bounds
 >
-	{#each shipments as shipment}
-		<DefaultMarker lngLat={[shipment.from.longitude, shipment.from.latitude]}>
+	{#each locations as location}
+		<DefaultMarker lngLat={[location.from.longitude, location.from.latitude]}>
 			<Popup offset={[0, -10]}>
 				<div class="text-lg font-bold">Package source</div>
 			</Popup>
 		</DefaultMarker>
 
-		<DefaultMarker lngLat={[shipment.to.longitude, shipment.to.latitude]}>
+		<DefaultMarker lngLat={[location.to.longitude, location.to.latitude]}>
 			<Popup offset={[0, -10]}>
 				<div class="text-lg font-bold">Package source</div>
 			</Popup>
@@ -44,7 +41,7 @@
 
 		<DeckGlLayer
 			type={ArcLayer}
-			data={shipments}
+			data={locations}
 			bind:hovered
 			getSourcePosition={(d) => [d.from.longitude, d.from.latitude]}
 			getTargetPosition={(d) => [d.to.longitude, d.to.latitude]}

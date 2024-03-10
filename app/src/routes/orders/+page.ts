@@ -1,6 +1,4 @@
 import type { ShipmentAccount } from '$src/utils/idl/shipment';
-import type { MockTransportOrder } from '$src/utils/types/mockTransport';
-import type { ProgramAccount } from '@coral-xyz/anchor';
 import { error } from '@sveltejs/kit';
 
 /** @type {import('./$types').PageLoad } */

@@ -1,5 +1,4 @@
 <script lang="ts">
-	import type { MockTransportOrder } from '$src/utils/types/mockTransport';
 	import ScrollableMenu from '$src/components/Navigation/ScrollableMenu.svelte';
 	import CategoryButton from '$src/components/Navigation/CategoryButton.svelte';
 	import HotNavigation from '$src/components/Navigation/HotNavigation.svelte';
@@ -8,7 +7,6 @@
 	import OrderCard from '$src/components/Shipment/OrderCard.svelte';
 	import ShipmentsMap from '$src/components/ShipmentMap/ShipmentsMap.svelte';
 	import type { ShipmentAccount } from '$src/utils/idl/shipment';
-	import ShipmentMap from '$src/components/ShipmentMap/ShipmentMap.svelte';
 
 	type SearchableOrder = ShipmentAccount & SearchItem;
 	export let data: PageData;
@@ -20,6 +18,8 @@
 	// TODO: consider placing in context to avoid creating order stores, when we
 	// shouldn't
 	const searchStore = createSearchStore(searchableOrders);
+
+	$: locationsOnMap = $searchStore.data.map((s) => s.account.shipment.geography);
 
 	// TODO: make it dynamic?
 	const categories: string[] = [
@@ -83,7 +83,7 @@
 		</div>
 		<!-- Map should be fixed or floating, and on mobile in some access menu from the right side, to allow quick preview -->
 		<!-- need to rework it to include filtering -->
-		<!-- <div><ShipmentsMap shipments={$searchStore.data} /></div> -->
+		<div><ShipmentsMap locations={locationsOnMap} /></div>
 	</div>
 </main>
 

@@ -52,12 +52,12 @@
 		if (price <= 0) {
 			throw new Error('Price must be greater than 0');
 		}
-		if (when < new Date()) {
-			throw new Error('When must be in the future');
-		}
-		if (deadline < when) {
-			throw new Error('Deadline must be after when');
-		}
+		// if (when < new Date()) {
+		// 	throw new Error('When must be in the future');
+		// }
+		// if (deadline < when) {
+		// 	throw new Error('Deadline must be after when');
+		// }
 	}
 
 	async function addOrder() {
@@ -85,14 +85,14 @@
 
 		const createShipmentIx = await program.methods
 			.createShipment(new BN(price * 10 ** 6), {
-				deadline: new BN(deadline.valueOf()),
+				deadline: new BN(0),
 				// 0 for now, will be updated later
 				details: {
 					priority: 0,
 					access: 0,
 					count: 0,
 					fragility: 0,
-					reserved: [0, 0, 0]
+					reserved: [0, 0, 0, 0]
 				},
 				// same as above, would be nice to implement logic used in protocol
 				// to avoid getting all the values from the user
@@ -102,7 +102,7 @@
 					from: { latitude: shipmentSourceCoord[0], longitude: shipmentSourceCoord[1] },
 					to: { latitude: shipmentDestinationCoord[0], longitude: shipmentDestinationCoord[1] }
 				},
-				when: new BN(when.valueOf())
+				when: new BN(0)
 			})
 			.accounts({
 				shipper,
@@ -112,7 +112,8 @@
 			.instruction();
 
 		const tx = new Transaction().add(createShipmentIx);
-		await useSignAndSendTransaction(connection, wallet, tx);
+		const sig = await useSignAndSendTransaction(connection, wallet, tx);
+		console.log(sig);
 	}
 
 	async function handleOrderAdd(event: { currentTarget: EventTarget & HTMLFormElement }) {
@@ -121,6 +122,7 @@
 	}
 </script>
 
+<!-- A lot of is commented out to test anchor handling on little data -->
 <main class="container">
 	<div class="grid" id="maingrid">
 		<div id="order">
@@ -181,7 +183,7 @@
 								</div>
 							</td></tr
 						> -->
-						<tr>
+						<!-- <tr>
 							<td>Date</td><td>
 								<input
 									type="datetime-local"
@@ -202,7 +204,7 @@
 									bind:value={deadline}
 								/></td
 							>
-						</tr>
+						</tr> -->
 						<!-- <tr
 							><td colspan="2">
 								<label for="priority">Priority</label>
