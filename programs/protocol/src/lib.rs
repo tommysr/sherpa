@@ -8,7 +8,7 @@ use errors::Error;
 
 use anchor_lang::prelude::*;
 
-declare_id!("82VDeeUheGof2qZ7gM8sTCFLB3xoqFexF7uxet7Cv9N3");
+declare_id!("2N6nkQuZw64wmLgg3Vj4PMUi6Vv9QLyZc7oVZH5a9aZ1");
 
 #[program]
 pub mod protocol {
