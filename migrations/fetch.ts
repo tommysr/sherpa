@@ -5,9 +5,14 @@
 import { AnchorProvider, Program, Wallet } from '@coral-xyz/anchor'
 import { Protocol } from '../target/types/protocol'
 import * as anchor from '@coral-xyz/anchor'
-import { Connection } from '@solana/web3.js'
-import { getShipmentAddresses, getShipperAddress, getStateAddress } from '../sdk/sdk'
-import { ANDREW } from './mocks/shippers'
+import { Connection, Keypair } from '@solana/web3.js'
+import {
+  getCarrierAddress,
+  getShipmentAddresses,
+  getShipperAddress,
+  getStateAddress
+} from '../sdk/sdk'
+import { ANDREW, JACOB, ROBERT, ZDZICH } from './mocks/shippers'
 
 const connection = new Connection('https://api.devnet.solana.com', { commitment: 'confirmed' })
 const wallet = Wallet.local()
@@ -19,6 +24,8 @@ const program = anchor.workspace.Protocol as Program<Protocol>
 const stateAddress = getStateAddress(program)
 
 const run = async () => {
+  // console.log(Buffer.from(Keypair.generate().secretKey).toString('base64'))
+
   console.log('Running for', program.programId.toBase58())
   console.log('Running as ', provider.wallet.publicKey.toBase58())
 
@@ -39,6 +46,23 @@ const run = async () => {
     'Andrew shipments',
     shipmentAddresses.map((address, i) => [address.toBase58(), shipmentAccounts[i]])
   )
+
+  // Available Carrier
+  const carrierAddress = getCarrierAddress(program, ROBERT.publicKey)
+  const carrierAccount = await program.account.carrier.fetchNullable(carrierAddress)
+  console.log('Robert carrier', carrierAddress.toBase58())
+
+  // Unavailable Carrier
+  const unavailableCarrierAddress = getCarrierAddress(program, ZDZICH.publicKey)
+  const unavailableCarrierAccount = await program.account.carrier.fetchNullable(
+    unavailableCarrierAddress
+  )
+  console.log('Zdzich carrier', unavailableCarrierAddress.toBase58(), unavailableCarrierAccount)
+
+  // Forwarder
+  const forwarderAddress = getCarrierAddress(program, JACOB.publicKey)
+  const forwarderAccount = await program.account.forwarder.fetchNullable(forwarderAddress)
+  console.log('Jacob forwarder', forwarderAddress.toBase58(), forwarderAccount)
 }
 
 run()
