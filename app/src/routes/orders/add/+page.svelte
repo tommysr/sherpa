@@ -7,15 +7,14 @@
 	} from '$src/lib/addresses';
 	import { anchorStore } from '$src/stores/anchor';
 	import { walletStore } from '$src/stores/wallet';
+	import { formStore } from '$stores/orderForm';
 	import { web3Store } from '$src/stores/web3';
 	import { useSignAndSendTransaction } from '$src/utils/wallet/singAndSendTx';
 	import { Transaction, type PublicKey } from '@solana/web3.js';
 	import { BN } from 'bn.js';
 	import { get } from 'svelte/store';
-
-	let price: number = 0.01;
-	let when: Date = new Date();
-	let deadline: Date = new Date();
+	import PricePick from '$src/components/ShipmentForm/PricePick.svelte';
+	import DatePick from '$src/components/ShipmentForm/DatePick.svelte';
 
 	async function registerShipper(shipper: PublicKey) {
 		const { program } = get(anchorStore);
@@ -35,11 +34,10 @@
 	}
 
 	function validateOrderForm() {
-		console.log(price, when, deadline);
-
-		if (price <= 0) {
-			throw new Error('Price must be greater than 0');
-		}
+		// console.log(price, when, deadline);
+		// if (price <= 0) {
+		// 	throw new Error('Price must be greater than 0');
+		// }
 		// if (when < new Date()) {
 		// 	throw new Error('When must be in the future');
 		// }
@@ -72,7 +70,7 @@
 		const shipment = getShipmentAddress(program, wallet.publicKey!, shipperAccount?.count || 0);
 
 		const createShipmentIx = await program.methods
-			.createShipment(new BN(price * 10 ** 6), {
+			.createShipment(new BN(0 * 10 ** 6), {
 				deadline: new BN(0),
 				// 0 for now, will be updated later
 				details: {
@@ -112,24 +110,18 @@
 
 <!-- A lot of is commented out to test anchor handling on little data -->
 <main class="container">
-	<div class="grid" id="maingrid">
-		<div id="order">
-			<form method="post" on:submit|preventDefault={handleOrderAdd}>
-				<label for="amount">Ship payment in SOL</label>
-				<input
-					id="amount"
-					name="amount"
-					type="number"
-					min="0.001"
-					step="0.001"
-					placeholder="0.01"
-					required
-					bind:value={price}
-				/>
+	<div class="form-box">
+		<form method="post" on:submit|preventDefault={handleOrderAdd}>
+			<PricePick bind:price={$formStore.price} />
+			<DatePick name="when" date={$formStore.when} />
+			<DatePick name="deadline" date={$formStore.deadline} />
 
-				<LocationPick />
+			<LocationPick
+				bind:shipmentSourceCoords={$formStore.location.from}
+				bind:shipmentDestinationCoords={$formStore.location.to}
+			/>
 
-				<!-- <tr>
+			<!-- <tr>
 							<td>Weight</td>
 							<td>
 								<div class="grid">
@@ -152,7 +144,7 @@
 								</div>
 							</td></tr
 						> -->
-				<!-- <tr>
+			<!-- <tr>
 							<td>Date</td><td>
 								<input
 									type="datetime-local"
@@ -174,7 +166,7 @@
 								/></td
 							>
 						</tr> -->
-				<!-- <tr
+			<!-- <tr
 							><td colspan="2">
 								<label for="priority">Priority</label>
 								<input
@@ -220,7 +212,7 @@
 								</fieldset></td
 							>
 						</tr> -->
-				<!-- //</tbody>
+			<!-- //</tbody>
 			<tfoot>
 						<!-- <tr>
 							<td colspan="2">
@@ -235,17 +227,31 @@
 								</fieldset></td
 							>
 						</tr> -->
-				<!-- </tfoot>
+			<!-- </tfoot>
 				</table> -->
 
-				<button type="submit">Create</button>
-			</form>
-		</div>
+			<div class="flex justify-end">
+				{#if $formStore.state == 'add'}
+					<button type="submit">Create</button>
+				{:else}
+					<button>Enter {$formStore.state}</button>
+				{/if}
+			</div>
+		</form>
 	</div>
 </main>
 
 <style lang="scss">
-	#maingrid {
-		margin-top: 50px;
+	.form-box {
+		margin-top: 20px;
+	}
+
+	.flex {
+		display: flex;
+		padding-right: 20px;
+	}
+
+	.justify-end {
+		justify-content: flex-end;
 	}
 </style>

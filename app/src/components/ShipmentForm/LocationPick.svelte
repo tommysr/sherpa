@@ -2,12 +2,12 @@
 	import ShipmentMap from '../ShipmentMap/ShipmentMap.svelte';
 	import { LngLat } from 'maplibre-gl';
 
-	let shipmentSourceCoords: LngLat = new LngLat(15, 50);
-	let shipmentDestinationCoords: LngLat = new LngLat(15, 50);
+	export let shipmentSourceCoords: LngLat = new LngLat(15, 50);
+	export let shipmentDestinationCoords: LngLat = new LngLat(15, 50);
 </script>
 
-<div>
-	<div>
+<div class="location-box">
+	<div class="info-box">
 		<table>
 			<tbody>
 				<tr>
@@ -32,10 +32,20 @@
 			</tbody>
 		</table>
 	</div>
-	<div>
+	<div class="map-box">
 		<ShipmentMap
 			bind:sourceLocation={shipmentSourceCoords}
 			bind:destinationLocation={shipmentDestinationCoords}
 		/>
 	</div>
 </div>
+
+<style lang="scss">
+	.location-box {
+		margin-bottom: 20px;
+	}
+
+	.map-box {
+		padding: 20px;
+	}
+</style>
