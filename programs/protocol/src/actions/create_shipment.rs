@@ -5,13 +5,13 @@ use crate::{Error, Shipment, ShipmentData, Shipper};
 #[derive(Accounts)]
 pub struct CreateShipment<'info> {
     #[account(init,
-        seeds = [b"shipment", signer.to_account_info().key.as_ref(), &shipper.load().unwrap().count.to_le_bytes()], bump,
+        seeds = [b"shipment", signer.key.as_ref(), &shipper.load().unwrap().count.to_le_bytes()], bump,
         payer = signer, 
         space = 8 + std::mem::size_of::<Shipment>()
     )]
     pub shipment: AccountLoader<'info, Shipment>,
     #[account(mut, 
-        seeds = [b"shipper", signer.to_account_info().key.as_ref()], bump,
+        seeds = [b"shipper", signer.key.as_ref()], bump,
         constraint = shipper.load().unwrap().authority == *signer.key @ Error::SignerNotAnAuthority
     )]
     pub shipper: AccountLoader<'info, Shipper>,
@@ -25,6 +25,7 @@ pub fn handler(ctx: Context<CreateShipment>, price: u64, shipment: ShipmentData)
     let account = &mut ctx.accounts.shipment.load_init()?;
     
     **account = Shipment {
+        owner: *ctx.accounts.signer.key,
         shipper: *ctx.accounts.signer.key,
         price,
         no: shipper.count,
