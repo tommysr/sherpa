@@ -1,4 +1,8 @@
 <script lang="ts">
+	// CONSIDER: this scss file import some picocss stylesheets and
+	// pico overrides the default styles of some components like button, input, etc.
+	// so, it's ruining the default styles of components like Map
+
 	// sass
 	import '$src/sass/main.scss';
 
@@ -19,6 +23,7 @@
 	import { clusterApiUrl } from '@solana/web3.js';
 
 	let wallets: Adapter[];
+	// it's a solana devnet cluster, but consider changing it to more performant provider
 	const network = clusterApiUrl('devnet');
 	const localStorageKey = 'walletAdapter';
 
@@ -31,5 +36,4 @@
 <ConnectionProvider {network} />
 <WalletProvider {localStorageKey} {wallets} autoConnect />
 <Navbar />
-
 <slot />

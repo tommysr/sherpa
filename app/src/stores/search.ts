@@ -20,7 +20,7 @@ const filterByString = <T extends SearchItem>(s: SearchStoreInt<T>) => {
 };
 
 const purgeFiltered = <T>(s: SearchStoreInt<T>) => {
-	s.filtered = [];
+	s.filtered = s.data;
 	s.searchState = 'none';
 	return s;
 };

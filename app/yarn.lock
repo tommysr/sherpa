@@ -5471,7 +5471,7 @@ magic-string@^0.30.4, magic-string@^0.30.5:
   dependencies:
     "@jridgewell/sourcemap-codec" "^1.4.15"
 
-maplibre-gl@^4.0.0:
+maplibre-gl@^4.0.0, maplibre-gl@^4.1.0:
   version "4.1.0"
   resolved "https://registry.yarnpkg.com/maplibre-gl/-/maplibre-gl-4.1.0.tgz#b2c7f438bafa7d029c6b5a0a5f5dfc6770cffc44"
   integrity sha512-4RQFJSroo/JAJml6Rj2FFIZOfnjsqPp0O9kSp8aVXQUY0HGXNupltzPKbBZeucqi7ynRQHFeu+onTM3hY0Makw==
@@ -7045,11 +7045,6 @@ svelte-check@^3.6.0:
     espree "^9.0.0"
     postcss "^8.4.29"
     postcss-scss "^4.0.8"
-
-svelte-geolocation@^0.3.0:
-  version "0.3.0"
-  resolved "https://registry.yarnpkg.com/svelte-geolocation/-/svelte-geolocation-0.3.0.tgz#560f404565c8b489a2ecd087a60c1ae930532390"
-  integrity sha512-6SV3vENzyWSiLRLT2uVgl7ZHxU1XY0Uy4dSKHLg3iedagjIoL+u/BJylxuQY2i5ZdJl9gg+09B3oKfUrknExJQ==
 
 svelte-hmr@^0.15.3:
   version "0.15.3"

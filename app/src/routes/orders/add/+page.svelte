@@ -1,5 +1,5 @@
 <script lang="ts">
-	import ShipmentMap from '$components/ShipmentMap/ShipmentMap.svelte';
+	import LocationPick from '$src/components/ShipmentForm/LocationPick.svelte';
 	import {
 		getShipmentAddress,
 		getShipperAddress,
@@ -8,26 +8,14 @@
 	import { anchorStore } from '$src/stores/anchor';
 	import { walletStore } from '$src/stores/wallet';
 	import { web3Store } from '$src/stores/web3';
-	import type { MockTransportOrder } from '$src/utils/types/mockTransport';
 	import { useSignAndSendTransaction } from '$src/utils/wallet/singAndSendTx';
 	import { Transaction, type PublicKey } from '@solana/web3.js';
 	import { BN } from 'bn.js';
-	import Geolocation from 'svelte-geolocation';
 	import { get } from 'svelte/store';
 
-	const START_POSITION: [number, number] = [15, 50];
-	const OFFSET_START_POSITION: [number, number] = [START_POSITION[0] + 1, START_POSITION[1] + 1];
-
-	let shipmentSourceCoord: [number, number] = START_POSITION;
-	let shipmentDestinationCoord: [number, number] = OFFSET_START_POSITION;
 	let price: number = 0.01;
 	let when: Date = new Date();
 	let deadline: Date = new Date();
-
-	function handleBrowserPosition(e: any) {
-		const coords = e.detail.coords;
-		shipmentSourceCoord = [coords.longitude, coords.latitude];
-	}
 
 	async function registerShipper(shipper: PublicKey) {
 		const { program } = get(anchorStore);
@@ -81,7 +69,7 @@
 			await registerShipper(shipper);
 		}
 
-		const shipment = getShipmentAddress(program, shipper, shipperAccount?.count || 0);
+		const shipment = getShipmentAddress(program, wallet.publicKey!, shipperAccount?.count || 0);
 
 		const createShipmentIx = await program.methods
 			.createShipment(new BN(price * 10 ** 6), {
@@ -99,8 +87,8 @@
 				dimensions: { depth: 0, height: 0, weight: 0, width: 0 },
 				// TODO: array is awful, should be an object
 				geography: {
-					from: { latitude: shipmentSourceCoord[0], longitude: shipmentSourceCoord[1] },
-					to: { latitude: shipmentDestinationCoord[0], longitude: shipmentDestinationCoord[1] }
+					from: { latitude: 0, longitude: 0 },
+					to: { latitude: 0, longitude: 0 }
 				},
 				when: new BN(0)
 			})
@@ -138,29 +126,10 @@
 					required
 					bind:value={price}
 				/>
-				<table>
-					<tbody>
-						<tr>
-							<td>Source Location </td>
-							<td>
-								<div data-type="amount">
-									<span>Longitude: {shipmentSourceCoord[0].toFixed(4)}</span>
-									<span>Latitude: {shipmentSourceCoord[1].toFixed(4)}</span>
-								</div>
-							</td>
-						</tr>
 
-						<tr>
-							<td>Destination Location</td>
-							<td>
-								<div data-type="amount">
-									<span>Longitude: {shipmentDestinationCoord[0].toFixed(4)}</span>
-									<span> Latitude: {shipmentDestinationCoord[1].toFixed(4)}</span>
-								</div>
-							</td>
-						</tr>
+				<LocationPick />
 
-						<!-- <tr>
+				<!-- <tr>
 							<td>Weight</td>
 							<td>
 								<div class="grid">
@@ -183,7 +152,7 @@
 								</div>
 							</td></tr
 						> -->
-						<!-- <tr>
+				<!-- <tr>
 							<td>Date</td><td>
 								<input
 									type="datetime-local"
@@ -205,7 +174,7 @@
 								/></td
 							>
 						</tr> -->
-						<!-- <tr
+				<!-- <tr
 							><td colspan="2">
 								<label for="priority">Priority</label>
 								<input
@@ -251,8 +220,8 @@
 								</fieldset></td
 							>
 						</tr> -->
-					</tbody>
-					<tfoot>
+				<!-- //</tbody>
+			<tfoot>
 						<!-- <tr>
 							<td colspan="2">
 								<fieldset>
@@ -266,18 +235,11 @@
 								</fieldset></td
 							>
 						</tr> -->
-					</tfoot>
-				</table>
+				<!-- </tfoot>
+				</table> -->
 
 				<button type="submit">Create</button>
 			</form>
-		</div>
-		<div>
-			<Geolocation getPosition watch on:position={handleBrowserPosition} />
-			<ShipmentMap
-				bind:sourceLocation={shipmentSourceCoord}
-				bind:destinationLocation={shipmentDestinationCoord}
-			/>
 		</div>
 	</div>
 </main>
