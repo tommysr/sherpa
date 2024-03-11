@@ -2,10 +2,16 @@ import { AnchorProvider, BN, Program, Wallet } from '@coral-xyz/anchor'
 import { Protocol } from '../target/types/protocol'
 import * as anchor from '@coral-xyz/anchor'
 import { Connection, clusterApiUrl } from '@solana/web3.js'
-import { getShipmentAddress, getShipperAddress, getStateAddress } from '../sdk/sdk'
+import {
+  getCarrierAddress,
+  getForwarderAddress,
+  getShipmentAddress,
+  getShipperAddress,
+  getStateAddress
+} from '../sdk/sdk'
 import { ONE_SOL } from '../tests/utils'
 import { crateFromSchoolToAirport } from './mocks/shipments'
-import { ANDREW } from './mocks/shippers'
+import { ANDREW, JACOB, ROBERT, ZDZICH } from './mocks/shippers'
 
 const connection = new Connection(clusterApiUrl('devnet'), { commitment: 'confirmed' })
 const wallet = Wallet.local()
@@ -68,6 +74,81 @@ const run = async () => {
 
   const shipmentAccount = await program.account.shipment.fetch(shipmentAddress)
   console.log('Shipment', shipmentAddress.toBase58(), shipmentAccount)
+
+  // Available Carrier
+  const carrier = ROBERT
+  const carrierAddress = getCarrierAddress(program, carrier.publicKey)
+
+  const carrierExists = (await program.account.carrier.fetchNullable(carrierAddress)) !== null
+
+  if (!carrierExists) {
+    console.log('Creating carrier account')
+    const availability = {
+      time: new BN(Date.now()),
+      location: {
+        latitude: 43,
+        longitude: 44
+      }
+    }
+    await program.methods
+      .registerCarrier(availability)
+      .accounts({
+        carrier: carrierAddress,
+        signer: carrier.publicKey
+      })
+      .signers([carrier])
+      .rpc()
+  }
+
+  const carrierAccount = await program.account.carrier.fetch(carrierAddress)
+  console.log('Carrier', carrier.publicKey.toBase58(), carrierAccount)
+
+  // Unavailable Carrier
+  const unavailableCarrier = ZDZICH
+  const unavailableCarrierAddress = getCarrierAddress(program, unavailableCarrier.publicKey)
+
+  const unavailableCarrierExists =
+    (await program.account.carrier.fetchNullable(unavailableCarrierAddress)) !== null
+
+  if (!unavailableCarrierExists) {
+    console.log('Creating unavailable carrier account')
+    await program.methods
+      .registerCarrier(null)
+      .accounts({
+        carrier: unavailableCarrierAddress,
+        signer: unavailableCarrier.publicKey
+      })
+      .signers([unavailableCarrier])
+      .rpc()
+  }
+
+  const unavailableCarrierAccount = await program.account.carrier.fetch(unavailableCarrierAddress)
+  console.log(
+    'Unavailable carrier',
+    unavailableCarrier.publicKey.toBase58(),
+    unavailableCarrierAccount
+  )
+
+  // Forwarder
+  const forwarder = JACOB
+  const forwarderAddress = getForwarderAddress(program, forwarder.publicKey)
+
+  const forwarderExists = (await program.account.forwarder.fetchNullable(forwarderAddress)) !== null
+
+  if (!forwarderExists) {
+    console.log('Creating forwarder account')
+    await program.methods
+      .registerForwarder()
+      .accounts({
+        forwarder: forwarderAddress,
+        signer: forwarder.publicKey
+      })
+      .signers([forwarder])
+      .rpc()
+  }
+
+  const forwarderAccount = await program.account.forwarder.fetch(forwarderAddress)
+  console.log('Forwarder', forwarder.publicKey.toBase58(), forwarderAccount)
 }
 
 run()
