@@ -7,6 +7,7 @@
 	export let depth: number | undefined = undefined;
 	export let isMetricTon: boolean = false;
 </script>
+
 <h1>Dimensions</h1>
 <div class="grid marginb">
 	<div class="flex-box">
@@ -26,14 +27,28 @@
 			<label for="lb">lb</label>
 		</fieldset>
 
-		<fieldset>
-			<h4>Distance metrics</h4>
-			<!-- <legend>Distance metrics:</legend> -->
-			<input type="radio" id="cm" name="distance-metrics" bind:group={distanceMetrics} value="cm" />
-			<label for="cm">cm</label>
-			<input type="radio" id="ft" name="distance-metrics" bind:group={distanceMetrics} value="ft" />
-			<label for="ft">ft</label>
-		</fieldset>
+		{#if !isMetricTon}
+			<fieldset>
+				<h4>Distance metrics</h4>
+				<!-- <legend>Distance metrics:</legend> -->
+				<input
+					type="radio"
+					id="cm"
+					name="distance-metrics"
+					bind:group={distanceMetrics}
+					value="cm"
+				/>
+				<label for="cm">cm</label>
+				<input
+					type="radio"
+					id="ft"
+					name="distance-metrics"
+					bind:group={distanceMetrics}
+					value="ft"
+				/>
+				<label for="ft">ft</label>
+			</fieldset>
+		{/if}
 	</div>
 
 	<div class="flex-box">
@@ -44,7 +59,7 @@
 		</div>
 		<!-- TODO: handle input validation, min, max, step and others -->
 
-		{#if isMetricTon}
+		{#if !isMetricTon}
 			<div>
 				<label for="amount">width</label>
 
@@ -76,7 +91,6 @@
 	fieldset {
 		text-align: center;
 	}
-
 
 	h1 {
 		text-align: center;
