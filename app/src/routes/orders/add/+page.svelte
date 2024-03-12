@@ -15,6 +15,8 @@
 	import { get } from 'svelte/store';
 	import PricePick from '$src/components/ShipmentForm/PricePick.svelte';
 	import DatePick from '$src/components/ShipmentForm/DatePick.svelte';
+	import DimensionsPick from '$src/components/ShipmentForm/DimensionsPick.svelte';
+	import Details from '$src/components/ShipmentForm/Details.svelte';
 
 	async function registerShipper(shipper: PublicKey) {
 		const { program } = get(anchorStore);
@@ -106,137 +108,57 @@
 		validateOrderForm();
 		await addOrder();
 	}
+
+	function handleButtonClick(event: Event) {
+		if ($formStore.nextState === 'dimensions') {
+			$formStore.nextState = 'properties';
+		} else if ($formStore.nextState === 'properties') {
+			$formStore.nextState = 'submit';
+		}
+
+		if ($formStore.nextState === 'submit') {
+			// open modal?
+			validateOrderForm();
+		}
+	}
+
+	function handleBackButtonClick(event: Event) {
+		if ($formStore.nextState === 'properties') {
+			$formStore.nextState = 'dimensions';
+		} else if ($formStore.nextState === 'submit') {
+			$formStore.nextState = 'properties';
+		}
+	}
 </script>
 
-<!-- A lot of is commented out to test anchor handling on little data -->
+<!-- CONSIDER: avoid binding to much -->
 <main class="container">
 	<div class="form-box">
+		<button class="s-button" on:click={handleBackButtonClick}>back</button>
 		<form method="post" on:submit|preventDefault={handleOrderAdd}>
-			<PricePick bind:price={$formStore.price} />
-			<DatePick name="when" date={$formStore.when} />
-			<DatePick name="deadline" date={$formStore.deadline} />
+			{#if $formStore.nextState == 'dimensions'}
+				<PricePick bind:price={$formStore.price} />
+				<DatePick name="when" bind:date={$formStore.when} />
+				<DatePick name="deadline" bind:date={$formStore.deadline} />
+				<LocationPick
+					bind:shipmentSourceCoords={$formStore.location.from}
+					bind:shipmentDestinationCoords={$formStore.location.to}
+				/>
+			{:else if $formStore.nextState == 'properties'}
+				<DimensionsPick
+					bind:weightMetrics={$formStore.weightMetrics}
+					bind:distanceMetrics={$formStore.distanceMetrics}
+					bind:weight={$formStore.dimensions.weight}
+					bind:width={$formStore.dimensions.width}
+					bind:height={$formStore.dimensions.height}
+				/>
+			{:else if $formStore.nextState == 'submit'}
+				<Details />
+			{/if}
 
-			<LocationPick
-				bind:shipmentSourceCoords={$formStore.location.from}
-				bind:shipmentDestinationCoords={$formStore.location.to}
-			/>
-
-			<!-- <tr>
-							<td>Weight</td>
-							<td>
-								<div class="grid">
-									<input
-										type="weight"
-										name="weight"
-										placeholder="weight"
-										aria-label="weight"
-										required
-									/>
-									<select
-										name="favorite-cuisine"
-										aria-label="Select your favorite cuisine..."
-										required
-									>
-										<option selected disabled value=""> kg/lb </option>
-										<option>kg</option>
-										<option>lb</option>
-									</select>
-								</div>
-							</td></tr
-						> -->
-			<!-- <tr>
-							<td>Date</td><td>
-								<input
-									type="datetime-local"
-									name="datetime-local"
-									aria-label="Datetime local"
-									required
-									bind:value={when}
-								/></td
-							>
-						</tr>
-						<tr>
-							<td>Deadline</td><td>
-								<input
-									type="datetime-local"
-									name="datetime-deadline"
-									aria-label="Datetime local"
-									required
-									bind:value={deadline}
-								/></td
-							>
-						</tr> -->
-			<!-- <tr
-							><td colspan="2">
-								<label for="priority">Priority</label>
-								<input
-									id="priority"
-									name="priority"
-									list="priorities"
-									type="range"
-									min="1"
-									max="7"
-									step="1"
-									value="3"
-									required
-								/>
-								<datalist id="priorities">
-									<option value="1">Min</option>
-									<option value="2">Low</option>
-									<option value="3">Medium</option>
-									<option value="4">High</option>
-									<option value="5">Max</option>
-								</datalist>
-							</td></tr
-						>
-						<tr>
-							<td>Fragility</td><td
-								><fieldset>
-									<legend>Describe the package:</legend>
-									<label>
-										<input type="radio" name="fragility" checked />
-										Ice Packaging
-									</label>
-									<label>
-										<input type="radio" name="fragility" />
-										Vacuum-Sealed Packaging
-									</label>
-									<label>
-										<input type="radio" name="fragility" />
-										Glass Containers
-									</label>
-									<label>
-										<input type="radio" name="fragility" />
-										Thin Plastic Wrap
-									</label>
-								</fieldset></td
-							>
-						</tr> -->
-			<!-- //</tbody>
-			<tfoot>
-						<!-- <tr>
-							<td colspan="2">
-								<fieldset>
-									<legend>Shipment preferences:</legend>
-									<input type="checkbox" id="international" name="international" />
-									<label for="international">International</label>
-									<input type="checkbox" id="tracked" name="tracked" />
-									<label for="tracked">Tracked shipping</label>
-									<input type="checkbox" id="signature" name="signature" />
-									<label for="signature">Signature Required</label>
-								</fieldset></td
-							>
-						</tr> -->
-			<!-- </tfoot>
-				</table> -->
-
-			<div class="flex justify-end">
-				{#if $formStore.state == 'add'}
-					<button type="submit">Create</button>
-				{:else}
-					<button>Enter {$formStore.state}</button>
-				{/if}
-			</div>
+			<button class="s-button" type="submit" on:click|preventDefault={handleButtonClick}
+				>{$formStore.nextState}</button
+			>
 		</form>
 	</div>
 </main>
@@ -246,12 +168,7 @@
 		margin-top: 20px;
 	}
 
-	.flex {
-		display: flex;
-		padding-right: 20px;
-	}
-
-	.justify-end {
-		justify-content: flex-end;
+	.s-button {
+		margin-top: 20px;
 	}
 </style>
