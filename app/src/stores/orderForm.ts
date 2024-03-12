@@ -1,4 +1,4 @@
-import type { ShipmentDimensions } from '$src/utils/idl/shipment';
+import type { ShipmentDetails, ShipmentDimensions } from '$src/utils/idl/shipment';
 import type { LngLat } from 'maplibre-gl';
 import { writable } from 'svelte/store';
 
@@ -12,6 +12,7 @@ interface FormInterface {
 	when?: Date;
 	deadline?: Date;
 	dimensions: Partial<ShipmentDimensions>;
+	details: Partial<ShipmentDetails>;
 	weightMetrics: string;
 	distanceMetrics: string;
 	isMetricTon: boolean;
@@ -22,6 +23,7 @@ export function createFormStore() {
 		price: 0.01,
 		location: {},
 		dimensions: {},
+		details: {},
 		nextState: 'dimensions',
 		weightMetrics: 'kg',
 		distanceMetrics: 'cm',

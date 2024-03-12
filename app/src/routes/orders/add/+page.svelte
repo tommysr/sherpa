@@ -35,17 +35,26 @@
 		await useSignAndSendTransaction(connection, wallet, tx);
 	}
 
+	// something simple for now, most assertions should be moved
+	// to the component, but for now it's fine
 	function validateOrderForm() {
-		// console.log(price, when, deadline);
-		// if (price <= 0) {
-		// 	throw new Error('Price must be greater than 0');
-		// }
-		// if (when < new Date()) {
-		// 	throw new Error('When must be in the future');
-		// }
-		// if (deadline < when) {
-		// 	throw new Error('Deadline must be after when');
-		// }
+		const orderStore = get(formStore);
+
+		if (orderStore.price! <= 0) {
+			throw new Error('Price must be greater than 0');
+		}
+		if (orderStore.when! < new Date()) {
+			throw new Error('When must be in the future');
+		}
+		if (orderStore.deadline! < orderStore.when!) {
+			throw new Error('Deadline must be after when');
+		}
+
+		if (orderStore.isMetricTon) {
+			orderStore.dimensions.depth = 0;
+			orderStore.dimensions.height = 0;
+			orderStore.dimensions.weight = 0;
+		}
 	}
 
 	async function addOrder() {
@@ -70,27 +79,34 @@
 		}
 
 		const shipment = getShipmentAddress(program, wallet.publicKey!, shipperAccount?.count || 0);
+		const order = get(formStore);
+
+		const { price, when, deadline } = order;
+		const { access, count, fragility, priority } = order.details;
+		const { depth, height, weight, width } = order.dimensions;
+		const { from, to } = order.location;
 
 		const createShipmentIx = await program.methods
-			.createShipment(new BN(0 * 10 ** 6), {
-				deadline: new BN(0),
-				// 0 for now, will be updated later
+			.createShipment(new BN(price! * 10 ** 6), {
+				deadline: new BN(deadline!.valueOf()),
 				details: {
-					priority: 0,
-					access: 0,
-					count: 0,
-					fragility: 0,
+					priority: priority ?? 0,
+					access: access ?? 0,
+					count: count ?? 1,
+					fragility: fragility ?? 0,
 					reserved: [0, 0, 0, 0]
 				},
-				// same as above, would be nice to implement logic used in protocol
-				// to avoid getting all the values from the user
-				dimensions: { depth: 0, height: 0, weight: 0, width: 0 },
-				// TODO: array is awful, should be an object
-				geography: {
-					from: { latitude: 0, longitude: 0 },
-					to: { latitude: 0, longitude: 0 }
+				dimensions: {
+					depth: depth ?? 0,
+					height: height ?? 0,
+					weight: weight ?? 0,
+					width: width ?? 0
 				},
-				when: new BN(0)
+				geography: {
+					from: { latitude: from?.lat!, longitude: from?.lng! },
+					to: { latitude: to?.lat!, longitude: from?.lng! }
+				},
+				when: new BN(when!.valueOf())
 			})
 			.accounts({
 				shipper,
@@ -104,13 +120,8 @@
 		console.log(sig);
 	}
 
-	async function handleOrderAdd(event: { currentTarget: EventTarget & HTMLFormElement }) {
-		validateOrderForm();
-		await addOrder();
-	}
-
 	// Not sure if i can use $ in typescript, but seems it works
-	function handleButtonClick(event: Event) {
+	async function handleButtonClick(event: Event) {
 		if ($formStore.nextState === 'dimensions') {
 			$formStore.nextState = 'properties';
 		} else if ($formStore.nextState === 'properties') {
@@ -120,6 +131,7 @@
 		if ($formStore.nextState === 'submit') {
 			// open modal?
 			validateOrderForm();
+			await addOrder();
 		}
 	}
 
@@ -139,7 +151,7 @@
 			<button class="s-button" on:click={handleBackButtonClick}>back</button>
 		{/if}
 
-		<form method="post" on:submit|preventDefault={handleOrderAdd}>
+		<form method="post" on:submit|preventDefault={handleButtonClick}>
 			{#if $formStore.nextState == 'dimensions'}
 				<PricePick bind:price={$formStore.price} />
 				<table>
@@ -164,9 +176,7 @@
 				<Details />
 			{/if}
 
-			<button class="s-button" type="submit" on:click|preventDefault={handleButtonClick}
-				>{$formStore.nextState}</button
-			>
+			<button class="s-button" type="submit" on:click|preventDefault={handleButtonClick}>{$formStore.nextState}</button>
 		</form>
 	</div>
 </main>
