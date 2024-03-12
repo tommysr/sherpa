@@ -1,8 +1,11 @@
 <script lang="ts">
 	export let count: number = 1;
+	export let fragility: number = 2;
+	export let priority: number = 3;
+	export let access: number = 4;
 </script>
 
-<div class="amount">
+<div class="space">
 	<label for="amount">Count</label>
 	<input
 		id="amount"
@@ -20,15 +23,15 @@
 <input
 	id="priority"
 	name="priority"
-	list="priorities"
+	list="priority"
 	type="range"
 	min="1"
-	max="7"
+	max="5"
 	step="1"
-	value="3"
+	bind:value={priority}
 	required
 />
-<datalist id="priorities">
+<datalist id="datalist5values">
 	<option value="1">Min</option>
 	<option value="2">Low</option>
 	<option value="3">Medium</option>
@@ -38,17 +41,17 @@
 
 <label for="fragility">Fragility</label>
 <input
-	id="priority"
-	name="priority"
-	list="priorities"
+	id="fragility"
+	name="fragility"
+	list="fragilities"
 	type="range"
 	min="1"
-	max="7"
+	max="5"
 	step="1"
-	value="3"
+	bind:value={fragility}
 	required
 />
-<datalist id="priorities">
+<datalist id="datalist5values">
 	<option value="1">Min</option>
 	<option value="2">Low</option>
 	<option value="3">Medium</option>
@@ -56,47 +59,17 @@
 	<option value="5">Max</option>
 </datalist>
 
-<!-- 
-  ><fieldset>
-    <legend>Describe the package:</legend>
-    <label>
-      <input type="radio" name="fragility" checked />
-      Ice Packaging
-    </label>
-    <label>
-      <input type="radio" name="fragility" />
-      Vacuum-Sealed Packaging
-    </label>
-    <label>
-      <input type="radio" name="fragility" />
-      Glass Containers
-    </label>
-    <label>
-      <input type="radio" name="fragility" />
-      Thin Plastic Wrap
-    </label>
-  </fieldset></td
->
-</tr> -->
-<!-- //</tbody>
-<tfoot>
-
-<td colspan="2">
-  <fieldset>
-    <legend>Shipment preferences:</legend>
-    <input type="checkbox" id="international" name="international" />
-    <label for="international">International</label>
-    <input type="checkbox" id="tracked" name="tracked" />
-    <label for="tracked">Tracked shipping</label>
-    <input type="checkbox" id="signature" name="signature" />
-    <label for="signature">Signature Required</label>
-  </fieldset></td
->
-</tr> -->
--->
+<select class="space" name="access"  required bind:value={access}>
+	<option selected disabled value=0> Tell how hard is to access source place </option>
+	<option value=1>Only car</option>
+	<option value=2>Truck up to 10t</option>
+	<option value=3>Truck over 10t</option>
+	<option value=4>Something else</option>
+	<option value=5>Can't tell</option>
+</select>
 
 <style lang="scss">
-	.amount {
+	.space {
 		margin-bottom: 20px;
 		margin-top: 20px;
 	}

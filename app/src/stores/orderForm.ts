@@ -2,6 +2,9 @@ import type { ShipmentDimensions } from '$src/utils/idl/shipment';
 import type { LngLat } from 'maplibre-gl';
 import { writable } from 'svelte/store';
 
+
+// Partial could make something bad in the future if there is no proper 
+// validation of object properties, so maybe provide some default values
 interface FormInterface {
 	price?: number;
 	location: Partial<{ from: LngLat; to: LngLat }>;
@@ -11,6 +14,7 @@ interface FormInterface {
 	dimensions: Partial<ShipmentDimensions>;
 	weightMetrics: string;
 	distanceMetrics: string;
+	isMetricTon: boolean;
 }
 
 export function createFormStore() {
@@ -20,13 +24,15 @@ export function createFormStore() {
 		dimensions: {},
 		nextState: 'dimensions',
 		weightMetrics: 'kg',
-		distanceMetrics: 'cm'
+		distanceMetrics: 'cm',
+		isMetricTon: false
 	});
 
 	return {
 		subscribe,
 		set,
 		update,
+
 		changeNextState: () => {
 			update((s) => {
 				if (s.nextState == 'dimensions') {

@@ -109,6 +109,7 @@
 		await addOrder();
 	}
 
+	// Not sure if i can use $ in typescript, but seems it works
 	function handleButtonClick(event: Event) {
 		if ($formStore.nextState === 'dimensions') {
 			$formStore.nextState = 'properties';
@@ -134,12 +135,17 @@
 <!-- CONSIDER: avoid binding to much -->
 <main class="container">
 	<div class="form-box">
-		<button class="s-button" on:click={handleBackButtonClick}>back</button>
+		{#if $formStore.nextState != 'dimensions'}
+			<button class="s-button" on:click={handleBackButtonClick}>back</button>
+		{/if}
+
 		<form method="post" on:submit|preventDefault={handleOrderAdd}>
 			{#if $formStore.nextState == 'dimensions'}
 				<PricePick bind:price={$formStore.price} />
-				<DatePick name="when" bind:date={$formStore.when} />
-				<DatePick name="deadline" bind:date={$formStore.deadline} />
+				<table>
+					<DatePick name="when" bind:date={$formStore.when} />
+					<DatePick name="deadline" bind:date={$formStore.deadline} />
+				</table>
 				<LocationPick
 					bind:shipmentSourceCoords={$formStore.location.from}
 					bind:shipmentDestinationCoords={$formStore.location.to}
@@ -151,6 +157,8 @@
 					bind:weight={$formStore.dimensions.weight}
 					bind:width={$formStore.dimensions.width}
 					bind:height={$formStore.dimensions.height}
+					bind:depth={$formStore.dimensions.depth}
+					bind:isMetricTon={$formStore.isMetricTon}
 				/>
 			{:else if $formStore.nextState == 'submit'}
 				<Details />

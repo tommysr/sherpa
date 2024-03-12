@@ -3,12 +3,14 @@
 	export let date = new Date();
 </script>
 
-<div class="grid">
-	<h5>
-		{name}
-	</h5>
-	<input type="datetime-local" {name} aria-label="Datetime local" required bind:value={date} />
-</div>
+<tr>
+	<td>
+		<label for={name}>{name}</label>
+	</td>
+	<td>
+		<input type="datetime-local" {name} aria-label="Datetime local" required bind:value={date} />
+	</td>
+</tr>
 
 <style class="scss">
 </style>
