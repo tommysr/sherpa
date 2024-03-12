@@ -8,7 +8,7 @@ use errors::Error;
 
 use anchor_lang::prelude::*;
 
-declare_id!("82VDeeUheGof2qZ7gM8sTCFLB3xoqFexF7uxet7Cv9N3");
+declare_id!("2N6nkQuZw64wmLgg3Vj4PMUi6Vv9QLyZc7oVZH5a9aZ1");
 
 #[program]
 pub mod protocol {
@@ -22,11 +22,26 @@ pub mod protocol {
         actions::register_shipper::handler(ctx)
     }
 
+    pub fn register_forwarder(ctx: Context<RegisterForwarder>) -> Result<()> {
+        actions::register_forwarder::handler(ctx)
+    }
+
+    pub fn register_carrier(
+        ctx: Context<RegisterCarrier>,
+        availability: Option<Availability>,
+    ) -> Result<()> {
+        actions::register_carrier::handler(ctx, availability)
+    }
+
     pub fn create_shipment(
         ctx: Context<CreateShipment>,
         price: u64,
         shipment: ShipmentData,
     ) -> Result<()> {
         actions::create_shipment::handler(ctx, price, shipment)
+    }
+
+    pub fn buy_shipment(ctx: Context<BuyShipment>) -> Result<()> {
+        actions::buy_shipment::handler(ctx)
     }
 }

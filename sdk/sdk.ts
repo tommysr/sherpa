@@ -5,7 +5,9 @@ import type { Protocol } from '../target/types/protocol'
 
 export const STATE_SEED = 'state'
 export const SHIPPER_SEED = 'shipper'
-export const TRANSPORT_SEED = 'shipment'
+export const FORWARDER_SEED = 'forwarder'
+export const CARRIER_SEED = 'carrier'
+export const SHIPMENT_SEED = 'shipment'
 
 export const getStateAddress = (program: Program<Protocol>) => {
   const [stateAddress, stateBump] = PublicKey.findProgramAddressSync(
@@ -23,6 +25,22 @@ export const getShipperAddress = (program: Program<Protocol>, shipper: PublicKey
   return shipperAddress
 }
 
+export const getForwarderAddress = (program: Program<Protocol>, forwarder: PublicKey) => {
+  const [forwarderAddress, shipperBump] = PublicKey.findProgramAddressSync(
+    [Buffer.from(anchor.utils.bytes.utf8.encode(FORWARDER_SEED)), forwarder.toBuffer()],
+    program.programId
+  )
+  return forwarderAddress
+}
+
+export const getCarrierAddress = (program: Program<Protocol>, carrier: PublicKey) => {
+  const [carrierAddress, shipperBump] = PublicKey.findProgramAddressSync(
+    [Buffer.from(anchor.utils.bytes.utf8.encode(CARRIER_SEED)), carrier.toBuffer()],
+    program.programId
+  )
+  return carrierAddress
+}
+
 export const getShipmentAddress = (
   program: Program<Protocol>,
   shipper: PublicKey,
@@ -32,7 +50,7 @@ export const getShipmentAddress = (
   indexBuffer.writeInt32LE(index)
 
   const [shipmentAddress, shipmentBump] = PublicKey.findProgramAddressSync(
-    [Buffer.from(anchor.utils.bytes.utf8.encode(TRANSPORT_SEED)), shipper.toBuffer(), indexBuffer],
+    [Buffer.from(anchor.utils.bytes.utf8.encode(SHIPMENT_SEED)), shipper.toBuffer(), indexBuffer],
     program.programId
   )
 
