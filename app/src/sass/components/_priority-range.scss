@@ -1,0 +1,14 @@
+datalist#datalist5values {
+    display: flex;
+    justify-content: space-between;
+    margin-top: -0.5rem;
+    margin-inline: auto;
+
+    option {
+        display: flex;
+        position: relative;
+        justify-content: center;
+        width: 0;
+        font-size: 0.9em;
+    }
+}
