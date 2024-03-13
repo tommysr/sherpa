@@ -73,8 +73,8 @@
 	<div class="grid">
 		<div>
 			{#if $searchStore.filtered.length != 0}
-				{#each $searchStore.filtered as { account: { shipment } }}
-					<OrderCard name="1" date={new Date(shipment.when.toString())} {...shipment.geography} />
+				{#each $searchStore.filtered as { account } }
+					<OrderCard shipment={account} />
 				{/each}
 			{:else}
 				<p>Nothing found</p>

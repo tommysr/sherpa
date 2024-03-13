@@ -34,7 +34,7 @@ export interface ShipmentData {
 	deadline: BN;
 }
 
-interface Shipment {
+export interface Shipment {
 	owner: PublicKey;
 	shipper: PublicKey;
 	price: BN;

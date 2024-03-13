@@ -2,7 +2,6 @@ import { anchorStore } from '$src/stores/anchor';
 import { error, json } from '@sveltejs/kit';
 import { get } from 'svelte/store';
 import type { ShipmentAccount } from '$src/utils/idl/shipment';
-import { decodeIdlAccount } from '@coral-xyz/anchor/dist/cjs/idl';
 
 export async function GET() {
 	const { program } = get(anchorStore);
@@ -13,8 +12,6 @@ export async function GET() {
 		// status 500 for now, because we want to retry or cache orders
 		throw error(500, 'No shipments found');
 	}
-
-	console.log(shipments[0].account.shipment.geography.from.latitude)
 
 	return json(shipments);
 }
