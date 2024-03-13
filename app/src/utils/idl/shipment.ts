@@ -35,6 +35,7 @@ export interface ShipmentData {
 }
 
 interface Shipment {
+	owner: PublicKey;
 	shipper: PublicKey;
 	price: BN;
 	no: number;

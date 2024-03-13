@@ -45,6 +45,57 @@ export type Protocol = {
       "args": []
     },
     {
+      "name": "registerForwarder",
+      "accounts": [
+        {
+          "name": "forwarder",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "signer",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "registerCarrier",
+      "accounts": [
+        {
+          "name": "carrier",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "signer",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "availability",
+          "type": {
+            "option": {
+              "defined": "Availability"
+            }
+          }
+        }
+      ]
+    },
+    {
       "name": "createShipment",
       "accounts": [
         {
@@ -80,14 +131,79 @@ export type Protocol = {
           }
         }
       ]
+    },
+    {
+      "name": "buyShipment",
+      "accounts": [
+        {
+          "name": "shipment",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "shipper",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "forwarder",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "signer",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": []
     }
   ],
   "accounts": [
+    {
+      "name": "carrier",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "authority",
+            "type": "publicKey"
+          },
+          {
+            "name": "availability",
+            "type": {
+              "defined": "Availability"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "forwarder",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "authority",
+            "type": "publicKey"
+          }
+        ]
+      }
+    },
     {
       "name": "shipment",
       "type": {
         "kind": "struct",
         "fields": [
+          {
+            "name": "owner",
+            "type": "publicKey"
+          },
           {
             "name": "shipper",
             "type": "publicKey"
@@ -148,6 +264,24 @@ export type Protocol = {
     }
   ],
   "types": [
+    {
+      "name": "Availability",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "time",
+            "type": "u64"
+          },
+          {
+            "name": "location",
+            "type": {
+              "defined": "GeoLocation"
+            }
+          }
+        ]
+      }
+    },
     {
       "name": "ShipmentDetails",
       "type": {
@@ -342,6 +476,57 @@ export const IDL: Protocol = {
       "args": []
     },
     {
+      "name": "registerForwarder",
+      "accounts": [
+        {
+          "name": "forwarder",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "signer",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "registerCarrier",
+      "accounts": [
+        {
+          "name": "carrier",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "signer",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "availability",
+          "type": {
+            "option": {
+              "defined": "Availability"
+            }
+          }
+        }
+      ]
+    },
+    {
       "name": "createShipment",
       "accounts": [
         {
@@ -377,14 +562,79 @@ export const IDL: Protocol = {
           }
         }
       ]
+    },
+    {
+      "name": "buyShipment",
+      "accounts": [
+        {
+          "name": "shipment",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "shipper",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "forwarder",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "signer",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": []
     }
   ],
   "accounts": [
+    {
+      "name": "carrier",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "authority",
+            "type": "publicKey"
+          },
+          {
+            "name": "availability",
+            "type": {
+              "defined": "Availability"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "forwarder",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "authority",
+            "type": "publicKey"
+          }
+        ]
+      }
+    },
     {
       "name": "shipment",
       "type": {
         "kind": "struct",
         "fields": [
+          {
+            "name": "owner",
+            "type": "publicKey"
+          },
           {
             "name": "shipper",
             "type": "publicKey"
@@ -445,6 +695,24 @@ export const IDL: Protocol = {
     }
   ],
   "types": [
+    {
+      "name": "Availability",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "time",
+            "type": "u64"
+          },
+          {
+            "name": "location",
+            "type": {
+              "defined": "GeoLocation"
+            }
+          }
+        ]
+      }
+    },
     {
       "name": "ShipmentDetails",
       "type": {

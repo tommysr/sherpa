@@ -14,5 +14,7 @@ export async function GET() {
 		throw error(500, 'No shipments found');
 	}
 
+	console.log(shipments[0].account.shipment.geography.from.latitude)
+
 	return json(shipments);
 }
