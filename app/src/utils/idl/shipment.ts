@@ -26,21 +26,26 @@ export interface Geography {
 	to: GeoLocation;
 }
 
-export interface ShipmentData {
+export interface ShipmentData<D> {
 	geography: Geography;
 	details: ShipmentDetails;
 	dimensions: ShipmentDimensions;
-	when: BN;
-	deadline: BN;
+	when: D;
+	deadline: D;
 }
 
-export interface Shipment {
-	owner: PublicKey;
-	shipper: PublicKey;
-	price: BN;
+export interface Shipment<Date, Price, Key> {
+	owner: Key;
+	shipper: Key;
+	price: Price;
 	no: number;
 	reserved: number[];
-	shipment: ShipmentData;
+	shipment: ShipmentData<Date>;
 }
 
-export type ShipmentAccount = ProgramAccount<Shipment>;
+export type ShipmentAccount = ProgramAccount<Shipment<BN, BN, PublicKey>>;
+type ApiProgramAccount<T> = {
+	publicKey: string,
+	account: T
+}
+export type ApiShipmentAccount = ApiProgramAccount<Shipment<string, number, string>>;

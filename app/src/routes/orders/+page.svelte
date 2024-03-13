@@ -8,13 +8,13 @@
 
 	import { createSearchStore, type SearchItem } from '$stores/search';
 	import type { PageData } from './$types';
-	import type { ShipmentAccount } from '$src/utils/idl/shipment';
-	type SearchableOrder = ShipmentAccount & SearchItem;
+	import type { ApiShipmentAccount, ShipmentAccount } from '$src/utils/idl/shipment';
+	type SearchableOrder = ApiShipmentAccount & SearchItem;
 
 	export let data: PageData;
 
 	// CONSIDER: should me moved to server side
-	const searchableOrders: SearchableOrder[] = data.orders.map((order: ShipmentAccount) => {
+	const searchableOrders: SearchableOrder[] = data.orders.map((order: ApiShipmentAccount) => {
 		return { ...order, searchParams: order.account.shipment.details.priority.toString() };
 	});
 
@@ -74,7 +74,7 @@
 		<div>
 			{#if $searchStore.filtered.length != 0}
 				{#each $searchStore.filtered as { account } }
-					<OrderCard shipment={account} />
+					<OrderCard shipmentData={account} />
 				{/each}
 			{:else}
 				<p>Nothing found</p>

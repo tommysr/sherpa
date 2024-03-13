@@ -1,8 +1,8 @@
-import type { ShipmentAccount } from '$src/utils/idl/shipment';
+import type { ApiShipmentAccount, ShipmentAccount } from '$src/utils/idl/shipment';
 import { error } from '@sveltejs/kit';
 
 /** @type {import('./$types').PageLoad } */
-export async function load({ fetch }): Promise<{ orders: ShipmentAccount[] }> {
+export async function load({ fetch }): Promise<{ orders: ApiShipmentAccount[] }> {
 	try {
 		const fetchedOrders = await fetch('/api/orders', {
 			method: 'GET',
