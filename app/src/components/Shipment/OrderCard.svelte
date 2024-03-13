@@ -80,14 +80,14 @@
 						<p>{location}: {value.latitude}, {value.longitude}</p>
 					{/each}
 				</article>
-			</svelte:fragment>
 
-			<article slot="footer">
-				<header>properties</header>
-				{#each properties as [location, value]}
-					<p>{location}: {value}</p>
-				{/each}
-			</article>
+				<article slot="footer">
+					<header>properties</header>
+					{#each properties as [location, value]}
+						<p>{location}: {value}</p>
+					{/each}
+				</article>
+			</svelte:fragment>
 		</CancelConfirmModal>
 	</div>
 </Card>
