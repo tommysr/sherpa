@@ -29,13 +29,12 @@
 <style lang="scss">
 	.mygrid {
 		display: grid;
-		grid-template-columns: 1fr 2.5fr 2.5fr 1fr;
+		grid-template-columns: 1.5fr 2.5fr 3fr 1fr;
 	}
 	.info {
-		text-align: left;
+		text-align: center;
 		display: flex;
-		align-content: center;
-		align-items: center;
+		justify-content: center;
 	}
 
 	footer {

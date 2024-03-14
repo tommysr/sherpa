@@ -15,7 +15,7 @@ export async function GET() {
 
 	let apiShipments: ApiShipmentAccount[] = shipments.map(shipment => {
 		return {
-			... shipment,
+			...shipment,
 			publicKey: shipment.publicKey.toString(),
 			account: {
 				...shipment.account,
@@ -24,6 +24,12 @@ export async function GET() {
 				price: shipment.account.price.toNumber(),
 				shipment: {
 					...shipment.account.shipment,
+					dimensions: {
+						depth: shipment.account.shipment.dimensions.depth / 1000,
+						height: shipment.account.shipment.dimensions.height / 1000,
+						width: shipment.account.shipment.dimensions.width / 1000,
+						weight: shipment.account.shipment.dimensions.weight / 1000,
+					},
 					when: (new Date(shipment.account.shipment.when.toNumber())).toISOString(),
 					deadline: (new Date(shipment.account.shipment.deadline.toNumber())).toISOString(),
 				}
@@ -31,6 +37,6 @@ export async function GET() {
 		}
 	})
 
-	
+
 	return json(apiShipments);
 }

@@ -108,7 +108,7 @@
 			{/await}
 
 			{#if index != len - 1}
-				→
+				{'→ '}
 			{/if}
 		{/each}
 	</svelte:fragment>
@@ -116,14 +116,20 @@
 	<svelte:fragment slot="third-info">
 		{@const len = dimensions.length}
 		{#each dimensions as [dimension, value], index}
-			{dimension[0]}: {value}
+			{dimension[0]}: {value} 
 
-			{#if index === len - 1}
-				{''}
+			<!-- TODO: add these on blockchain -->
+			{#if index == len - 1}
+				kg
 			{:else}
-				{'x '}
+				m
+			{/if}
+
+			{#if index == len - 2}
+				<br> 
 			{/if}
 		{/each}
+
 		<!--  -->
 	</svelte:fragment>
 	<svelte:fragment slot="fourth-info">
