@@ -12,7 +12,7 @@
 	import CancelConfirmModal from './CancelConfirmModal.svelte';
 	import Card from './Card.svelte';
 	import { PublicKey, Transaction, TransactionInstruction } from '@solana/web3.js';
-	import { getForwarderAddress } from '$src/lib/addresses';
+	import { getForwarderAddress, getShipperAddress } from '$src/lib/addresses';
 	import { walletStore } from '$src/stores/wallet';
 	import { web3Store } from '$src/stores/web3';
 	import { useSignAndSendTransaction } from '$src/utils/wallet/singAndSendTx';
@@ -58,13 +58,14 @@
 			const registerIx = await registerForwarderIx(forwarder);
 			tx.add(registerIx);
 		}
-
+		
 		const ix = await program.methods
 			.buyShipment()
 			.accounts({
-				shipper: new PublicKey(shipmentData.shipper),
+				shipper: getShipperAddress(program, new PublicKey(shipmentData.shipper)),
 				shipment: new PublicKey(shipmentAccount.publicKey),
-				forwarder: new PublicKey(forwarder)
+				forwarder,
+				signer: wallet.publicKey!
 			})
 			.instruction();
 
@@ -116,7 +117,7 @@
 	<svelte:fragment slot="third-info">
 		{@const len = dimensions.length}
 		{#each dimensions as [dimension, value], index}
-			{dimension[0]}: {value} 
+			{dimension[0]}: {value}
 
 			<!-- TODO: add these on blockchain, would be nice to have some objects 
 			representing different properties -->
@@ -127,7 +128,7 @@
 			{/if}
 
 			{#if index == len - 2}
-				<br> 
+				<br />
 			{/if}
 		{/each}
 

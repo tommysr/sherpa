@@ -52,12 +52,13 @@
 		<slot name="body" />
 
 		<footer>
+			<!-- should be outside of this component -->
 			{#if status === 'confirm'}
 				<span aria-busy="false">Click confirm to buy</span>
 			{:else if status === 'Preparing transaction'}
 				<span aria-busy="true">Sending transaction...</span>
 			{:else if status === 'Transaction sent'}
-				<ins>Transaction sent: <a href="https://solscan.io/tx/{signature}">explorer</a> </ins> 
+				<ins>Transaction sent: <a href="https://explorer.solana.com/tx/{signature}?cluster=devnet">explorer</a> </ins> 
 			{/if}
 			<span>
 				<button role="button" class="secondary" data-target="confirm-modal" on:click={closeModal}>
