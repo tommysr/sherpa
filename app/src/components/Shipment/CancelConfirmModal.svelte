@@ -1,18 +1,18 @@
 <script lang="ts">
-
 	let modalElement: HTMLDialogElement;
+	let statusElement: HTMLDivElement;
 
 	// TODO: add these classes to html to prevent scrolling and add animationm
 	// const isOpenClass = 'modal-is-open';
 	// const openingClass = 'modal-is-opening';
 	// const closingClass = 'modal-is-closing';
 
-
 	export let isModalOpen: boolean = false;
-	export let confirmClickHandler: (e: Event) => Promise<void>;
+	export let confirmClickHandler: (e: Event) => Promise<string>;
 
 	let confirmButtonDisabled = false;
-	let buttonValue = 'confirm';
+	let status = 'confirm';
+	let signature: string;
 
 	// To open modal from other components
 	$: {
@@ -33,13 +33,12 @@
 
 	async function handleConfirmClick(e: Event) {
 		try {
-			buttonValue = 'Preparing transaction'
+			status = 'Preparing transaction';
 			confirmButtonDisabled = true;
-			await confirmClickHandler(e);
-			buttonValue = 'Transaction sent'
+			signature = await confirmClickHandler(e);
+			status = 'Transaction sent';
 		} catch (error) {
 			confirmButtonDisabled = false;
-			console.error(error);
 		}
 	}
 </script>
@@ -53,15 +52,31 @@
 		<slot name="body" />
 
 		<footer>
-			<slot name="footer" />
-			<button role="button" class="secondary" data-target="confirm-modal" on:click={closeModal}>
-				Cancel</button
-			><button autofocus data-target="confirm-modal" on:click={handleConfirmClick} disabled={confirmButtonDisabled}
-				>{buttonValue}</button
-			>
+			{#if status === 'confirm'}
+				<span aria-busy="false">Click confirm to buy</span>
+			{:else if status === 'Preparing transaction'}
+				<span aria-busy="true">Sending transaction...</span>
+			{:else if status === 'Transaction sent'}
+				<ins>Transaction sent: <a href="https://solscan.io/tx/{signature}">explorer</a> </ins> 
+			{/if}
+			<span>
+				<button role="button" class="secondary" data-target="confirm-modal" on:click={closeModal}>
+					Cancel</button
+				><button
+					autofocus
+					data-target="confirm-modal"
+					on:click={handleConfirmClick}
+					disabled={confirmButtonDisabled}>confirm</button
+				>
+			</span>
 		</footer>
 	</article>
 </dialog>
 
 <style lang="scss">
+	footer {
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
+	}
 </style>

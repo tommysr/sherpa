@@ -48,4 +48,5 @@ type ApiProgramAccount<T> = {
 	publicKey: string,
 	account: T
 }
+
 export type ApiShipmentAccount = ApiProgramAccount<Shipment<string, number, string>>;

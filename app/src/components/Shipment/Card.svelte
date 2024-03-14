@@ -3,9 +3,8 @@
 
 <div class="card">
 	<article>
-		<!-- <header>
-			<slot name="header" />
-		</header> -->
+		<slot name="header" />
+
 		<div class="mygrid">
 			<div class="info">
 				<slot name="first-info" />
@@ -29,7 +28,7 @@
 <style lang="scss">
 	.mygrid {
 		display: grid;
-		grid-template-columns: 1.5fr 2.5fr 3fr 1fr;
+		grid-template-columns: 1.5fr 2.5fr 3fr 1.5fr;
 	}
 	.info {
 		text-align: center;

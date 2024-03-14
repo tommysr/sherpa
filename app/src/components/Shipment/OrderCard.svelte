@@ -46,7 +46,7 @@
 		return registerShipperIx;
 	}
 
-	async function handleBuyOrder(e: Event) {
+	async function handleBuyOrder(e: Event): Promise<string> {
 		const { program } = get(anchorStore);
 		const wallet = get(walletStore);
 		const { connection } = get(web3Store);
@@ -70,7 +70,7 @@
 
 		tx.add(ix);
 		const sig = await useSignAndSendTransaction(connection, wallet, tx);
-		console.log(sig);
+		return sig;
 	}
 
 	async function getLocationFromCoords(lat: number, long: number): Promise<string> {
@@ -118,7 +118,8 @@
 		{#each dimensions as [dimension, value], index}
 			{dimension[0]}: {value} 
 
-			<!-- TODO: add these on blockchain -->
+			<!-- TODO: add these on blockchain, would be nice to have some objects 
+			representing different properties -->
 			{#if index == len - 1}
 				kg
 			{:else}
@@ -152,6 +153,7 @@
 
 			<p>Price: {shipmentData.price / 10 ** 9}</p>
 			<p>Shipper address: {shipmentData.shipper.toString()}</p>
+			<p>Owner address: {shipmentData.owner.toString()}</p>
 			<p>When: {new Date(shipmentData.shipment.when).toDateString()}</p>
 			<p>Deadline: {new Date(shipmentData.shipment.deadline).toDateString()}</p>
 		</article>
