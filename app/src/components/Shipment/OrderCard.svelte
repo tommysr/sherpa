@@ -104,7 +104,7 @@
 	</button>
 </Card>
 
-<CancelConfirmModal bind:isModalOpen={isBuyClicked} on:confirmed={handleBuyOrder}>
+<CancelConfirmModal bind:isModalOpen={isBuyClicked} confirmClickHandler={handleBuyOrder}>
 	<h4 slot="header">Check your order</h4>
 	<svelte:fragment slot="body">
 		<article>

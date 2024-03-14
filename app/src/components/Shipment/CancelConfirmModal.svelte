@@ -1,5 +1,4 @@
 <script lang="ts">
-	import { createEventDispatcher } from 'svelte';
 
 	let modalElement: HTMLDialogElement;
 
@@ -8,9 +7,12 @@
 	// const openingClass = 'modal-is-opening';
 	// const closingClass = 'modal-is-closing';
 
-	const dispatch = createEventDispatcher();
 
 	export let isModalOpen: boolean = false;
+	export let confirmClickHandler: (e: Event) => Promise<void>;
+
+	let confirmButtonDisabled = false;
+	let buttonValue = 'confirm';
 
 	// To open modal from other components
 	$: {
@@ -29,8 +31,16 @@
 		modalElement.removeAttribute('open');
 	}
 
-	function handleConfirmClick(e: Event) {
-       dispatch('confirmed')
+	async function handleConfirmClick(e: Event) {
+		try {
+			buttonValue = 'Preparing transaction'
+			confirmButtonDisabled = true;
+			await confirmClickHandler(e);
+			buttonValue = 'Transaction sent'
+		} catch (error) {
+			confirmButtonDisabled = false;
+			console.error(error);
+		}
 	}
 </script>
 
@@ -46,11 +56,12 @@
 			<slot name="footer" />
 			<button role="button" class="secondary" data-target="confirm-modal" on:click={closeModal}>
 				Cancel</button
-			><button autofocus data-target="confirm-modal" on:click={handleConfirmClick}>Confirm</button>
+			><button autofocus data-target="confirm-modal" on:click={handleConfirmClick} disabled={confirmButtonDisabled}
+				>{buttonValue}</button
+			>
 		</footer>
 	</article>
 </dialog>
 
 <style lang="scss">
-
 </style>

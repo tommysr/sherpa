@@ -73,8 +73,8 @@
 	<div class="grid">
 		<div>
 			{#if $searchStore.filtered.length != 0}
-				{#each $searchStore.filtered as { account } }
-					<OrderCard shipmentData={account} />
+				{#each $searchStore.filtered as account }
+					<OrderCard shipmentAccount={account} />
 				{/each}
 			{:else}
 				<p>Nothing found</p>
