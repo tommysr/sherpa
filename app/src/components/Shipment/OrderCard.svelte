@@ -72,36 +72,70 @@
 		const sig = await useSignAndSendTransaction(connection, wallet, tx);
 		console.log(sig);
 	}
+
+	async function getLocationFromCoords(lat: number, long: number): Promise<string> {
+		const response = await fetch(
+			`https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${lat}&lon=${long}`
+		);
+		const data = await response.json();
+
+		console.log(data.address);
+		if (data.address.village) {
+			return data.address.village;
+		} else if (data.address.city && data.address.city_district) {
+			return `${data.address.city}, ${data.address.city_district}`;
+		} else {
+			throw Error('No location found');
+		}
+	}
 </script>
 
 <Card>
 	<svelte:fragment slot="first-info">
-		<h2>Price</h2>
-		{shipmentData.price / 10 ** 9}
-		<h4>Deadline</h4>
-		{new Date(shipmentData.shipment.deadline).toDateString()}
-		<h4>When</h4>
-		{new Date(shipmentData.shipment.when).toDateString()}
+		<h3>{shipmentData.price / 10 ** 9} SOL</h3>
 	</svelte:fragment>
 	<svelte:fragment slot="second-info">
-		<h4>Dimensions</h4>
-		<!-- looking to rendering some box to make it cute -->
-		{#each dimensions as [dimension, value]}
-			<p>{dimension}: {value}</p>
+		{@const len = locations.length}
+
+		{#each locations as [location, value], index}
+			<!-- TODO: batching or keep locations on server -->
+			{#await getLocationFromCoords(value.latitude, value.longitude)}
+				<article aria-busy="true"></article>
+			{:then location}
+				{location}
+			{:catch error}
+				{value.latitude.toFixed(4)} {value.longitude.toFixed(4)}
+			{/await}
+
+			{#if index != len - 1}
+				→
+			{/if}
 		{/each}
 	</svelte:fragment>
 
 	<svelte:fragment slot="third-info">
-		<h4>Location</h4>
-		<!-- i would like to show only some place from an api taking long and lat in and then in some subroute show all the information -->
-		{#each locations as [location, value]}
-			<p>{location}: {value.latitude.toFixed(4)}, {value.longitude.toFixed(4)}</p>
+		{@const len = dimensions.length}
+		{#each dimensions as [dimension, value], index}
+			{dimension[0]}: {value}
+
+			{#if index === len - 1}
+				{''}
+			{:else}
+				{'x '}
+			{/if}
 		{/each}
+		<!--  -->
+	</svelte:fragment>
+	<svelte:fragment slot="fourth-info">
+		<button slot="footer" class="contrast" on:click={() => (isBuyClicked = !isBuyClicked)}>
+			Buy
+		</button>
 	</svelte:fragment>
 
-	<button slot="footer" class="contrast" on:click={() => (isBuyClicked = !isBuyClicked)}>
-		Buy
-	</button>
+	<svelte:fragment slot="footer">
+		<span>Date: {new Date(shipmentData.shipment.when).toDateString()}</span>
+		<span>Deadline: {new Date(shipmentData.shipment.deadline).toDateString()}</span>
+	</svelte:fragment>
 </Card>
 
 <CancelConfirmModal bind:isModalOpen={isBuyClicked} confirmClickHandler={handleBuyOrder}>
