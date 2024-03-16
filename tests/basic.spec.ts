@@ -170,7 +170,6 @@ describe('protocol', () => {
     const subscriptionId = program.addEventListener('ShipmentCreated', event => {
       expect(event.shipper.equals(shipperAddress)).true
       expect(event.shipment.equals(shipmentAddress)).true
-      once()
     })
 
     await program.methods
