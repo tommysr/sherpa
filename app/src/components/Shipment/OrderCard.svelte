@@ -75,19 +75,20 @@
 	}
 
 	async function getLocationFromCoords(lat: number, long: number): Promise<string> {
-		const response = await fetch(
-			`https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${lat}&lon=${long}`
-		);
-		const data = await response.json();
+		return `${lat.toFixed(4)}, ${long.toFixed(4)}`;
+		// const response = await fetch(
+		// 	`https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${lat}&lon=${long}`
+		// );
+		// const data = await response.json();
 
-		console.log(data.address);
-		if (data.address.village) {
-			return data.address.village;
-		} else if (data.address.city && data.address.city_district) {
-			return `${data.address.city}, ${data.address.city_district}`;
-		} else {
-			throw Error('No location found');
-		}
+		// console.log(data.address);
+		// if (data.address.village) {
+		// 	return data.address.village;
+		// } else if (data.address.city && data.address.city_district) {
+		// 	return `${data.address.city}, ${data.address.city_district}`;
+		// } else {
+		// 	throw Error('No location found');
+		// }
 	}
 </script>
 

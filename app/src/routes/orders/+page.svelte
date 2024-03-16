@@ -6,23 +6,14 @@
 	import OrderCard from '$src/components/Shipment/OrderCard.svelte';
 	import ShipmentsMap from '$src/components/ShipmentMap/ShipmentsMap.svelte';
 
-	import { createSearchStore, type SearchItem } from '$stores/search';
 	import type { PageData } from './$types';
-	import type { ApiShipmentAccount, ShipmentAccount } from '$src/utils/idl/shipment';
-	type SearchableOrder = ApiShipmentAccount & SearchItem;
+	import { searchableShipments } from '$src/stores/searchableShipments';
+	import ShipmentLayout from '$src/components/Shipment/ShipmentLayout.svelte';
 
-	export let data: PageData;
+	// export let data: PageData;
 
-	// CONSIDER: should me moved to server side
-	const searchableOrders: SearchableOrder[] = data.orders.map((order: ApiShipmentAccount) => {
-		return { ...order, searchParams: order.account.shipment.details.priority.toString() };
-	});
-
-	// CONSIDER: placing in context to avoid creating order stores, when we
-	// shouldn't and just update the data after pulling changes.
-	const searchStore = createSearchStore(searchableOrders);
-
-	$: locationsOnMap = $searchStore.data.map((s) => s.account.shipment.geography);
+	// $: shipments = $searchableShipments.data.filter((s) => s.account.owner == s.account.shipper)
+	$: locationsOnMap = $searchableShipments.data.map((s) => s.account.shipment.geography);
 
 	// TODO: make it dynamic or from server
 	const categories: string[] = [
@@ -49,15 +40,15 @@
 	];
 
 	function handleSearchKeydown(e: KeyboardEvent) {
-		if ($searchStore.searchString && e.key == 'Enter') {
-			searchStore.performSearch();
+		if ($searchableShipments.searchString && e.key == 'Enter') {
+			searchableShipments.performSearch();
 		} else {
-			searchStore.purgeFiltered();
+			searchableShipments.purgeFiltered();
 		}
 	}
 </script>
 
-<svelte:head><title>Orders</title></svelte:head>
+<svelte:head><title>Shipments list</title></svelte:head>
 
 <main class="container">
 	<ScrollableMenu>
@@ -68,12 +59,15 @@
 		{/each}
 	</ScrollableMenu>
 
-	<HotNavigation bind:searchValue={$searchStore.searchString} on:keydown={handleSearchKeydown} />
+	<HotNavigation
+		bind:searchValue={$searchableShipments.searchString}
+		on:keydown={handleSearchKeydown}
+	/>
 
 	<div class="grid">
 		<div>
-			{#if $searchStore.filtered.length != 0}
-				{#each $searchStore.filtered as account }
+			{#if $searchableShipments.filtered.length != 0}
+				{#each $searchableShipments.filtered as account}
 					<OrderCard shipmentAccount={account} />
 				{/each}
 			{:else}

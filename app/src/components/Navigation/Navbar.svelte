@@ -11,7 +11,7 @@
 
 		<ul>
 			<li><a href="/orders">Sellers</a></li>
-			<li><a href="/forwarder">Forwarders</a></li>
+			<li><a href="/orders/bought">Forwarders</a></li>
 			<li><a href="/carrier">Carriers</a></li>
 		</ul>
 
