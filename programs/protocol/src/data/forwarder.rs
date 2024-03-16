@@ -4,4 +4,5 @@ use anchor_lang::prelude::*;
 #[derive(Debug, Default, PartialEq, Eq)]
 pub struct Forwarder {
     pub authority: Pubkey,
+    pub count: u32,
 }

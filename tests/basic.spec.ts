@@ -4,6 +4,7 @@ import { Protocol } from '../target/types/protocol'
 import { Keypair, SystemProgram } from '@solana/web3.js'
 import { ONE_SOL, awaitedAirdrops } from './utils'
 import {
+  getBoughtShipmentAddress,
   getCarrierAddress,
   getForwarderAddress,
   getShipmentAddress,
@@ -199,13 +200,17 @@ describe('protocol', () => {
 
     const forwarderAccount = await program.account.forwarder.fetch(forwarderAddress)
     expect(forwarderAccount.authority.equals(forwarder.publicKey)).true
+    expect(forwarderAccount.count).eq(0)
   })
 
   it('buy shipment', async () => {
     const shipmentAddress = getShipmentAddress(program, shipper.publicKey, 0)
+    const boughtShipmentAddress = getBoughtShipmentAddress(program, forwarder.publicKey, 0)
+
     await program.methods
       .buyShipment()
       .accounts({
+        bought: boughtShipmentAddress,
         shipment: shipmentAddress,
         shipper: shipperAddress,
         forwarder: forwarderAddress,
@@ -217,6 +222,14 @@ describe('protocol', () => {
 
     const shipmentAccount = await program.account.shipment.fetch(shipmentAddress)
     expect(shipmentAccount.owner.equals(forwarder.publicKey)).true
+
+    const forwarderAccount = await program.account.forwarder.fetch(forwarderAddress)
+    expect(forwarderAccount.count).eq(1)
+
+    const boughtShipment = await program.account.boughtShipment.fetch(boughtShipmentAddress)
+    expect(boughtShipment.owner.equals(forwarder.publicKey)).true
+    expect(boughtShipment.no).eq(0)
+    expect(boughtShipment.shipment).to.deep.equal(shipmentAccount.shipment)
   })
 
   it('register carrier', async () => {

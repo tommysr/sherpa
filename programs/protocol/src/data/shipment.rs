@@ -56,3 +56,12 @@ pub struct Shipment {
     pub reserved: [u8; 4],
     pub shipment: ShipmentData,
 }
+
+#[account(zero_copy)]
+#[derive(Debug, Default, PartialEq)]
+pub struct BoughtShipment {
+    pub owner: Pubkey,
+    pub no: u32,
+    pub reserved: [u8; 4],
+    pub shipment: ShipmentData,
+}

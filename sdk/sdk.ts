@@ -8,6 +8,7 @@ export const SHIPPER_SEED = 'shipper'
 export const FORWARDER_SEED = 'forwarder'
 export const CARRIER_SEED = 'carrier'
 export const SHIPMENT_SEED = 'shipment'
+export const BOUGHT_SHIPMENT_SEED = 'boughtShipment'
 
 export const getStateAddress = (program: Program<Protocol>) => {
   const [stateAddress, stateBump] = PublicKey.findProgramAddressSync(
@@ -51,6 +52,26 @@ export const getShipmentAddress = (
 
   const [shipmentAddress, shipmentBump] = PublicKey.findProgramAddressSync(
     [Buffer.from(anchor.utils.bytes.utf8.encode(SHIPMENT_SEED)), shipper.toBuffer(), indexBuffer],
+    program.programId
+  )
+
+  return shipmentAddress
+}
+
+export const getBoughtShipmentAddress = (
+  program: Program<Protocol>,
+  forwarder: PublicKey,
+  index: number
+) => {
+  const indexBuffer = Buffer.alloc(4)
+  indexBuffer.writeInt32LE(index)
+
+  const [shipmentAddress, shipmentBump] = PublicKey.findProgramAddressSync(
+    [
+      Buffer.from(anchor.utils.bytes.utf8.encode(BOUGHT_SHIPMENT_SEED)),
+      forwarder.toBuffer(),
+      indexBuffer
+    ],
     program.programId
   )
 
