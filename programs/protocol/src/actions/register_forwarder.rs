@@ -20,6 +20,7 @@ pub fn handler(ctx: Context<RegisterForwarder>) -> Result<()> {
 
     **account = Forwarder {
         authority: *ctx.accounts.signer.key,
+        count: 0,
     };
 
     Ok(())

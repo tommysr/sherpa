@@ -4,6 +4,7 @@ import { Protocol } from '../target/types/protocol'
 import { Keypair, SystemProgram } from '@solana/web3.js'
 import { ONE_SOL, awaitedAirdrops } from './utils'
 import {
+  getBoughtShipmentAddress,
   getCarrierAddress,
   getForwarderAddress,
   getShipmentAddress,
@@ -100,6 +101,11 @@ describe('protocol', () => {
       }
     }
 
+    const subscriptionId = program.addEventListener('ShipmentCreated', event => {
+      expect(event.shipper.equals(shipperAddress)).true
+      expect(event.shipment.equals(shipmentAddress)).true
+    })
+
     await program.methods
       .createShipment(shipmentPrice, shipmentData)
       .accounts({
@@ -110,6 +116,8 @@ describe('protocol', () => {
       })
       .signers([shipper])
       .rpc()
+
+    program.removeEventListener(subscriptionId)
 
     const shipmentAccount = await program.account.shipment.fetch(shipmentAddress)
 
@@ -159,6 +167,11 @@ describe('protocol', () => {
       deadline: new BN(1)
     }
 
+    const subscriptionId = program.addEventListener('ShipmentCreated', event => {
+      expect(event.shipper.equals(shipperAddress)).true
+      expect(event.shipment.equals(shipmentAddress)).true
+    })
+
     await program.methods
       .createShipment(shipmentPrice, shipmentData)
       .accounts({
@@ -169,6 +182,8 @@ describe('protocol', () => {
       })
       .signers([shipper])
       .rpc()
+
+    program.removeEventListener(subscriptionId)
 
     const shipmentAccount = await program.account.shipment.fetch(shipmentAddress)
     expect(shipmentAccount.shipper.equals(shipper.publicKey)).true
@@ -199,13 +214,24 @@ describe('protocol', () => {
 
     const forwarderAccount = await program.account.forwarder.fetch(forwarderAddress)
     expect(forwarderAccount.authority.equals(forwarder.publicKey)).true
+    expect(forwarderAccount.count).eq(0)
   })
 
   it('buy shipment', async () => {
     const shipmentAddress = getShipmentAddress(program, shipper.publicKey, 0)
+    const boughtShipmentAddress = getBoughtShipmentAddress(program, forwarder.publicKey, 0)
+
+    const subscriptionId = program.addEventListener('ShipmentTransferred', event => {
+      expect(event.seller.equals(shipperAddress)).true
+      expect(event.buyer.equals(forwarderAddress)).true
+      expect(event.before.equals(shipmentAddress)).true
+      expect(event.after.equals(boughtShipmentAddress)).true
+    })
+
     await program.methods
       .buyShipment()
       .accounts({
+        bought: boughtShipmentAddress,
         shipment: shipmentAddress,
         shipper: shipperAddress,
         forwarder: forwarderAddress,
@@ -217,6 +243,16 @@ describe('protocol', () => {
 
     const shipmentAccount = await program.account.shipment.fetch(shipmentAddress)
     expect(shipmentAccount.owner.equals(forwarder.publicKey)).true
+
+    const forwarderAccount = await program.account.forwarder.fetch(forwarderAddress)
+    expect(forwarderAccount.count).eq(1)
+
+    const boughtShipment = await program.account.boughtShipment.fetch(boughtShipmentAddress)
+    expect(boughtShipment.owner.equals(forwarder.publicKey)).true
+    expect(boughtShipment.no).eq(0)
+    expect(boughtShipment.shipment).to.deep.equal(shipmentAccount.shipment)
+
+    program.removeEventListener(subscriptionId)
   })
 
   it('register carrier', async () => {
