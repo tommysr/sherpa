@@ -21,18 +21,18 @@ pub mod protocol {
     }
 
     pub fn register_shipper(ctx: Context<RegisterShipper>) -> Result<()> {
-        actions::register_shipper::handler(ctx)
+        actions::shipper::register::handler(ctx)
     }
 
     pub fn register_forwarder(ctx: Context<RegisterForwarder>) -> Result<()> {
-        actions::register_forwarder::handler(ctx)
+        actions::forwarder::register::handler(ctx)
     }
 
     pub fn register_carrier(
         ctx: Context<RegisterCarrier>,
         availability: Option<Availability>,
     ) -> Result<()> {
-        actions::register_carrier::handler(ctx, availability)
+        actions::carrier::register::handler(ctx, availability)
     }
 
     pub fn create_shipment(
