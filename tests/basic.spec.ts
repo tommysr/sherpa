@@ -101,6 +101,11 @@ describe('protocol', () => {
       }
     }
 
+    const subscriptionId = program.addEventListener('ShipmentCreated', event => {
+      expect(event.shipper.equals(shipperAddress)).true
+      expect(event.shipment.equals(shipmentAddress)).true
+    })
+
     await program.methods
       .createShipment(shipmentPrice, shipmentData)
       .accounts({
@@ -111,6 +116,8 @@ describe('protocol', () => {
       })
       .signers([shipper])
       .rpc()
+
+    program.removeEventListener(subscriptionId)
 
     const shipmentAccount = await program.account.shipment.fetch(shipmentAddress)
 
@@ -160,6 +167,12 @@ describe('protocol', () => {
       deadline: new BN(1)
     }
 
+    const subscriptionId = program.addEventListener('ShipmentCreated', event => {
+      expect(event.shipper.equals(shipperAddress)).true
+      expect(event.shipment.equals(shipmentAddress)).true
+      once()
+    })
+
     await program.methods
       .createShipment(shipmentPrice, shipmentData)
       .accounts({
@@ -170,6 +183,8 @@ describe('protocol', () => {
       })
       .signers([shipper])
       .rpc()
+
+    program.removeEventListener(subscriptionId)
 
     const shipmentAccount = await program.account.shipment.fetch(shipmentAddress)
     expect(shipmentAccount.shipper.equals(shipper.publicKey)).true
@@ -207,6 +222,13 @@ describe('protocol', () => {
     const shipmentAddress = getShipmentAddress(program, shipper.publicKey, 0)
     const boughtShipmentAddress = getBoughtShipmentAddress(program, forwarder.publicKey, 0)
 
+    const subscriptionId = program.addEventListener('ShipmentTransferred', event => {
+      expect(event.seller.equals(shipperAddress)).true
+      expect(event.buyer.equals(forwarderAddress)).true
+      expect(event.before.equals(shipmentAddress)).true
+      expect(event.after.equals(boughtShipmentAddress)).true
+    })
+
     await program.methods
       .buyShipment()
       .accounts({
@@ -230,6 +252,8 @@ describe('protocol', () => {
     expect(boughtShipment.owner.equals(forwarder.publicKey)).true
     expect(boughtShipment.no).eq(0)
     expect(boughtShipment.shipment).to.deep.equal(shipmentAccount.shipment)
+
+    program.removeEventListener(subscriptionId)
   })
 
   it('register carrier', async () => {

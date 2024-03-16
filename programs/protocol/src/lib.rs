@@ -1,10 +1,12 @@
 mod actions;
 mod data;
 mod errors;
+mod events;
 
 use actions::*;
 use data::*;
 use errors::Error;
+use events::*;
 
 use anchor_lang::prelude::*;
 

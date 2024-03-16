@@ -1,6 +1,6 @@
 use anchor_lang::prelude::*;
 
-use crate::{BoughtShipment, Error, Forwarder, Shipment, Shipper};
+use crate::{BoughtShipment, Error, Forwarder, Shipment, ShipmentTransferred, Shipper};
 
 #[derive(Accounts)]
 pub struct BuyShipment<'info> {
@@ -43,6 +43,13 @@ pub fn handler(ctx: Context<BuyShipment>) -> Result<()> {
     };
 
     forwarder.count += 1;
+
+    emit!(ShipmentTransferred {
+        seller: ctx.accounts.shipper.key(),
+        buyer: ctx.accounts.forwarder.key(),
+        before: ctx.accounts.shipment.key(),
+        after: ctx.accounts.bought.key(),
+    });
 
     Ok(())
 }
