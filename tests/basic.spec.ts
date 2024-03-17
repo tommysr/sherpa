@@ -2,7 +2,7 @@ import * as anchor from '@coral-xyz/anchor'
 import { BN, Program } from '@coral-xyz/anchor'
 import { Protocol } from '../target/types/protocol'
 import { Keypair, SystemProgram } from '@solana/web3.js'
-import { ONE_HOUR, ONE_SOL, awaitedAirdrops } from './utils'
+import { ONE_HOUR, ONE_SOL, U32_MAX, awaitedAirdrops } from './utils'
 import {
   decodeName,
   encodeName,
@@ -313,8 +313,9 @@ describe('protocol', () => {
 
     const offerAccount = await program.account.shipmentOffer.fetch(offerAddress)
     expect(offerAccount.owner.equals(carrier.publicKey)).true
-    expect(offerAccount.payment.eq(ONE_SOL)).true
-    expect(offerAccount.collateral.eqn(0)).true
+    expect(offerAccount.details.payment.eq(ONE_SOL)).true
+    expect(offerAccount.details.collateral.eqn(0)).true
+    expect(offerAccount.details.deadline.eq(U32_MAX)).true
     expect(offerAccount.shipment).to.deep.equal(boughtShipment.shipment)
 
     const carrierAccount = await program.account.carrier.fetch(carrierAddress)
