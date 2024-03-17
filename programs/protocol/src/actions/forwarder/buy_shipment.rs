@@ -31,13 +31,15 @@ pub struct BuyShipment<'info> {
 pub fn handler(ctx: Context<BuyShipment>) -> Result<()> {
     let forwarded = &mut ctx.accounts.bought.load_init()?;
     let shipment = &mut ctx.accounts.shipment.load_mut()?;
+    let shipper = &mut ctx.accounts.shipper.load_mut()?;
     let forwarder = &mut ctx.accounts.forwarder.load_mut()?;
 
     shipment.owner = *ctx.accounts.signer.key;
 
     **forwarded = BoughtShipment {
-        buyer: *ctx.accounts.signer.key,
-        owner: *ctx.accounts.signer.key,
+        creator: shipper.creator,
+        buyer: ctx.accounts.signer.key(),
+        owner: ctx.accounts.signer.key(),
         no: forwarder.count,
         reserved: [0; 4],
         shipment: shipment.shipment,

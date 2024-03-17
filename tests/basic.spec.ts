@@ -296,6 +296,12 @@ describe('protocol', () => {
     const offerAddress = getOfferAddress(program, carrier.publicKey, 0)
     const shipmentAddress = getBoughtShipmentAddress(program, forwarder.publicKey, 0)
 
+    const subscriptionId = program.addEventListener('OfferMade', event => {
+      expect(event.from.equals(forwarder.publicKey)).true
+      expect(event.to.equals(carrier.publicKey)).true
+      expect(event.offer.equals(offerAddress)).true
+    })
+
     await program.methods
       .makeOffer(ONE_SOL, 3600)
       .accounts({
@@ -322,12 +328,20 @@ describe('protocol', () => {
     const carrierAccount = await program.account.carrier.fetch(carrierAddress)
     expect(carrierAccount.offers).eq(1)
     expect(carrierAccount.count).eq(0)
+
+    program.removeEventListener(subscriptionId)
   })
 
   it('accept offer', async () => {
     const offerAddress = getOfferAddress(program, carrier.publicKey, 0)
     const shipmentAddress = getBoughtShipmentAddress(program, forwarder.publicKey, 0)
     const taskAddress = getAcceptedOfferAddress(program, carrier.publicKey, 0)
+
+    const subscriptionId = program.addEventListener('OfferAccepted', event => {
+      expect(event.from.equals(forwarder.publicKey)).true
+      expect(event.to.equals(carrier.publicKey)).true
+      expect(event.offer.equals(offerAddress)).true
+    })
 
     await program.methods
       .acceptOffer()
@@ -356,5 +370,7 @@ describe('protocol', () => {
     expect(taskAccount.details.collateral.eq(offerAccount.details.collateral)).true
     expect(taskAccount.details.deadline.eq(offerAccount.details.deadline)).true
     expect(taskAccount.no).eq(0)
+
+    program.removeEventListener(subscriptionId)
   })
 })

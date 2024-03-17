@@ -1,6 +1,8 @@
 use anchor_lang::prelude::*;
 
-use crate::{AcceptedOffer, BoughtShipment, Carrier, Error, Forwarder, ShipmentOffer};
+use crate::{
+    AcceptedOffer, BoughtShipment, Carrier, Error, Forwarder, OfferAccepted, ShipmentOffer,
+};
 
 #[derive(Accounts)]
 pub struct AcceptOffer<'info> {
@@ -53,6 +55,12 @@ pub fn handler(ctx: Context<AcceptOffer>) -> Result<()> {
     };
 
     carrier.count += 1;
+
+    emit!(OfferAccepted {
+        from: shipment.buyer,
+        to: shipment.owner,
+        offer: ctx.accounts.offer.key(),
+    });
 
     Ok(())
 }

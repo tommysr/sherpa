@@ -1,6 +1,6 @@
 use anchor_lang::prelude::*;
 
-use crate::{BoughtShipment, Carrier, Error, Forwarder, OfferDetails, ShipmentOffer};
+use crate::{BoughtShipment, Carrier, Error, Forwarder, OfferDetails, OfferMade, ShipmentOffer};
 
 #[derive(Accounts)]
 pub struct MakeOffer<'info> {
@@ -54,6 +54,12 @@ pub fn handler(ctx: Context<MakeOffer>, payment: u64, timeout: u32) -> Result<()
     };
 
     carrier.offers += 1;
+
+    emit!(OfferMade {
+        from: ctx.accounts.forwarder.load()?.creator,
+        to: carrier.creator,
+        offer: ctx.accounts.offer.key(),
+    });
 
     Ok(())
 }
