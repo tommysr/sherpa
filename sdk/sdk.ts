@@ -85,3 +85,54 @@ export const getShipmentAddresses = (
 ) => {
   return Array.from({ length: count }, (_, i) => getShipmentAddress(program, shipper, i))
 }
+
+export const encodeName = (utf8Name: string) => {
+  const encoded = anchor.utils.bytes.utf8.encode(utf8Name)
+
+  if (encoded.length > 64) {
+    throw new Error('name too long')
+  }
+
+  const value: number[] = []
+  for (let i = 0; i < encoded.length; i++) {
+    switch (i % 4) {
+      case 0:
+        value.push(encoded[i])
+        break
+      case 1:
+        value[value.length - 1] |= encoded[i] << 8
+        break
+      case 2:
+        value[value.length - 1] |= encoded[i] << 16
+        break
+      case 3:
+        value[value.length - 1] |= encoded[i] << 24
+        break
+    }
+  }
+
+  while (value.length < 64) {
+    value.push(0)
+  }
+
+  return {
+    value
+  }
+}
+
+export const decodeName = (encoded: { value: number[] }): string => {
+  let result: number[] = []
+
+  for (let i of encoded.value) {
+    result.push(i % 256)
+    result.push((i >> 8) % 256)
+    result.push((i >> 16) % 256)
+    result.push((i >> 24) % 256)
+  }
+
+  while (result[result.length - 1] === 0) {
+    result.pop()
+  }
+
+  return anchor.utils.bytes.utf8.decode(Buffer.from(result))
+}

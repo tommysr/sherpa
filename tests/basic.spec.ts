@@ -4,6 +4,8 @@ import { Protocol } from '../target/types/protocol'
 import { Keypair, SystemProgram } from '@solana/web3.js'
 import { ONE_SOL, awaitedAirdrops } from './utils'
 import {
+  decodeName,
+  encodeName,
   getBoughtShipmentAddress,
   getCarrierAddress,
   getForwarderAddress,
@@ -56,7 +58,7 @@ describe('protocol', () => {
 
   it('register shipper', async () => {
     await program.methods
-      .registerShipper()
+      .registerShipper(encodeName('Alice'))
       .accounts({
         shipper: shipperAddress,
         signer: shipper.publicKey,
@@ -66,7 +68,9 @@ describe('protocol', () => {
       .rpc()
 
     const shipperAccount = await program.account.shipper.fetch(shipperAddress)
+    expect(shipperAccount.creator.equals(shipper.publicKey)).true
     expect(shipperAccount.authority.equals(shipper.publicKey)).true
+    expect(decodeName(shipperAccount.name)).eq('Alice')
     expect(shipperAccount.count).eq(0)
   })
 
@@ -203,7 +207,7 @@ describe('protocol', () => {
 
   it('register forwarder', async () => {
     await program.methods
-      .registerForwarder()
+      .registerForwarder(encodeName('Bob'))
       .accounts({
         forwarder: forwarderAddress,
         signer: forwarder.publicKey,
@@ -213,7 +217,9 @@ describe('protocol', () => {
       .rpc()
 
     const forwarderAccount = await program.account.forwarder.fetch(forwarderAddress)
+    expect(forwarderAccount.creator.equals(forwarder.publicKey)).true
     expect(forwarderAccount.authority.equals(forwarder.publicKey)).true
+    expect(decodeName(forwarderAccount.name)).eq('Bob')
     expect(forwarderAccount.count).eq(0)
   })
 
@@ -265,7 +271,7 @@ describe('protocol', () => {
     }
 
     await program.methods
-      .registerCarrier(availability)
+      .registerCarrier(encodeName('Carol'), availability)
       .accounts({
         carrier: carrierAddress,
         signer: carrier.publicKey,
@@ -275,8 +281,12 @@ describe('protocol', () => {
       .rpc()
 
     const carrierAccount = await program.account.carrier.fetch(carrierAddress)
+    expect(carrierAccount.creator.equals(carrier.publicKey)).true
     expect(carrierAccount.authority.equals(carrier.publicKey)).true
+    expect(decodeName(carrierAccount.name)).eq('Carol')
     expect(carrierAccount.availability.time.eq(availability.time)).true
     expect(carrierAccount.availability.location).to.deep.equal(availability.location)
+    expect(carrierAccount.offers).eq(0)
+    expect(carrierAccount.count).eq(0)
   })
 })
