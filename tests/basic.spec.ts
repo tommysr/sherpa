@@ -296,7 +296,7 @@ describe('protocol', () => {
     const shipmentAddress = getBoughtShipmentAddress(program, forwarder.publicKey, 0)
 
     await program.methods
-      .createOffer(ONE_SOL, 3600)
+      .makeOffer(ONE_SOL, 3600)
       .accounts({
         offer: offerAddress,
         shipment: shipmentAddress,

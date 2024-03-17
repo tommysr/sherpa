@@ -3,7 +3,7 @@ use anchor_lang::prelude::*;
 use crate::{BoughtShipment, Carrier, Error, Forwarder, ShipmentOffer};
 
 #[derive(Accounts)]
-pub struct CreateOffer<'info> {
+pub struct MakeOffer<'info> {
     #[account(init,
         // Potentially DoSable
         seeds = [b"offer", carrier.load().unwrap().creator.as_ref(), &carrier.load().unwrap().offers.to_le_bytes()], bump,
@@ -29,7 +29,7 @@ pub struct CreateOffer<'info> {
     pub system_program: Program<'info, System>,
 }
 
-pub fn handler(ctx: Context<CreateOffer>, payment: u64, timeout: u32) -> Result<()> {
+pub fn handler(ctx: Context<MakeOffer>, payment: u64, timeout: u32) -> Result<()> {
     let offer = &mut ctx.accounts.offer.load_init()?;
     let carrier = &mut ctx.accounts.carrier.load_mut()?;
     let shipment = &mut ctx.accounts.shipment.load_mut()?;
