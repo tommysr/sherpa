@@ -8,7 +8,7 @@ export const SHIPPER_SEED = 'shipper'
 export const FORWARDER_SEED = 'forwarder'
 export const CARRIER_SEED = 'carrier'
 export const SHIPMENT_SEED = 'shipment'
-export const BOUGHT_SHIPMENT_SEED = 'boughtShipment'
+export const BOUGHT_SHIPMENT_SEED = 'forwarded'
 
 export const getStateAddress = (program: Program<Protocol>) => {
   const [stateAddress, stateBump] = PublicKey.findProgramAddressSync(

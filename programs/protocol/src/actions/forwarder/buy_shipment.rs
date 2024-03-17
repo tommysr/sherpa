@@ -5,7 +5,7 @@ use crate::{BoughtShipment, Error, Forwarder, Shipment, ShipmentTransferred, Shi
 #[derive(Accounts)]
 pub struct BuyShipment<'info> {
     #[account(init,
-        seeds = [b"boughtShipment", signer.key.as_ref(), &forwarder.load().unwrap().count.to_le_bytes()], bump,
+        seeds = [b"forwarded", signer.key.as_ref(), &forwarder.load().unwrap().count.to_le_bytes()], bump,
         payer = signer,
         space = 8 + std::mem::size_of::<BoughtShipment>()
     )]
@@ -29,13 +29,14 @@ pub struct BuyShipment<'info> {
 }
 
 pub fn handler(ctx: Context<BuyShipment>) -> Result<()> {
-    let bought = &mut ctx.accounts.bought.load_init()?;
+    let forwarded = &mut ctx.accounts.bought.load_init()?;
     let shipment = &mut ctx.accounts.shipment.load_mut()?;
     let forwarder = &mut ctx.accounts.forwarder.load_mut()?;
 
     shipment.owner = *ctx.accounts.signer.key;
 
-    **bought = BoughtShipment {
+    **forwarded = BoughtShipment {
+        buyer: *ctx.accounts.signer.key,
         owner: *ctx.accounts.signer.key,
         no: forwarder.count,
         reserved: [0; 4],

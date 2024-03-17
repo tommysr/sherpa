@@ -20,19 +20,20 @@ pub mod protocol {
         actions::initialize_state::handler(ctx)
     }
 
-    pub fn register_shipper(ctx: Context<RegisterShipper>) -> Result<()> {
-        actions::shipper::register::handler(ctx)
+    pub fn register_shipper(ctx: Context<RegisterShipper>, name: Name) -> Result<()> {
+        actions::shipper::register::handler(ctx, name)
     }
 
-    pub fn register_forwarder(ctx: Context<RegisterForwarder>) -> Result<()> {
-        actions::forwarder::register::handler(ctx)
+    pub fn register_forwarder(ctx: Context<RegisterForwarder>, name: Name) -> Result<()> {
+        actions::forwarder::register::handler(ctx, name)
     }
 
     pub fn register_carrier(
         ctx: Context<RegisterCarrier>,
+        name: Name,
         availability: Option<Availability>,
     ) -> Result<()> {
-        actions::carrier::register::handler(ctx, availability)
+        actions::carrier::register::handler(ctx, name, availability)
     }
 
     pub fn create_shipment(
@@ -45,5 +46,9 @@ pub mod protocol {
 
     pub fn buy_shipment(ctx: Context<BuyShipment>) -> Result<()> {
         actions::buy_shipment::handler(ctx)
+    }
+
+    pub fn create_offer(ctx: Context<CreateOffer>, payment: u64) -> Result<()> {
+        actions::create_offer::handler(ctx, payment)
     }
 }

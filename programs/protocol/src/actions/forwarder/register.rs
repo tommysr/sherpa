@@ -1,6 +1,6 @@
 use anchor_lang::prelude::*;
 
-use crate::Forwarder;
+use crate::{Forwarder, Name};
 
 #[derive(Accounts)]
 pub struct RegisterForwarder<'info> {
@@ -15,11 +15,13 @@ pub struct RegisterForwarder<'info> {
     pub system_program: Program<'info, System>,
 }
 
-pub fn handler(ctx: Context<RegisterForwarder>) -> Result<()> {
+pub fn handler(ctx: Context<RegisterForwarder>, name: Name) -> Result<()> {
     let account = &mut ctx.accounts.forwarder.load_init()?;
 
     **account = Forwarder {
-        authority: *ctx.accounts.signer.key,
+        creator: ctx.accounts.signer.key(),
+        authority: ctx.accounts.signer.key(),
+        name,
         count: 0,
     };
 

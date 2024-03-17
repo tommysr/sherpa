@@ -1,6 +1,6 @@
 use anchor_lang::prelude::*;
 
-use crate::{Availability, Carrier};
+use crate::{Availability, Carrier, Name};
 
 
 #[derive(Accounts)]
@@ -16,12 +16,16 @@ pub struct RegisterCarrier<'info> {
     pub system_program: Program<'info, System>,
 }
 
-pub fn handler(ctx: Context<RegisterCarrier>, availability: Option<Availability>) -> Result<()> {
+pub fn handler(ctx: Context<RegisterCarrier>, name: Name, availability: Option<Availability>) -> Result<()> {
     let account = &mut ctx.accounts.carrier.load_init()?;
 
     **account = Carrier {
+        creator: *ctx.accounts.signer.key,
         authority: *ctx.accounts.signer.key,
-        availability: availability.unwrap_or_default()
+        name,
+        availability: availability.unwrap_or_default(),
+        offers: 0,
+        count: 0,
     };
 
     Ok(())
