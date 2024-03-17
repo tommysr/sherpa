@@ -10,4 +10,7 @@ pub struct ShipmentOffer {
     pub collateral: u64,
     pub deadline: u64,
     pub shipment: ShipmentData,
+    pub submitted: i64,
+    pub timeout: u32,
+    pub no: u32,
 }

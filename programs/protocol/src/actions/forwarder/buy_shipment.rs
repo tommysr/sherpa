@@ -5,7 +5,7 @@ use crate::{BoughtShipment, Error, Forwarder, Shipment, ShipmentTransferred, Shi
 #[derive(Accounts)]
 pub struct BuyShipment<'info> {
     #[account(init,
-        seeds = [b"forwarded", signer.key.as_ref(), &forwarder.load().unwrap().count.to_le_bytes()], bump,
+        seeds = [b"forwarded", forwarder.load().unwrap().creator.as_ref(), &forwarder.load().unwrap().count.to_le_bytes()], bump,
         payer = signer,
         space = 8 + std::mem::size_of::<BoughtShipment>()
     )]
@@ -19,7 +19,7 @@ pub struct BuyShipment<'info> {
     )]
     pub shipper: AccountLoader<'info, Shipper>,
     #[account(mut, 
-        seeds = [b"forwarder", forwarder.load().unwrap().authority.as_ref()], bump,
+        seeds = [b"forwarder", forwarder.load().unwrap().creator.as_ref()], bump,
         constraint = forwarder.load().unwrap().authority == *signer.key @ Error::SignerNotAnAuthority
     )]
     pub forwarder: AccountLoader<'info, Forwarder>,

@@ -2,13 +2,14 @@ import * as anchor from '@coral-xyz/anchor'
 import { BN, Program } from '@coral-xyz/anchor'
 import { Protocol } from '../target/types/protocol'
 import { Keypair, SystemProgram } from '@solana/web3.js'
-import { ONE_SOL, awaitedAirdrops } from './utils'
+import { ONE_HOUR, ONE_SOL, awaitedAirdrops } from './utils'
 import {
   decodeName,
   encodeName,
   getBoughtShipmentAddress,
   getCarrierAddress,
   getForwarderAddress,
+  getOfferAddress,
   getShipmentAddress,
   getShipperAddress,
   getStateAddress
@@ -287,6 +288,37 @@ describe('protocol', () => {
     expect(carrierAccount.availability.time.eq(availability.time)).true
     expect(carrierAccount.availability.location).to.deep.equal(availability.location)
     expect(carrierAccount.offers).eq(0)
+    expect(carrierAccount.count).eq(0)
+  })
+
+  it('make offer', async () => {
+    const offerAddress = getOfferAddress(program, carrier.publicKey, 0)
+    const shipmentAddress = getBoughtShipmentAddress(program, forwarder.publicKey, 0)
+
+    await program.methods
+      .createOffer(ONE_SOL, 3600)
+      .accounts({
+        offer: offerAddress,
+        shipment: shipmentAddress,
+        forwarder: forwarderAddress,
+        carrier: carrierAddress,
+        signer: forwarder.publicKey
+      })
+      .signers([forwarder])
+      .rpc()
+
+    const boughtShipment = await program.account.boughtShipment.fetch(shipmentAddress)
+    expect(boughtShipment.buyer.equals(forwarder.publicKey)).true
+    expect(boughtShipment.owner.equals(carrier.publicKey)).true
+
+    const offerAccount = await program.account.shipmentOffer.fetch(offerAddress)
+    expect(offerAccount.owner.equals(carrier.publicKey)).true
+    expect(offerAccount.payment.eq(ONE_SOL)).true
+    expect(offerAccount.collateral.eqn(0)).true
+    expect(offerAccount.shipment).to.deep.equal(boughtShipment.shipment)
+
+    const carrierAccount = await program.account.carrier.fetch(carrierAddress)
+    expect(carrierAccount.offers).eq(1)
     expect(carrierAccount.count).eq(0)
   })
 })

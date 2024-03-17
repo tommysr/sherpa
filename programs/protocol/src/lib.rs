@@ -48,7 +48,7 @@ pub mod protocol {
         actions::buy_shipment::handler(ctx)
     }
 
-    pub fn create_offer(ctx: Context<CreateOffer>, payment: u64) -> Result<()> {
-        actions::create_offer::handler(ctx, payment)
+    pub fn create_offer(ctx: Context<CreateOffer>, payment: u64, timeout: u32) -> Result<()> {
+        actions::create_offer::handler(ctx, payment, timeout)
     }
 }
