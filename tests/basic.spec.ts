@@ -6,6 +6,7 @@ import { ONE_HOUR, ONE_SOL, U32_MAX, awaitedAirdrops } from './utils'
 import {
   decodeName,
   encodeName,
+  getAcceptedOfferAddress,
   getBoughtShipmentAddress,
   getCarrierAddress,
   getForwarderAddress,
@@ -309,7 +310,7 @@ describe('protocol', () => {
 
     const boughtShipment = await program.account.boughtShipment.fetch(shipmentAddress)
     expect(boughtShipment.buyer.equals(forwarder.publicKey)).true
-    expect(boughtShipment.owner.equals(carrier.publicKey)).true
+    expect(boughtShipment.owner.equals(forwarder.publicKey)).true
 
     const offerAccount = await program.account.shipmentOffer.fetch(offerAddress)
     expect(offerAccount.owner.equals(carrier.publicKey)).true
@@ -321,5 +322,39 @@ describe('protocol', () => {
     const carrierAccount = await program.account.carrier.fetch(carrierAddress)
     expect(carrierAccount.offers).eq(1)
     expect(carrierAccount.count).eq(0)
+  })
+
+  it('accept offer', async () => {
+    const offerAddress = getOfferAddress(program, carrier.publicKey, 0)
+    const shipmentAddress = getBoughtShipmentAddress(program, forwarder.publicKey, 0)
+    const taskAddress = getAcceptedOfferAddress(program, carrier.publicKey, 0)
+
+    await program.methods
+      .acceptOffer()
+      .accounts({
+        task: taskAddress,
+        offer: offerAddress,
+        shipment: shipmentAddress,
+        forwarder: forwarderAddress,
+        carrier: carrierAddress,
+        signer: carrier.publicKey
+      })
+      .signers([carrier])
+      .rpc()
+
+    const shipmentAccount = await program.account.boughtShipment.fetch(shipmentAddress)
+    expect(shipmentAccount.buyer.equals(forwarder.publicKey)).true
+    expect(shipmentAccount.owner.equals(carrier.publicKey)).true
+
+    const offerAccount = await program.account.shipmentOffer.fetch(offerAddress)
+    expect(offerAccount.owner.equals(carrier.publicKey)).true
+
+    const taskAccount = await program.account.acceptedOffer.fetch(taskAddress)
+    expect(taskAccount.owner.equals(carrier.publicKey)).true
+    expect(taskAccount.shipment).to.deep.equal(shipmentAccount.shipment)
+    expect(taskAccount.details.payment.eq(offerAccount.details.payment)).true
+    expect(taskAccount.details.collateral.eq(offerAccount.details.collateral)).true
+    expect(taskAccount.details.deadline.eq(offerAccount.details.deadline)).true
+    expect(taskAccount.no).eq(0)
   })
 })

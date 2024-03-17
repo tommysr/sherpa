@@ -51,4 +51,8 @@ pub mod protocol {
     pub fn make_offer(ctx: Context<MakeOffer>, payment: u64, timeout: u32) -> Result<()> {
         actions::make_offer::handler(ctx, payment, timeout)
     }
+
+    pub fn accept_offer(ctx: Context<AcceptOffer>) -> Result<()> {
+        actions::accept_offer::handler(ctx)
+    }
 }

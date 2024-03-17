@@ -13,6 +13,7 @@ pub struct MakeOffer<'info> {
     pub offer: AccountLoader<'info, ShipmentOffer>,
     #[account(mut,
         seeds = [b"forwarded", forwarder.load().unwrap().creator.as_ref(), &shipment.load().unwrap().no.to_le_bytes()], bump,
+        constraint = shipment.load().unwrap().buyer == *signer.key @ Error::SignerNotAnOwner,
     )]
     pub shipment: AccountLoader<'info, BoughtShipment>,
     #[account(mut,
@@ -34,19 +35,9 @@ pub fn handler(ctx: Context<MakeOffer>, payment: u64, timeout: u32) -> Result<()
     let carrier = &mut ctx.accounts.carrier.load_mut()?;
     let shipment = &mut ctx.accounts.shipment.load_mut()?;
 
-    require_eq!(
-        shipment.buyer,
-        *ctx.accounts.signer.key,
-        Error::ShipmentSold
-    );
+    require_eq!(shipment.buyer, shipment.owner, Error::ShipmentSold);
 
-    require_eq!(
-        shipment.buyer,
-        *ctx.accounts.signer.key,
-        Error::SignerNotAnOwner
-    );
-
-    shipment.owner = carrier.creator;
+    let now = Clock::get()?.unix_timestamp;
 
     **offer = ShipmentOffer {
         owner: carrier.creator,
@@ -56,9 +47,10 @@ pub fn handler(ctx: Context<MakeOffer>, payment: u64, timeout: u32) -> Result<()
             deadline: u64::MAX,
         },
         shipment: shipment.shipment,
-        submitted: Clock::get()?.unix_timestamp,
-        timeout,
+        submitted: now,
+        timeout: now + timeout as i64,
         no: carrier.offers,
+        shipment_no: shipment.no,
     };
 
     carrier.offers += 1;
