@@ -86,9 +86,13 @@
 		const { depth, height, weight, width } = order.dimensions;
 		const { from, to } = order.location;
 
+		// typing XD
+		const deadlineDate = new Date(deadline!);
+		const whenDate = new Date(when!);
+
 		const createShipmentIx = await program.methods
-			.createShipment(new BN(price! * 10 ** 6), {
-				deadline: new BN(deadline!.valueOf()),
+			.createShipment(new BN(price! * 10 ** 9), {
+				deadline: new BN(deadlineDate.valueOf()),
 				details: {
 					priority: priority ?? 0,
 					access: access ?? 0,
@@ -106,7 +110,7 @@
 					from: { latitude: from?.lat!, longitude: from?.lng! },
 					to: { latitude: to?.lat!, longitude: from?.lng! }
 				},
-				when: new BN(when!.valueOf())
+				when: new BN(whenDate.valueOf())
 			})
 			.accounts({
 				shipper,
@@ -173,10 +177,17 @@
 					bind:isMetricTon={$formStore.isMetricTon}
 				/>
 			{:else if $formStore.nextState == 'submit'}
-				<Details />
+				<Details
+					bind:priority={$formStore.details.priority}
+					bind:count={$formStore.details.count}
+					bind:fragility={$formStore.details.fragility}
+					bind:access={$formStore.details.access}
+				/>
 			{/if}
 
-			<button class="s-button" type="submit" on:click|preventDefault={handleButtonClick}>{$formStore.nextState}</button>
+			<button class="s-button" type="submit" on:click|preventDefault={handleButtonClick}
+				>{$formStore.nextState}</button
+			>
 		</form>
 	</div>
 </main>

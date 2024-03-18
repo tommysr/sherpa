@@ -6,6 +6,8 @@ import { PublicKey } from '@solana/web3.js';
 export const STATE_SEED = 'state';
 export const SHIPPER_SEED = 'shipper';
 export const TRANSPORT_SEED = 'shipment';
+export const FORWARDER_SEED = 'forwarder'
+
 
 export const getStateAddressWithBump = (program: Program<Protocol>): [PublicKey, number] => {
 	const [stateAddress, stateBump] = PublicKey.findProgramAddressSync(
@@ -38,3 +40,11 @@ export const getShipmentAddress = (
 
 	return shipmentAddress;
 };
+
+export const getForwarderAddress = (program: Program<Protocol>, forwarder: PublicKey) => {
+	const [forwarderAddress, shipperBump] = PublicKey.findProgramAddressSync(
+	  [Buffer.from(anchor.utils.bytes.utf8.encode(FORWARDER_SEED)), forwarder.toBuffer()],
+	  program.programId
+	)
+	return forwarderAddress
+  }
