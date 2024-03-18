@@ -288,8 +288,8 @@ describe('protocol', () => {
     expect(decodeName(carrierAccount.name)).eq('Carol')
     expect(carrierAccount.availability.time.eq(availability.time)).true
     expect(carrierAccount.availability.location).to.deep.equal(availability.location)
-    expect(carrierAccount.offers).eq(0)
-    expect(carrierAccount.count).eq(0)
+    expect(carrierAccount.offersCount).eq(0)
+    expect(carrierAccount.tasksCount).eq(0)
   })
 
   it('make offer', async () => {
@@ -326,8 +326,8 @@ describe('protocol', () => {
     expect(offerAccount.shipment).to.deep.equal(boughtShipment.shipment)
 
     const carrierAccount = await program.account.carrier.fetch(carrierAddress)
-    expect(carrierAccount.offers).eq(1)
-    expect(carrierAccount.count).eq(0)
+    expect(carrierAccount.offersCount).eq(1)
+    expect(carrierAccount.tasksCount).eq(0)
 
     program.removeEventListener(subscriptionId)
   })

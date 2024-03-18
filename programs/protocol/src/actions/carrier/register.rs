@@ -24,8 +24,8 @@ pub fn handler(ctx: Context<RegisterCarrier>, name: Name, availability: Option<A
         authority: *ctx.accounts.signer.key,
         name,
         availability: availability.unwrap_or_default(),
-        offers: 0,
-        count: 0,
+        offers_count: 0,
+        tasks_count: 0,
     };
 
     Ok(())

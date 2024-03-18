@@ -7,7 +7,7 @@ use crate::{
 #[derive(Accounts)]
 pub struct AcceptOffer<'info> {
     #[account(init,
-        seeds = [b"task", carrier.load().unwrap().creator.as_ref(), &carrier.load().unwrap().count.to_le_bytes()], bump,
+        seeds = [b"task", carrier.load().unwrap().creator.as_ref(), &carrier.load().unwrap().tasks_count.to_le_bytes()], bump,
         payer = signer,
         space = 8 + std::mem::size_of::<AcceptedOffer>()
     )]
@@ -49,12 +49,12 @@ pub fn handler(ctx: Context<AcceptOffer>) -> Result<()> {
         owner: carrier.creator,
         details: offer.details,
         shipment: shipment.shipment,
-        no: carrier.count,
+        no: carrier.tasks_count,
         accepted: Clock::get()?.unix_timestamp,
         reserved: [0; 4],
     };
 
-    carrier.count += 1;
+    carrier.tasks_count += 1;
 
     emit!(OfferAccepted {
         from: shipment.buyer,

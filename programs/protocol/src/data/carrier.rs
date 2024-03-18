@@ -19,6 +19,6 @@ pub struct Carrier {
     pub authority: Pubkey,
     pub name: Name,
     pub availability: Availability,
-    pub offers: u32,
-    pub count: u32,
+    pub offers_count: u32,
+    pub tasks_count: u32,
 }

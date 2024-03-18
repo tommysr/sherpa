@@ -6,7 +6,7 @@ use crate::{BoughtShipment, Carrier, Error, Forwarder, OfferDetails, OfferMade, 
 pub struct MakeOffer<'info> {
     #[account(init,
         // Potentially DoSable
-        seeds = [b"offer", carrier.load().unwrap().creator.as_ref(), &carrier.load().unwrap().offers.to_le_bytes()], bump,
+        seeds = [b"offer", carrier.load().unwrap().creator.as_ref(), &carrier.load().unwrap().offers_count.to_le_bytes()], bump,
         payer = signer,
         space = 8 + std::mem::size_of::<ShipmentOffer>()
     )]
@@ -49,11 +49,11 @@ pub fn handler(ctx: Context<MakeOffer>, payment: u64, timeout: u32) -> Result<()
         shipment: shipment.shipment,
         submitted: now,
         timeout: now + timeout as i64,
-        no: carrier.offers,
+        no: carrier.offers_count,
         shipment_no: shipment.no,
     };
 
-    carrier.offers += 1;
+    carrier.offers_count += 1;
 
     emit!(OfferMade {
         from: ctx.accounts.forwarder.load()?.creator,
