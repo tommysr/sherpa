@@ -11,7 +11,7 @@ export const ANDREW = Keypair.fromSecretKey(
 )
 
 // An owner of Audi A5, working for courier for multiple companies
-export const ROBERT = Keypair.fromSecretKey(
+export const IGOR = Keypair.fromSecretKey(
   Uint8Array.from(
     Buffer.from(
       'coT8N5ulqBThzrEoMRXnHnKLoT3EAGpe/LvPC74eZOY2bBBlImECtu07LsPaR2D5920YfVDQTB0yTuR9ti0n3A==',
