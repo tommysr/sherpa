@@ -74,6 +74,7 @@
 	}
 
 	async function getLocationFromCoords(lat: number, long: number): Promise<string> {
+		return `${lat.toFixed(4)}, ${long.toFixed(4)}`;
 		// const response = await fetch(
 		// 	`https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${lat}&lon=${long}`
 		// );
@@ -87,7 +88,6 @@
 		// } else {
 		// 	throw Error('No location found');
 		// }
-		return 's';
 	}
 </script>
 

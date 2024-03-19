@@ -37,6 +37,7 @@ export function createSearchStore<T extends SearchItem>(initialData: T[]) {
 		subscribe,
 		set,
 		update,
+		default: (defData: T[]) => set({ data: defData, filtered: defData, searchString: '', searchState: 'none' }),
 		performSearch: () => update(filterByString),
 		purgeFiltered: () => update(purgeFiltered)
 	};

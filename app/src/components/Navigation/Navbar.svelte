@@ -11,8 +11,8 @@
 
 		<div class="lg:flex lg:gap-x-10">
 			<a href="/orders" class="text-sm font-semibold">Shippers</a>
-			<a href="/forwarder" class="text-sm font-semibold">Forwarders</a>
-			<a href="</carrier" class="text-sm font-semibold">Carriers</a>
+			<a href="/orders/bought" class="text-sm font-semibold">Forwarders</a>
+			<a href="/carrier" class="text-sm font-semibold">Carriers</a>
 		</div>
 		
 		<div class="flex lg:flex-1 lg:justify-end">
