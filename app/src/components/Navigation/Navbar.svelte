@@ -11,7 +11,7 @@
 
 		<div class="lg:flex lg:gap-x-10">
 			<a href="/shipments" class="text-sm font-semibold">Shippers</a>
-			<a href="/shipments/bought" class="text-sm font-semibold">Forwarders</a>
+			<a href="/shipments/add" class="text-sm font-semibold">Forwarders</a>
 			<a href="/carrier" class="text-sm font-semibold">Carriers</a>
 		</div>
 

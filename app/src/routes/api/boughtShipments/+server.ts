@@ -5,6 +5,7 @@ import type {
 	ApiBoughtShipmentAccount,
 	BoughtShipmentAccount
 } from '$src/utils/idl/boughtShipment';
+import { parseBoughtShipmentToApiBoughtShipment } from '$src/utils/parse/boughtShipment';
 
 export async function GET() {
 	const { program } = get(anchorStore);
@@ -20,23 +21,7 @@ export async function GET() {
 		return {
 			...shipment,
 			publicKey: shipment.publicKey.toString(),
-			account: {
-				...shipment.account,
-				buyer: shipment.account.buyer.toString(),
-				creator: shipment.account.creator.toString(),
-				owner: shipment.account.owner.toString(),
-				shipment: {
-					...shipment.account.shipment,
-					dimensions: {
-						depth: shipment.account.shipment.dimensions.depth / 1000,
-						height: shipment.account.shipment.dimensions.height / 1000,
-						width: shipment.account.shipment.dimensions.width / 1000,
-						weight: shipment.account.shipment.dimensions.weight / 1000
-					},
-					when: new Date(shipment.account.shipment.when.toNumber()).toISOString(),
-					deadline: new Date(shipment.account.shipment.deadline.toNumber()).toISOString()
-				}
-			}
+			account: parseBoughtShipmentToApiBoughtShipment(shipment.account)
 		};
 	});
 

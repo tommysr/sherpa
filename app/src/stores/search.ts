@@ -25,6 +25,20 @@ const purgeFiltered = <T>(s: SearchStoreInt<T>) => {
 	return s;
 };
 
+const addItem = <T>(item: T) => {
+	return (s: SearchStoreInt<T>) => {
+		s.data.push(item);
+		return s;
+	};
+};
+
+const removeItem = <T>(index: number) => {
+	return (s: SearchStoreInt<T>) => {
+		s.data.splice(index, 1);
+		return s;
+	};
+};
+
 export function createSearchStore<T extends SearchItem>(initialData: T[]) {
 	const { subscribe, set, update } = writable<SearchStoreInt<T>>({
 		data: initialData,
@@ -37,8 +51,11 @@ export function createSearchStore<T extends SearchItem>(initialData: T[]) {
 		subscribe,
 		set,
 		update,
-		default: (defData: T[]) => set({ data: defData, filtered: defData, searchString: '', searchState: 'none' }),
+		default: (defData: T[]) =>
+			set({ data: defData, filtered: defData, searchString: '', searchState: 'none' }),
 		performSearch: () => update(filterByString),
-		purgeFiltered: () => update(purgeFiltered)
+		purgeFiltered: () => update(purgeFiltered),
+		extend: (item: T) => update(addItem(item)),
+		shrink: (index: number) => update(removeItem(index))
 	};
 }

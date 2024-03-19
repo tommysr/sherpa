@@ -11,14 +11,17 @@
 	import { get } from 'svelte/store';
 	import CancelConfirmModal from './CancelConfirmModal.svelte';
 	import { PublicKey, Transaction, TransactionInstruction } from '@solana/web3.js';
-	import { getForwarderAddress, getShipperAddress } from '$sdk';
+	import {
+		getBoughtShipmentAddress,
+		getForwarderAddress,
+		getShipperAddress
+	} from '../../../../sdk/sdk';
 	import { walletStore } from '$src/stores/wallet';
 	import { web3Store } from '$src/stores/web3';
 	import { useSignAndSendTransaction } from '$src/utils/wallet/singAndSendTx';
-	import { encodeName, getShipmentAddress } from '$sdk';
+	import { encodeName } from '$sdk/sdk';
 	import SimpleButton from '../Buttons/SimpleButton.svelte';
 	import type { Entries } from '$src/utils/types/object';
-	import ConfirmModal from './ConfirmModal.svelte';
 	import NameModal from './NameModal.svelte';
 
 	export let shipmentAccount: ApiShipmentAccount;
@@ -77,11 +80,8 @@
 		const tx = new Transaction();
 
 		if (!forwarderAccount) {
-			console.log('opening modal');
 			isNameModalOpen = true;
-			console.log('waiting for name');
 			const name = await waitForName();
-			console.log(name);
 			const registerIx = await registerForwarderIx(forwarder, name);
 			tx.add(registerIx);
 		}
@@ -89,14 +89,16 @@
 		const ix = await program.methods
 			.buyShipment()
 			.accounts({
-				shipper: getShipperAddress(program, new PublicKey(shipmentData.shipper)),
+				shipper: getShipperAddress(program, new PublicKey(shipmentAccount.account.shipper)),
 				shipment: new PublicKey(shipmentAccount.publicKey),
 				forwarder,
+				bought: getBoughtShipmentAddress(program, wallet.publicKey!, forwarderAccount?.count || 0),
 				signer: wallet.publicKey!
 			})
 			.instruction();
 
 		tx.add(ix);
+
 		const sig = await useSignAndSendTransaction(connection, wallet, tx);
 		return sig;
 	}
