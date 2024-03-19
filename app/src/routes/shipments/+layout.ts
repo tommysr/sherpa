@@ -14,7 +14,7 @@ export async function load({
 }): Promise<{ orders: ApiShipmentAccount[]; boughtOrders: ApiBoughtShipmentAccount[] }> {
 	try {
 		const [fetchedOrders, fetchedBoughtOrders] = await Promise.all([
-			fetch('/api/orders', {
+			fetch('/api/shipments', {
 				method: 'GET',
 				headers: {
 					'content-type': 'application/json'
@@ -41,7 +41,6 @@ export async function load({
 		});
 
 		// TODO: make it more specific
-
 		const searchableBoughtOrders: SearchableBoughtOrder[] = boughtOrders.map(
 			(order: ApiBoughtShipmentAccount) => {
 				return {
