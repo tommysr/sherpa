@@ -1,7 +1,7 @@
 <script lang="ts">
 	// Components
 	import ScrollableMenu from '$src/components/Navigation/ScrollableMenu.svelte';
-	import CategoryButton from '$src/components/Navigation/CategoryButton.svelte';
+	import CategoryButton from '$src/components/Buttons/CategoryButton.svelte';
 	import HotNavigation from '$src/components/Navigation/HotNavigation.svelte';
 	import OrderCard from '$src/components/Shipment/OrderCard.svelte';
 	import ShipmentsMap from '$src/components/ShipmentMap/ShipmentsMap.svelte';
@@ -50,13 +50,13 @@
 <svelte:head><title>Shipments list</title></svelte:head>
 
 <main class="container">
-	<!-- <ScrollableMenu>
+	<ScrollableMenu>
 		{#each categories as category}
 			<CategoryButton on:click={() => console.log(`clicked category ${category}`)}
 				>{category}</CategoryButton
 			>
 		{/each}
-	</ScrollableMenu> -->
+	</ScrollableMenu>
 
 	<HotNavigation
 		bind:searchValue={$searchableShipments.searchString}

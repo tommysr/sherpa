@@ -17,6 +17,8 @@
 	import DatePick from '$src/components/ShipmentForm/DatePick.svelte';
 	import DimensionsPick from '$src/components/ShipmentForm/DimensionsPick.svelte';
 	import Details from '$src/components/ShipmentForm/Details.svelte';
+	import SimpleButton from '$src/components/Buttons/SimpleButton.svelte';
+	import { encodeName } from '../../../../../sdk/sdk';
 
 	async function registerShipper(shipper: PublicKey) {
 		const { program } = get(anchorStore);
@@ -24,7 +26,7 @@
 		const wallet = get(walletStore);
 
 		const registerShipperIx = await program.methods
-			.registerShipper()
+			.registerShipper(encodeName('shipper'))
 			.accounts({
 				shipper,
 				signer: wallet.publicKey!
@@ -185,9 +187,7 @@
 				/>
 			{/if}
 
-			<button class="s-button" type="submit" on:click|preventDefault={handleButtonClick}
-				>{$formStore.nextState}</button
-			>
+			<SimpleButton value={$formStore.nextState} on:click={handleButtonClick} />
 		</form>
 	</div>
 </main>

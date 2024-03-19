@@ -1,4 +1,6 @@
 <script lang="ts">
+	import SimpleButton from '../Buttons/SimpleButton.svelte';
+
 	let modalElement: HTMLDialogElement;
 	let statusElement: HTMLDivElement;
 
@@ -43,7 +45,7 @@
 	}
 </script>
 
-<dialog  id="confirm-modal" bind:this={modalElement}>
+<dialog id="confirm-modal" bind:this={modalElement}>
 	<article>
 		<header>
 			<slot name="header" />
@@ -65,15 +67,8 @@
 				</ins>
 			{/if}
 			<span>
-				<button role="button" class="secondary" data-target="confirm-modal" on:click={closeModal}>
-					Cancel</button
-				><button
-					role="button"
-					autofocus
-					data-target="confirm-modal"
-					on:click={handleConfirmClick}
-					disabled={confirmButtonDisabled}>confirm</button
-				>
+				<SimpleButton value="Cancel" on:click={closeModal} />
+				<SimpleButton value="confirm" on:click={handleConfirmClick} />
 			</span>
 		</footer>
 	</article>

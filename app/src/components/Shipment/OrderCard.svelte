@@ -16,6 +16,7 @@
 	import { web3Store } from '$src/stores/web3';
 	import { useSignAndSendTransaction } from '$src/utils/wallet/singAndSendTx';
 	import { encodeName } from '../../../../sdk/sdk';
+	import SimpleButton from '../Buttons/SimpleButton.svelte';
 
 	type Entries<T> = {
 		[K in keyof T]: [K, T[K]];
@@ -144,12 +145,7 @@
 			</div>
 		</div>
 		<div class="hidden shrink-0 sm:flex sm:flex-col sm:items-end basis-1/6">
-			<button
-				class="mx-1 px-4 py-1 text-sm text-white font-semibold bg-orange-400 rounded-md border border-orange-200 hover:text-white hover:bg-orange-600"
-				on:click={() => (isBuyClicked = !isBuyClicked)}
-			>
-				Buy
-			</button>
+			<SimpleButton on:click={() => (isBuyClicked = !isBuyClicked)} value="Buy" />
 		</div>
 	</div>
 	<footer class="flex justify-between">

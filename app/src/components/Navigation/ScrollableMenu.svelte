@@ -27,15 +27,4 @@
 </div>
 
 <style lang="scss">
-	// .scrollable {
-	// 	margin-top: 20px;
-	// 	display: grid;
-	// 	grid-template-columns: 50px auto 50px;
-	// }
-
-	// .scroll {
-	// 	display: flex;
-	// 	overflow-x: hidden;
-	// 	gap: 20px;
-	// }
 </style>

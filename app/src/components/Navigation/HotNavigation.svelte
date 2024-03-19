@@ -20,7 +20,7 @@
 	];
 </script>
 
-<div class="flex  justify-between items-center p-3">
+<div class="flex justify-between items-center p-3">
 	<div class="flex lg:gap-x-2">
 		{#each paths as { name, href }}
 			<a {href}>
@@ -31,11 +31,6 @@
 				</div>
 			</a>
 		{/each}
-		<!-- <nav>
-			<ul>
-			
-			</ul>
-		</nav> -->
 	</div>
 	<div>
 		<input
