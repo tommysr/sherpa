@@ -1,5 +1,5 @@
-import type { ApiShipmentAccount } from "$src/utils/idl/shipment";
-import { createSearchStore, type SearchItem } from "./search";
+import type { ApiShipmentAccount } from '$src/utils/idl/shipment';
+import { createSearchStore, type SearchItem } from './search';
 
 export type SearchableOrder = ApiShipmentAccount & SearchItem;
 

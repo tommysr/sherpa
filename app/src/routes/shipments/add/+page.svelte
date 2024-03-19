@@ -1,6 +1,6 @@
 <script lang="ts">
 	import LocationPick from '$src/components/ShipmentForm/LocationPick.svelte';
-	import { getShipmentAddress, getShipperAddress, getStateAddress } from '$sdk';
+	import { getShipmentAddress, getShipperAddress, getStateAddress } from '$sdk/sdk';
 	import { anchorStore } from '$src/stores/anchor';
 	import { walletStore } from '$src/stores/wallet';
 	import { formStore } from '$stores/orderForm';
@@ -14,7 +14,7 @@
 	import DimensionsPick from '$src/components/ShipmentForm/DimensionsPick.svelte';
 	import Details from '$src/components/ShipmentForm/Details.svelte';
 	import SimpleButton from '$src/components/Buttons/SimpleButton.svelte';
-	import { encodeName } from '$sdk';
+	import { encodeName } from '$sdk/sdk';
 
 	async function registerShipper(shipper: PublicKey) {
 		const { program } = get(anchorStore);
