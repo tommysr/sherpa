@@ -13,7 +13,7 @@ export async function GET() {
 		throw error(500, 'No shipments found');
 	}
 
-	let apiShipments: ApiShipmentAccount[] = shipments.map(shipment => {
+	let apiShipments: ApiShipmentAccount[] = shipments.map((shipment) => {
 		return {
 			...shipment,
 			publicKey: shipment.publicKey.toString(),
@@ -28,15 +28,14 @@ export async function GET() {
 						depth: shipment.account.shipment.dimensions.depth / 1000,
 						height: shipment.account.shipment.dimensions.height / 1000,
 						width: shipment.account.shipment.dimensions.width / 1000,
-						weight: shipment.account.shipment.dimensions.weight / 1000,
+						weight: shipment.account.shipment.dimensions.weight / 1000
 					},
-					when: (new Date(shipment.account.shipment.when.toNumber())).toISOString(),
-					deadline: (new Date(shipment.account.shipment.deadline.toNumber())).toISOString(),
+					when: new Date(shipment.account.shipment.when.toNumber()).toISOString(),
+					deadline: new Date(shipment.account.shipment.deadline.toNumber()).toISOString()
 				}
 			}
-		}
-	})
-
+		};
+	});
 
 	return json(apiShipments);
 }

@@ -1,5 +1,6 @@
 import type { ProgramAccount, BN } from '@coral-xyz/anchor';
 import type { PublicKey } from '@solana/web3.js';
+import type { ApiProgramAccount } from './account';
 
 export interface ShipmentDetails {
 	count: number;
@@ -44,9 +45,4 @@ export interface Shipment<Date, Price, Key> {
 }
 
 export type ShipmentAccount = ProgramAccount<Shipment<BN, BN, PublicKey>>;
-type ApiProgramAccount<T> = {
-	publicKey: string,
-	account: T
-}
-
 export type ApiShipmentAccount = ApiProgramAccount<Shipment<string, number, string>>;
