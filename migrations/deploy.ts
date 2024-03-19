@@ -3,6 +3,7 @@ import { Protocol } from '../target/types/protocol'
 import * as anchor from '@coral-xyz/anchor'
 import { Connection, clusterApiUrl } from '@solana/web3.js'
 import {
+  encodeName,
   getCarrierAddress,
   getForwarderAddress,
   getShipmentAddress,
@@ -11,7 +12,7 @@ import {
 } from '../sdk/sdk'
 import { ONE_SOL } from '../tests/utils'
 import { crateFromSchoolToAirport } from './mocks/shipments'
-import { ANDREW, JACOB, ROBERT, ZDZICH } from './mocks/shippers'
+import { ANDREW, JACOB, IGOR, ZDZICH } from './mocks/shippers'
 
 const connection = new Connection(clusterApiUrl('devnet'), { commitment: 'confirmed' })
 const wallet = Wallet.local()
@@ -43,7 +44,7 @@ const run = async () => {
   if (!shipperExists) {
     console.log('Creating shipper account')
     await program.methods
-      .registerShipper()
+      .registerShipper(encodeName('Andrew'))
       .accounts({
         shipper: shipperAddress,
         signer: shipper.publicKey
@@ -76,7 +77,7 @@ const run = async () => {
   console.log('Shipment', shipmentAddress.toBase58(), shipmentAccount)
 
   // Available Carrier
-  const carrier = ROBERT
+  const carrier = IGOR
   const carrierAddress = getCarrierAddress(program, carrier.publicKey)
 
   const carrierExists = (await program.account.carrier.fetchNullable(carrierAddress)) !== null
@@ -91,7 +92,7 @@ const run = async () => {
       }
     }
     await program.methods
-      .registerCarrier(availability)
+      .registerCarrier(encodeName('Igor'), availability)
       .accounts({
         carrier: carrierAddress,
         signer: carrier.publicKey
@@ -113,7 +114,7 @@ const run = async () => {
   if (!unavailableCarrierExists) {
     console.log('Creating unavailable carrier account')
     await program.methods
-      .registerCarrier(null)
+      .registerCarrier(encodeName('Zdzich'), null)
       .accounts({
         carrier: unavailableCarrierAddress,
         signer: unavailableCarrier.publicKey
@@ -138,7 +139,7 @@ const run = async () => {
   if (!forwarderExists) {
     console.log('Creating forwarder account')
     await program.methods
-      .registerForwarder()
+      .registerForwarder(encodeName('Jacob'))
       .accounts({
         forwarder: forwarderAddress,
         signer: forwarder.publicKey

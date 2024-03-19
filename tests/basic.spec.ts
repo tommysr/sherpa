@@ -2,11 +2,15 @@ import * as anchor from '@coral-xyz/anchor'
 import { BN, Program } from '@coral-xyz/anchor'
 import { Protocol } from '../target/types/protocol'
 import { Keypair, SystemProgram } from '@solana/web3.js'
-import { ONE_SOL, awaitedAirdrops } from './utils'
+import { ONE_HOUR, ONE_SOL, U32_MAX, awaitedAirdrops } from './utils'
 import {
+  decodeName,
+  encodeName,
+  getAcceptedOfferAddress,
   getBoughtShipmentAddress,
   getCarrierAddress,
   getForwarderAddress,
+  getOfferAddress,
   getShipmentAddress,
   getShipperAddress,
   getStateAddress
@@ -56,7 +60,7 @@ describe('protocol', () => {
 
   it('register shipper', async () => {
     await program.methods
-      .registerShipper()
+      .registerShipper(encodeName('Alice'))
       .accounts({
         shipper: shipperAddress,
         signer: shipper.publicKey,
@@ -66,7 +70,9 @@ describe('protocol', () => {
       .rpc()
 
     const shipperAccount = await program.account.shipper.fetch(shipperAddress)
+    expect(shipperAccount.creator.equals(shipper.publicKey)).true
     expect(shipperAccount.authority.equals(shipper.publicKey)).true
+    expect(decodeName(shipperAccount.name)).eq('Alice')
     expect(shipperAccount.count).eq(0)
   })
 
@@ -203,7 +209,7 @@ describe('protocol', () => {
 
   it('register forwarder', async () => {
     await program.methods
-      .registerForwarder()
+      .registerForwarder(encodeName('Bob'))
       .accounts({
         forwarder: forwarderAddress,
         signer: forwarder.publicKey,
@@ -213,7 +219,9 @@ describe('protocol', () => {
       .rpc()
 
     const forwarderAccount = await program.account.forwarder.fetch(forwarderAddress)
+    expect(forwarderAccount.creator.equals(forwarder.publicKey)).true
     expect(forwarderAccount.authority.equals(forwarder.publicKey)).true
+    expect(decodeName(forwarderAccount.name)).eq('Bob')
     expect(forwarderAccount.count).eq(0)
   })
 
@@ -265,7 +273,7 @@ describe('protocol', () => {
     }
 
     await program.methods
-      .registerCarrier(availability)
+      .registerCarrier(encodeName('Carol'), availability)
       .accounts({
         carrier: carrierAddress,
         signer: carrier.publicKey,
@@ -275,8 +283,94 @@ describe('protocol', () => {
       .rpc()
 
     const carrierAccount = await program.account.carrier.fetch(carrierAddress)
+    expect(carrierAccount.creator.equals(carrier.publicKey)).true
     expect(carrierAccount.authority.equals(carrier.publicKey)).true
+    expect(decodeName(carrierAccount.name)).eq('Carol')
     expect(carrierAccount.availability.time.eq(availability.time)).true
     expect(carrierAccount.availability.location).to.deep.equal(availability.location)
+    expect(carrierAccount.offersCount).eq(0)
+    expect(carrierAccount.tasksCount).eq(0)
+  })
+
+  it('make offer', async () => {
+    const offerAddress = getOfferAddress(program, carrier.publicKey, 0)
+    const shipmentAddress = getBoughtShipmentAddress(program, forwarder.publicKey, 0)
+
+    const subscriptionId = program.addEventListener('OfferMade', event => {
+      expect(event.from.equals(forwarder.publicKey)).true
+      expect(event.to.equals(carrier.publicKey)).true
+      expect(event.offer.equals(offerAddress)).true
+    })
+
+    await program.methods
+      .makeOffer(ONE_SOL, 3600)
+      .accounts({
+        offer: offerAddress,
+        shipment: shipmentAddress,
+        forwarder: forwarderAddress,
+        carrier: carrierAddress,
+        signer: forwarder.publicKey
+      })
+      .signers([forwarder])
+      .rpc()
+
+    const boughtShipment = await program.account.boughtShipment.fetch(shipmentAddress)
+    expect(boughtShipment.buyer.equals(forwarder.publicKey)).true
+    expect(boughtShipment.owner.equals(forwarder.publicKey)).true
+
+    const offerAccount = await program.account.shipmentOffer.fetch(offerAddress)
+    expect(offerAccount.owner.equals(carrier.publicKey)).true
+    expect(offerAccount.details.payment.eq(ONE_SOL)).true
+    expect(offerAccount.details.collateral.eqn(0)).true
+    expect(offerAccount.details.deadline.eq(U32_MAX)).true
+    expect(offerAccount.shipment).to.deep.equal(boughtShipment.shipment)
+
+    const carrierAccount = await program.account.carrier.fetch(carrierAddress)
+    expect(carrierAccount.offersCount).eq(1)
+    expect(carrierAccount.tasksCount).eq(0)
+
+    program.removeEventListener(subscriptionId)
+  })
+
+  it('accept offer', async () => {
+    const offerAddress = getOfferAddress(program, carrier.publicKey, 0)
+    const shipmentAddress = getBoughtShipmentAddress(program, forwarder.publicKey, 0)
+    const taskAddress = getAcceptedOfferAddress(program, carrier.publicKey, 0)
+
+    const subscriptionId = program.addEventListener('OfferAccepted', event => {
+      expect(event.from.equals(forwarder.publicKey)).true
+      expect(event.to.equals(carrier.publicKey)).true
+      expect(event.offer.equals(offerAddress)).true
+    })
+
+    await program.methods
+      .acceptOffer()
+      .accounts({
+        task: taskAddress,
+        offer: offerAddress,
+        shipment: shipmentAddress,
+        forwarder: forwarderAddress,
+        carrier: carrierAddress,
+        signer: carrier.publicKey
+      })
+      .signers([carrier])
+      .rpc()
+
+    const shipmentAccount = await program.account.boughtShipment.fetch(shipmentAddress)
+    expect(shipmentAccount.buyer.equals(forwarder.publicKey)).true
+    expect(shipmentAccount.owner.equals(carrier.publicKey)).true
+
+    const offerAccount = await program.account.shipmentOffer.fetch(offerAddress)
+    expect(offerAccount.owner.equals(carrier.publicKey)).true
+
+    const taskAccount = await program.account.acceptedOffer.fetch(taskAddress)
+    expect(taskAccount.owner.equals(carrier.publicKey)).true
+    expect(taskAccount.shipment).to.deep.equal(shipmentAccount.shipment)
+    expect(taskAccount.details.payment.eq(offerAccount.details.payment)).true
+    expect(taskAccount.details.collateral.eq(offerAccount.details.collateral)).true
+    expect(taskAccount.details.deadline.eq(offerAccount.details.deadline)).true
+    expect(taskAccount.no).eq(0)
+
+    program.removeEventListener(subscriptionId)
   })
 })

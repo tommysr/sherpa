@@ -8,4 +8,8 @@ pub enum Error {
     ShipperNotASigner = 1, // 1771
     #[msg("Invalid shipment number")]
     InvalidShipmentNumber = 2, // 1772
+    #[msg("Signer is not an owner of the shipment")]
+    SignerNotAnOwner = 3, // 1773
+    #[msg("Shipment is already sold")]
+    ShipmentSold = 4, // 1774
 }
