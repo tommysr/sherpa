@@ -1,16 +1,8 @@
 {
   "compilerOptions": {
-    "types": [
-      "mocha",
-      "chai"
-    ],
-    "typeRoots": [
-      "./node_modules/@types"
-    ],
-    "lib": [
-      "es2020",
-      "esnext"
-    ],
+    "types": ["mocha", "chai"],
+    "typeRoots": ["./node_modules/@types"],
+    "lib": ["es2020", "esnext"],
     "module": "commonjs",
     "target": "es2020",
     "moduleResolution": "node",
@@ -25,7 +17,5 @@
     "isolatedModules": true,
     "noFallthroughCasesInSwitch": true
   },
-  "include": [
-    "tests/**/*"
-, "sdk/sdk.ts"  ]
+  "include": ["tests/**/*", "sdk/sdk.ts"]
 }

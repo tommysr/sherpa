@@ -15,6 +15,7 @@
 	import { walletStore } from '$src/stores/wallet';
 	import { web3Store } from '$src/stores/web3';
 	import { useSignAndSendTransaction } from '$src/utils/wallet/singAndSendTx';
+	import { encodeName } from '../../../../sdk/sdk';
 
 	type Entries<T> = {
 		[K in keyof T]: [K, T[K]];
@@ -35,7 +36,7 @@
 		const wallet = get(walletStore);
 
 		const registerShipperIx = await program.methods
-			.registerForwarder()
+			.registerForwarder(encodeName('forwarder'))
 			.accounts({
 				forwarder,
 				signer: wallet.publicKey!

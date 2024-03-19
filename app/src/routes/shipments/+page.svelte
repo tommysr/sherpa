@@ -8,7 +8,6 @@
 
 	import type { PageData } from './$types';
 	import { searchableShipments } from '$src/stores/searchableShipments';
-	import ShipmentLayout from '$src/components/Shipment/ShipmentLayout.svelte';
 
 	// export let data: PageData;
 
