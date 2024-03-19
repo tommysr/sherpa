@@ -42,7 +42,14 @@ export type Protocol = {
           "isSigner": false
         }
       ],
-      "args": []
+      "args": [
+        {
+          "name": "name",
+          "type": {
+            "defined": "Name"
+          }
+        }
+      ]
     },
     {
       "name": "registerForwarder",
@@ -63,7 +70,14 @@ export type Protocol = {
           "isSigner": false
         }
       ],
-      "args": []
+      "args": [
+        {
+          "name": "name",
+          "type": {
+            "defined": "Name"
+          }
+        }
+      ]
     },
     {
       "name": "registerCarrier",
@@ -85,6 +99,12 @@ export type Protocol = {
         }
       ],
       "args": [
+        {
+          "name": "name",
+          "type": {
+            "defined": "Name"
+          }
+        },
         {
           "name": "availability",
           "type": {
@@ -136,6 +156,11 @@ export type Protocol = {
       "name": "buyShipment",
       "accounts": [
         {
+          "name": "bought",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
           "name": "shipment",
           "isMut": true,
           "isSigner": false
@@ -162,6 +187,92 @@ export type Protocol = {
         }
       ],
       "args": []
+    },
+    {
+      "name": "makeOffer",
+      "accounts": [
+        {
+          "name": "offer",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "shipment",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "forwarder",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "carrier",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "signer",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "payment",
+          "type": "u64"
+        },
+        {
+          "name": "timeout",
+          "type": "u32"
+        }
+      ]
+    },
+    {
+      "name": "acceptOffer",
+      "accounts": [
+        {
+          "name": "task",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "offer",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "shipment",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "forwarder",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "carrier",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "signer",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": []
     }
   ],
   "accounts": [
@@ -171,14 +282,32 @@ export type Protocol = {
         "kind": "struct",
         "fields": [
           {
+            "name": "creator",
+            "type": "publicKey"
+          },
+          {
             "name": "authority",
             "type": "publicKey"
+          },
+          {
+            "name": "name",
+            "type": {
+              "defined": "Name"
+            }
           },
           {
             "name": "availability",
             "type": {
               "defined": "Availability"
             }
+          },
+          {
+            "name": "offersCount",
+            "type": "u32"
+          },
+          {
+            "name": "tasksCount",
+            "type": "u32"
           }
         ]
       }
@@ -189,8 +318,103 @@ export type Protocol = {
         "kind": "struct",
         "fields": [
           {
+            "name": "creator",
+            "type": "publicKey"
+          },
+          {
             "name": "authority",
             "type": "publicKey"
+          },
+          {
+            "name": "name",
+            "type": {
+              "defined": "Name"
+            }
+          },
+          {
+            "name": "count",
+            "type": "u32"
+          }
+        ]
+      }
+    },
+    {
+      "name": "shipmentOffer",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "owner",
+            "type": "publicKey"
+          },
+          {
+            "name": "details",
+            "type": {
+              "defined": "OfferDetails"
+            }
+          },
+          {
+            "name": "shipment",
+            "type": {
+              "defined": "ShipmentData"
+            }
+          },
+          {
+            "name": "submitted",
+            "type": "i64"
+          },
+          {
+            "name": "timeout",
+            "type": "i64"
+          },
+          {
+            "name": "no",
+            "type": "u32"
+          },
+          {
+            "name": "shipmentNo",
+            "type": "u32"
+          }
+        ]
+      }
+    },
+    {
+      "name": "acceptedOffer",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "owner",
+            "type": "publicKey"
+          },
+          {
+            "name": "details",
+            "type": {
+              "defined": "OfferDetails"
+            }
+          },
+          {
+            "name": "shipment",
+            "type": {
+              "defined": "ShipmentData"
+            }
+          },
+          {
+            "name": "accepted",
+            "type": "i64"
+          },
+          {
+            "name": "no",
+            "type": "u32"
+          },
+          {
+            "name": "reserved",
+            "type": {
+              "array": [
+                "u8",
+                4
+              ]
+            }
           }
         ]
       }
@@ -235,13 +459,62 @@ export type Protocol = {
       }
     },
     {
+      "name": "boughtShipment",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "creator",
+            "type": "publicKey"
+          },
+          {
+            "name": "buyer",
+            "type": "publicKey"
+          },
+          {
+            "name": "owner",
+            "type": "publicKey"
+          },
+          {
+            "name": "no",
+            "type": "u32"
+          },
+          {
+            "name": "reserved",
+            "type": {
+              "array": [
+                "u8",
+                4
+              ]
+            }
+          },
+          {
+            "name": "shipment",
+            "type": {
+              "defined": "ShipmentData"
+            }
+          }
+        ]
+      }
+    },
+    {
       "name": "shipper",
       "type": {
         "kind": "struct",
         "fields": [
           {
+            "name": "creator",
+            "type": "publicKey"
+          },
+          {
             "name": "authority",
             "type": "publicKey"
+          },
+          {
+            "name": "name",
+            "type": {
+              "defined": "Name"
+            }
           },
           {
             "name": "count",
@@ -278,6 +551,43 @@ export type Protocol = {
             "type": {
               "defined": "GeoLocation"
             }
+          }
+        ]
+      }
+    },
+    {
+      "name": "Name",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "value",
+            "type": {
+              "array": [
+                "u32",
+                16
+              ]
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "OfferDetails",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "payment",
+            "type": "u64"
+          },
+          {
+            "name": "collateral",
+            "type": "u64"
+          },
+          {
+            "name": "deadline",
+            "type": "u64"
           }
         ]
       }
@@ -410,6 +720,88 @@ export type Protocol = {
       }
     }
   ],
+  "events": [
+    {
+      "name": "ShipmentTransferred",
+      "fields": [
+        {
+          "name": "seller",
+          "type": "publicKey",
+          "index": false
+        },
+        {
+          "name": "buyer",
+          "type": "publicKey",
+          "index": false
+        },
+        {
+          "name": "before",
+          "type": "publicKey",
+          "index": false
+        },
+        {
+          "name": "after",
+          "type": "publicKey",
+          "index": false
+        }
+      ]
+    },
+    {
+      "name": "ShipmentCreated",
+      "fields": [
+        {
+          "name": "shipper",
+          "type": "publicKey",
+          "index": false
+        },
+        {
+          "name": "shipment",
+          "type": "publicKey",
+          "index": false
+        }
+      ]
+    },
+    {
+      "name": "OfferMade",
+      "fields": [
+        {
+          "name": "from",
+          "type": "publicKey",
+          "index": false
+        },
+        {
+          "name": "to",
+          "type": "publicKey",
+          "index": false
+        },
+        {
+          "name": "offer",
+          "type": "publicKey",
+          "index": false
+        }
+      ]
+    },
+    {
+      "name": "OfferAccepted",
+      "fields": [
+        {
+          "name": "from",
+          "type": "publicKey",
+          "index": false
+        },
+        {
+          "name": "to",
+          "type": "publicKey",
+          "index": false
+        },
+        {
+          "name": "offer",
+          "type": "publicKey",
+          "index": false
+        }
+      ]
+    }
+  ],
   "errors": [
     {
       "code": 6000,
@@ -425,6 +817,16 @@ export type Protocol = {
       "code": 6002,
       "name": "InvalidShipmentNumber",
       "msg": "Invalid shipment number"
+    },
+    {
+      "code": 6003,
+      "name": "SignerNotAnOwner",
+      "msg": "Signer is not an owner of the shipment"
+    },
+    {
+      "code": 6004,
+      "name": "ShipmentSold",
+      "msg": "Shipment is already sold"
     }
   ]
 };
@@ -473,7 +875,14 @@ export const IDL: Protocol = {
           "isSigner": false
         }
       ],
-      "args": []
+      "args": [
+        {
+          "name": "name",
+          "type": {
+            "defined": "Name"
+          }
+        }
+      ]
     },
     {
       "name": "registerForwarder",
@@ -494,7 +903,14 @@ export const IDL: Protocol = {
           "isSigner": false
         }
       ],
-      "args": []
+      "args": [
+        {
+          "name": "name",
+          "type": {
+            "defined": "Name"
+          }
+        }
+      ]
     },
     {
       "name": "registerCarrier",
@@ -516,6 +932,12 @@ export const IDL: Protocol = {
         }
       ],
       "args": [
+        {
+          "name": "name",
+          "type": {
+            "defined": "Name"
+          }
+        },
         {
           "name": "availability",
           "type": {
@@ -567,6 +989,11 @@ export const IDL: Protocol = {
       "name": "buyShipment",
       "accounts": [
         {
+          "name": "bought",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
           "name": "shipment",
           "isMut": true,
           "isSigner": false
@@ -593,6 +1020,92 @@ export const IDL: Protocol = {
         }
       ],
       "args": []
+    },
+    {
+      "name": "makeOffer",
+      "accounts": [
+        {
+          "name": "offer",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "shipment",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "forwarder",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "carrier",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "signer",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "payment",
+          "type": "u64"
+        },
+        {
+          "name": "timeout",
+          "type": "u32"
+        }
+      ]
+    },
+    {
+      "name": "acceptOffer",
+      "accounts": [
+        {
+          "name": "task",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "offer",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "shipment",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "forwarder",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "carrier",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "signer",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": []
     }
   ],
   "accounts": [
@@ -602,14 +1115,32 @@ export const IDL: Protocol = {
         "kind": "struct",
         "fields": [
           {
+            "name": "creator",
+            "type": "publicKey"
+          },
+          {
             "name": "authority",
             "type": "publicKey"
+          },
+          {
+            "name": "name",
+            "type": {
+              "defined": "Name"
+            }
           },
           {
             "name": "availability",
             "type": {
               "defined": "Availability"
             }
+          },
+          {
+            "name": "offersCount",
+            "type": "u32"
+          },
+          {
+            "name": "tasksCount",
+            "type": "u32"
           }
         ]
       }
@@ -620,8 +1151,103 @@ export const IDL: Protocol = {
         "kind": "struct",
         "fields": [
           {
+            "name": "creator",
+            "type": "publicKey"
+          },
+          {
             "name": "authority",
             "type": "publicKey"
+          },
+          {
+            "name": "name",
+            "type": {
+              "defined": "Name"
+            }
+          },
+          {
+            "name": "count",
+            "type": "u32"
+          }
+        ]
+      }
+    },
+    {
+      "name": "shipmentOffer",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "owner",
+            "type": "publicKey"
+          },
+          {
+            "name": "details",
+            "type": {
+              "defined": "OfferDetails"
+            }
+          },
+          {
+            "name": "shipment",
+            "type": {
+              "defined": "ShipmentData"
+            }
+          },
+          {
+            "name": "submitted",
+            "type": "i64"
+          },
+          {
+            "name": "timeout",
+            "type": "i64"
+          },
+          {
+            "name": "no",
+            "type": "u32"
+          },
+          {
+            "name": "shipmentNo",
+            "type": "u32"
+          }
+        ]
+      }
+    },
+    {
+      "name": "acceptedOffer",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "owner",
+            "type": "publicKey"
+          },
+          {
+            "name": "details",
+            "type": {
+              "defined": "OfferDetails"
+            }
+          },
+          {
+            "name": "shipment",
+            "type": {
+              "defined": "ShipmentData"
+            }
+          },
+          {
+            "name": "accepted",
+            "type": "i64"
+          },
+          {
+            "name": "no",
+            "type": "u32"
+          },
+          {
+            "name": "reserved",
+            "type": {
+              "array": [
+                "u8",
+                4
+              ]
+            }
           }
         ]
       }
@@ -666,13 +1292,62 @@ export const IDL: Protocol = {
       }
     },
     {
+      "name": "boughtShipment",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "creator",
+            "type": "publicKey"
+          },
+          {
+            "name": "buyer",
+            "type": "publicKey"
+          },
+          {
+            "name": "owner",
+            "type": "publicKey"
+          },
+          {
+            "name": "no",
+            "type": "u32"
+          },
+          {
+            "name": "reserved",
+            "type": {
+              "array": [
+                "u8",
+                4
+              ]
+            }
+          },
+          {
+            "name": "shipment",
+            "type": {
+              "defined": "ShipmentData"
+            }
+          }
+        ]
+      }
+    },
+    {
       "name": "shipper",
       "type": {
         "kind": "struct",
         "fields": [
           {
+            "name": "creator",
+            "type": "publicKey"
+          },
+          {
             "name": "authority",
             "type": "publicKey"
+          },
+          {
+            "name": "name",
+            "type": {
+              "defined": "Name"
+            }
           },
           {
             "name": "count",
@@ -709,6 +1384,43 @@ export const IDL: Protocol = {
             "type": {
               "defined": "GeoLocation"
             }
+          }
+        ]
+      }
+    },
+    {
+      "name": "Name",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "value",
+            "type": {
+              "array": [
+                "u32",
+                16
+              ]
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "OfferDetails",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "payment",
+            "type": "u64"
+          },
+          {
+            "name": "collateral",
+            "type": "u64"
+          },
+          {
+            "name": "deadline",
+            "type": "u64"
           }
         ]
       }
@@ -841,6 +1553,88 @@ export const IDL: Protocol = {
       }
     }
   ],
+  "events": [
+    {
+      "name": "ShipmentTransferred",
+      "fields": [
+        {
+          "name": "seller",
+          "type": "publicKey",
+          "index": false
+        },
+        {
+          "name": "buyer",
+          "type": "publicKey",
+          "index": false
+        },
+        {
+          "name": "before",
+          "type": "publicKey",
+          "index": false
+        },
+        {
+          "name": "after",
+          "type": "publicKey",
+          "index": false
+        }
+      ]
+    },
+    {
+      "name": "ShipmentCreated",
+      "fields": [
+        {
+          "name": "shipper",
+          "type": "publicKey",
+          "index": false
+        },
+        {
+          "name": "shipment",
+          "type": "publicKey",
+          "index": false
+        }
+      ]
+    },
+    {
+      "name": "OfferMade",
+      "fields": [
+        {
+          "name": "from",
+          "type": "publicKey",
+          "index": false
+        },
+        {
+          "name": "to",
+          "type": "publicKey",
+          "index": false
+        },
+        {
+          "name": "offer",
+          "type": "publicKey",
+          "index": false
+        }
+      ]
+    },
+    {
+      "name": "OfferAccepted",
+      "fields": [
+        {
+          "name": "from",
+          "type": "publicKey",
+          "index": false
+        },
+        {
+          "name": "to",
+          "type": "publicKey",
+          "index": false
+        },
+        {
+          "name": "offer",
+          "type": "publicKey",
+          "index": false
+        }
+      ]
+    }
+  ],
   "errors": [
     {
       "code": 6000,
@@ -856,6 +1650,16 @@ export const IDL: Protocol = {
       "code": 6002,
       "name": "InvalidShipmentNumber",
       "msg": "Invalid shipment number"
+    },
+    {
+      "code": 6003,
+      "name": "SignerNotAnOwner",
+      "msg": "Signer is not an owner of the shipment"
+    },
+    {
+      "code": 6004,
+      "name": "ShipmentSold",
+      "msg": "Shipment is already sold"
     }
   ]
 };
