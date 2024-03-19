@@ -34,47 +34,55 @@
 	}
 </script>
 
-<div class="basis-1/3">
-	{#if locations}
-		{@const len = locations.length}
+<div class="space-y-3 p-3 max-w-90 border border-[theme(colors.mint)] rounded-md">
+	<div class="flex justify-between items-center space-between">
+		{#if locations}
+			<div class="rounded-full border px-1 text-sm border-[theme(colors.green)]">Locations</div>
+			{@const len = locations.length}
 
-		{#each locations as [location, value], index}
-			<!-- TODO: batching or keep locations on server -->
-			{#await getLocationFromCoords(value.latitude, value.longitude)}
-				<article aria-busy="true"></article>
-			{:then location}
-				{location}
-			{:catch error}
-				{value.latitude.toFixed(4)} {value.longitude.toFixed(4)}
-			{/await}
+			{#each locations as [location, value], index}
+				{#await getLocationFromCoords(value.latitude, value.longitude)}
+					fetching...
+				{:then location}
+					<div>
+						{location}
+					</div>
+				{:catch error}
+					{value.latitude.toFixed(4)} {value.longitude.toFixed(4)}
+				{/await}
 
-			{#if index != len - 1}
-				{'→ '}
-			{/if}
-		{/each}
-	{:else}
-		<p>No location</p>
-	{/if}
-</div>
-<div class="basis-1/3">
-	{#if dimensions}
-		{@const len = dimensions.length}
-		{#each dimensions as [dimension, value], index}
-			{dimension[0]}: {value}
-
-			<!-- TODO: add these on blockchain, would be nice to have some objects 
+				{#if index != len - 1}
+					<div>
+						{'→ '}
+					</div>
+				{/if}
+			{/each}
+		{:else}
+			<p>No location</p>
+		{/if}
+	</div>
+	<div class="flex justify-between items-center space-between">
+		{#if dimensions}
+			<div class="rounded-full border px-1 text-sm border-[theme(colors.green)]">Dimensions</div>
+			{@const len = dimensions.length}
+			{#each dimensions as [dimension, value], index}
+				<div>
+					{dimension[0]}: {value}
+				</div>
+				<!-- TODO: add these on blockchain, would be nice to have some objects 
 representing different properties -->
-			{#if index == len - 1}
-				kg
-			{:else}
-				m
-			{/if}
+				{#if index == len - 1}
+					kg
+				{:else}
+					m
+				{/if}
 
-			{#if index == len - 2}
-				<br />
-			{/if}
-		{/each}
-	{:else}
-		<p>No dimensions</p>
-	{/if}
+				{#if index == len - 2}
+					<br />
+				{/if}
+			{/each}
+		{:else}
+			<p>No dimensions</p>
+		{/if}
+	</div>
 </div>

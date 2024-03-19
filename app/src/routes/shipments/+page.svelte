@@ -9,7 +9,7 @@
 	import type { PageData } from './$types';
 	import { searchableShipments } from '$src/stores/searchableShipments';
 
-	// export let data: PageData;
+	export let data: PageData;
 
 	// $: shipments = $searchableShipments.data.filter((s) => s.account.owner == s.account.shipper)
 	$: locationsOnMap = $searchableShipments.data.map((s) => s.account.shipment.geography);

@@ -11,11 +11,7 @@
 	import { get } from 'svelte/store';
 	import CancelConfirmModal from './CancelConfirmModal.svelte';
 	import { PublicKey, Transaction, TransactionInstruction } from '@solana/web3.js';
-	import {
-		getBoughtShipmentAddress,
-		getForwarderAddress,
-		getShipperAddress
-	} from '../../../../sdk/sdk';
+	import { getBoughtShipmentAddress, getForwarderAddress, getShipperAddress } from '$sdk/sdk';
 	import { walletStore } from '$src/stores/wallet';
 	import { web3Store } from '$src/stores/web3';
 	import { useSignAndSendTransaction } from '$src/utils/wallet/singAndSendTx';

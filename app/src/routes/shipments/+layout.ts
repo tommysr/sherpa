@@ -1,10 +1,10 @@
 import {
 	searchableBoughtShipments,
 	type SearchableBoughtOrder
-} from '$src/stores/forwarderShipments.js';
+} from '$src/stores/forwarderShipments';
 import type { SearchableOrder } from '$src/stores/searchableShipments';
 import { searchableShipments } from '$src/stores/searchableShipments';
-import type { ApiBoughtShipmentAccount } from '$src/utils/idl/boughtShipment.js';
+import type { ApiBoughtShipmentAccount } from '$src/utils/idl/boughtShipment';
 import type { ApiShipmentAccount } from '$src/utils/idl/shipment';
 
 import { error } from '@sveltejs/kit';
@@ -42,6 +42,7 @@ function loadFromStores(): {
 export async function load({
 	fetch
 }): Promise<{ orders: ApiShipmentAccount[]; boughtOrders: ApiBoughtShipmentAccount[] }> {
+	console.log('loading shipments');
 	const fromStores = loadFromStores();
 
 	if (fromStores) {

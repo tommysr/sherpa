@@ -1,4 +1,4 @@
-<script lang="ts">
+<!-- <script lang="ts">
 	import { anchorStore } from '$src/stores/anchor';
 	import { searchableBoughtShipments } from '$src/stores/forwarderShipments';
 	import { searchableShipments } from '$src/stores/searchableShipments';
@@ -79,5 +79,5 @@
 		};
 	});
 </script>
-
+-->
 <slot />
