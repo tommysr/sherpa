@@ -65,7 +65,7 @@
 	/>
 
 	<div class="grid">
-		<div class="px-5"> 
+		<div class="px-5">
 			{#if $searchableShipments.filtered.length != 0}
 				{#each $searchableShipments.filtered as account}
 					<OrderCard shipmentAccount={account} />

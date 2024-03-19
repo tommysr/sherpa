@@ -1,6 +1,6 @@
 <script>
 	import OrderCard from '$src/components/Shipment/OrderCard.svelte';
-	import { forwarderShipments } from '$src/stores/forwarderShipments';
+	import { searchableBoughtShipments } from '$src/stores/forwarderShipments';
 </script>
 
 <svelte:head><title>Forwarder shipments list</title></svelte:head>
@@ -8,9 +8,10 @@
 <main class="container m-top">
 	<div class="grid">
 		<div>
-			{#if $forwarderShipments.length != 0}
-				{#each $forwarderShipments as account}
-					<OrderCard shipmentAccount={account} />
+			{#if $searchableBoughtShipments.filtered.length != 0}
+				{#each $searchableBoughtShipments.filtered as account}
+					<!-- <OrderCard shipmentAccount={account} /> -->
+					<p>{account.account.buyer}</p>
 				{/each}
 			{:else}
 				<p>Nothing found</p>

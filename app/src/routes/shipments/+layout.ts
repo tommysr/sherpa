@@ -50,6 +50,8 @@ export async function load({
 			}
 		);
 
+		console.log(orders, boughtOrders);
+
 		searchableShipments.default(searchableOrders);
 		searchableBoughtShipments.default(searchableBoughtOrders);
 
