@@ -43,7 +43,7 @@
 	}
 </script>
 
-<dialog id="confirm-modal" bind:this={modalElement}>
+<dialog  id="confirm-modal" bind:this={modalElement}>
 	<article>
 		<header>
 			<slot name="header" />
@@ -58,12 +58,17 @@
 			{:else if status === 'Preparing transaction'}
 				<span aria-busy="true">Sending transaction...</span>
 			{:else if status === 'Transaction sent'}
-				<ins>Transaction sent: <a href="https://explorer.solana.com/tx/{signature}?cluster=devnet">explorer</a> </ins> 
+				<ins
+					>Transaction sent: <a href="https://explorer.solana.com/tx/{signature}?cluster=devnet"
+						>explorer</a
+					>
+				</ins>
 			{/if}
 			<span>
 				<button role="button" class="secondary" data-target="confirm-modal" on:click={closeModal}>
 					Cancel</button
 				><button
+					role="button"
 					autofocus
 					data-target="confirm-modal"
 					on:click={handleConfirmClick}
