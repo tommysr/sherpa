@@ -20,18 +20,26 @@
 	];
 </script>
 
-<div class="grid navigation">
-	<div>
-		<nav>
+<div class="flex  justify-between items-center p-3">
+	<div class="flex lg:gap-x-2">
+		{#each paths as { name, href }}
+			<a {href}>
+				<div
+					class="mx-1 px-4 py-1 text-sm text-orange-600 font-semibold rounded-full border border-orange-200 hover:text-white hover:bg-orange-600"
+				>
+					{name}
+				</div>
+			</a>
+		{/each}
+		<!-- <nav>
 			<ul>
-				{#each paths as { name, href }}
-					<li><a {href}>{name}</a></li>
-				{/each}
+			
 			</ul>
-		</nav>
+		</nav> -->
 	</div>
 	<div>
 		<input
+			class="outline-none bg-[theme(colors.turquoise)] max-w-70 text-white rounded-full border border-white px-4 py-1 text-sm font-semibold"
 			type="search"
 			name="search"
 			placeholder="Search"
@@ -43,7 +51,7 @@
 </div>
 
 <style lang="scss">
-	.navigation {
-		margin-top: 20px;
-	}
+	// .navigation {
+	// 	margin-top: 20px;
+	// }
 </style>

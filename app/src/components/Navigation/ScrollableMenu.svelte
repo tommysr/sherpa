@@ -12,24 +12,30 @@
 	}
 </script>
 
-<div class="scrollable">
-	<button class="secondary" on:click={scrollCategoryMenuLeft}>-</button>
-	<div class="scroll" bind:this={scrollableMenu}>
+<div class="flex mt-4">
+	<button
+		class="mx-1 px-4 py-1 text-sm text-orange-600 font-semibold border-none"
+		on:click={scrollCategoryMenuLeft}>-</button
+	>
+	<div class="flex overflow-x-hidden" bind:this={scrollableMenu}>
 		<slot />
 	</div>
-	<button class="secondary" on:click={scrollCategoryMenuRight}>+</button>
+	<button
+		class=" mx-1 px-4 py-1 text-sm text-orange-600 font-semibold border-none"
+		on:click={scrollCategoryMenuRight}>+</button
+	>
 </div>
 
 <style lang="scss">
-	.scrollable {
-		margin-top: 20px;
-		display: grid;
-		grid-template-columns: 50px auto 50px;
-	}
+	// .scrollable {
+	// 	margin-top: 20px;
+	// 	display: grid;
+	// 	grid-template-columns: 50px auto 50px;
+	// }
 
-	.scroll {
-		display: flex;
-		overflow-x: hidden;
-		gap: 20px;
-	}
+	// .scroll {
+	// 	display: flex;
+	// 	overflow-x: hidden;
+	// 	gap: 20px;
+	// }
 </style>

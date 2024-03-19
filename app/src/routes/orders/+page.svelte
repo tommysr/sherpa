@@ -51,13 +51,13 @@
 <svelte:head><title>Shipments list</title></svelte:head>
 
 <main class="container">
-	<ScrollableMenu>
+	<!-- <ScrollableMenu>
 		{#each categories as category}
 			<CategoryButton on:click={() => console.log(`clicked category ${category}`)}
 				>{category}</CategoryButton
 			>
 		{/each}
-	</ScrollableMenu>
+	</ScrollableMenu> -->
 
 	<HotNavigation
 		bind:searchValue={$searchableShipments.searchString}
@@ -65,7 +65,7 @@
 	/>
 
 	<div class="grid">
-		<div>
+		<div class="px-5"> 
 			{#if $searchableShipments.filtered.length != 0}
 				{#each $searchableShipments.filtered as account}
 					<OrderCard shipmentAccount={account} />
@@ -74,9 +74,10 @@
 				<p>Nothing found</p>
 			{/if}
 		</div>
+
 		<!-- Map should be fixed or floating, and on mobile in some access menu from the right side, to allow quick preview -->
 		<!-- CONSIDER: include filtering, more dynamic -->
-		<div><ShipmentsMap locations={locationsOnMap} /></div>
+		<div class="px-5"><ShipmentsMap locations={locationsOnMap} /></div>
 	</div>
 </main>
 

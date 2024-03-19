@@ -10,7 +10,6 @@
 	} from '$src/utils/idl/shipment';
 	import { get } from 'svelte/store';
 	import CancelConfirmModal from './CancelConfirmModal.svelte';
-	import Card from './Card.svelte';
 	import { PublicKey, Transaction, TransactionInstruction } from '@solana/web3.js';
 	import { getForwarderAddress, getShipperAddress } from '$src/lib/addresses';
 	import { walletStore } from '$src/stores/wallet';
@@ -58,7 +57,7 @@
 			const registerIx = await registerForwarderIx(forwarder);
 			tx.add(registerIx);
 		}
-		
+
 		const ix = await program.methods
 			.buyShipment()
 			.accounts({
@@ -92,60 +91,71 @@
 	}
 </script>
 
-<Card>
-	<svelte:fragment slot="first-info">
-		<h3>{shipmentData.price / 10 ** 9} SOL</h3>
-	</svelte:fragment>
-	<svelte:fragment slot="second-info">
-		{@const len = locations.length}
+<div class="rounded bg-[theme(colors.mint)] my-3 first:mt-0 last:mb-0 p-6">
+	<div class="flex justify-between items-center gap-x-3">
+		<div class="basis-5/6 flex flex-row justify-between">
+			<div class="basis-1/3 text-2xl font-semibold text-center hover:text-orange-700">
+				<h3>{shipmentData.price / 10 ** 9} SOL</h3>
+			</div>
+			<div class="basis-1/3">
+				{#if locations}
+					{@const len = locations.length}
 
-		{#each locations as [location, value], index}
-			<!-- TODO: batching or keep locations on server -->
-			{#await getLocationFromCoords(value.latitude, value.longitude)}
-				<article aria-busy="true"></article>
-			{:then location}
-				{location}
-			{:catch error}
-				{value.latitude.toFixed(4)} {value.longitude.toFixed(4)}
-			{/await}
+					{#each locations as [location, value], index}
+						<!-- TODO: batching or keep locations on server -->
+						{#await getLocationFromCoords(value.latitude, value.longitude)}
+							<article aria-busy="true"></article>
+						{:then location}
+							{location}
+						{:catch error}
+							{value.latitude.toFixed(4)} {value.longitude.toFixed(4)}
+						{/await}
 
-			{#if index != len - 1}
-				{'→ '}
-			{/if}
-		{/each}
-	</svelte:fragment>
+						{#if index != len - 1}
+							{'→ '}
+						{/if}
+					{/each}
+				{:else}
+					<p>No location</p>
+				{/if}
+			</div>
+			<div class="basis-1/3">
+				{#if dimensions}
+					{@const len = dimensions.length}
+					{#each dimensions as [dimension, value], index}
+						{dimension[0]}: {value}
 
-	<svelte:fragment slot="third-info">
-		{@const len = dimensions.length}
-		{#each dimensions as [dimension, value], index}
-			{dimension[0]}: {value}
-
-			<!-- TODO: add these on blockchain, would be nice to have some objects 
+						<!-- TODO: add these on blockchain, would be nice to have some objects 
 			representing different properties -->
-			{#if index == len - 1}
-				kg
-			{:else}
-				m
-			{/if}
+						{#if index == len - 1}
+							kg
+						{:else}
+							m
+						{/if}
 
-			{#if index == len - 2}
-				<br />
-			{/if}
-		{/each}
-
-		<!--  -->
-	</svelte:fragment>
-	<svelte:fragment slot="fourth-info">
-		<button slot="footer" class="contrast" on:click={() => (isBuyClicked = !isBuyClicked)}>
-			Buy
-		</button>
-	</svelte:fragment>
-
-	<svelte:fragment slot="footer">
+						{#if index == len - 2}
+							<br />
+						{/if}
+					{/each}
+				{:else}
+					<p>No dimensions</p>
+				{/if}
+			</div>
+		</div>
+		<div class="hidden shrink-0 sm:flex sm:flex-col sm:items-end basis-1/6">
+			<button
+				class="mx-1 px-4 py-1 text-sm text-white font-semibold bg-orange-400 rounded-md border border-orange-200 hover:text-white hover:bg-orange-600"
+				on:click={() => (isBuyClicked = !isBuyClicked)}
+			>
+				Buy
+			</button>
+		</div>
+	</div>
+	<footer class="flex justify-between">
 		<span>Date: {new Date(shipmentData.shipment.when).toDateString()}</span>
 		<span>Deadline: {new Date(shipmentData.shipment.deadline).toDateString()}</span>
-	</svelte:fragment>
-</Card>
+	</footer>
+</div>
 
 <CancelConfirmModal bind:isModalOpen={isBuyClicked} confirmClickHandler={handleBuyOrder}>
 	<h4 slot="header">Check your order</h4>
