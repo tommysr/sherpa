@@ -11,16 +11,15 @@
 	import { get } from 'svelte/store';
 	import CancelConfirmModal from './CancelConfirmModal.svelte';
 	import { PublicKey, Transaction, TransactionInstruction } from '@solana/web3.js';
-	import { getForwarderAddress, getShipperAddress } from '$src/lib/addresses';
+	import { getForwarderAddress, getShipperAddress } from '$sdk';
 	import { walletStore } from '$src/stores/wallet';
 	import { web3Store } from '$src/stores/web3';
 	import { useSignAndSendTransaction } from '$src/utils/wallet/singAndSendTx';
-	import { encodeName } from '../../../../sdk/sdk';
+	import { encodeName, getShipmentAddress } from '$sdk';
 	import SimpleButton from '../Buttons/SimpleButton.svelte';
-
-	type Entries<T> = {
-		[K in keyof T]: [K, T[K]];
-	}[keyof T][];
+	import type { Entries } from '$src/utils/types/object';
+	import ConfirmModal from './ConfirmModal.svelte';
+	import NameModal from './NameModal.svelte';
 
 	export let shipmentAccount: ApiShipmentAccount;
 
@@ -31,13 +30,18 @@
 
 	let isBuyClicked: boolean = false;
 
-	async function registerForwarderIx(forwarder: PublicKey): Promise<TransactionInstruction> {
+	let nameModal: NameModal;
+	let isNameModalOpen: boolean = false;
+
+	async function registerForwarderIx(
+		forwarder: PublicKey,
+		name: string
+	): Promise<TransactionInstruction> {
 		const { program } = get(anchorStore);
-		const { connection } = get(web3Store);
 		const wallet = get(walletStore);
 
 		const registerShipperIx = await program.methods
-			.registerForwarder(encodeName('forwarder'))
+			.registerForwarder(encodeName(name))
 			.accounts({
 				forwarder,
 				signer: wallet.publicKey!
@@ -47,16 +51,38 @@
 		return registerShipperIx;
 	}
 
+	async function waitForName(): Promise<string> {
+		return new Promise<string>((resolve) => {
+			nameModal.$on('name', (e: CustomEvent<Event> & { detail: string }) => {
+				resolve(e.detail);
+			});
+		});
+	}
+
 	async function handleBuyOrder(e: Event): Promise<string> {
+		console.log('elo');
 		const { program } = get(anchorStore);
 		const wallet = get(walletStore);
 		const { connection } = get(web3Store);
+
+		// TODO: handle it
+		// if (!wallet.publicKey) {
+		// 	alert('Wallet not connected');
+		// 	return '';
+		// }
+
 		const forwarder = getForwarderAddress(program, wallet?.publicKey!);
+
 		const forwarderAccount = await program.account.forwarder.fetchNullable(forwarder);
 		const tx = new Transaction();
 
 		if (!forwarderAccount) {
-			const registerIx = await registerForwarderIx(forwarder);
+			console.log('opening modal');
+			isNameModalOpen = true;
+			console.log('waiting for name');
+			const name = await waitForName();
+			console.log(name);
+			const registerIx = await registerForwarderIx(forwarder, name);
 			tx.add(registerIx);
 		}
 
@@ -76,7 +102,8 @@
 	}
 
 	async function getLocationFromCoords(lat: number, long: number): Promise<string> {
-		return `${lat.toFixed(4)}, ${long.toFixed(4)}`;
+		// there are limits, only 1per sec, so caching is needed or some better provider.
+		return `Kraków, Poland`;
 		// const response = await fetch(
 		// 	`https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${lat}&lon=${long}`
 		// );
@@ -145,7 +172,12 @@
 			</div>
 		</div>
 		<div class="hidden shrink-0 sm:flex sm:flex-col sm:items-end basis-1/6">
-			<SimpleButton on:click={() => (isBuyClicked = !isBuyClicked)} value="Buy" />
+			<SimpleButton
+				on:click={() => {
+					isBuyClicked = !isBuyClicked;
+				}}
+				value="Buy"
+			/>
 		</div>
 	</div>
 	<footer class="flex justify-between">
@@ -191,3 +223,5 @@
 		</article>
 	</svelte:fragment>
 </CancelConfirmModal>
+
+<NameModal bind:open={isNameModalOpen} bind:this={nameModal} />
