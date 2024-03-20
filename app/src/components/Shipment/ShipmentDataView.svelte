@@ -85,4 +85,11 @@ representing different properties -->
 			<p>No dimensions</p>
 		{/if}
 	</div>
+
+	<div class="flex justify-between items-center space-between">
+		<div class="rounded-full border px-1 text-sm border-[theme(colors.green)]">Date</div>
+		Date: {new Date(shipmentData.when).toDateString()}
+		<div class="rounded-full border px-1 text-sm border-[theme(colors.green)]">Deadline</div>
+		{new Date(shipmentData.deadline).toDateString()}
+	</div>
 </div>

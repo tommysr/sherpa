@@ -20,6 +20,7 @@
 	import type { Entries } from '$src/utils/types/object';
 	import NameModal from './NameModal.svelte';
 	import type { ComponentEvents } from 'svelte';
+	import ShipmentDataView from './ShipmentDataView.svelte';
 
 	export let shipmentAccount: ApiShipmentAccount;
 
@@ -99,78 +100,16 @@
 		const sig = await useSignAndSendTransaction(connection, wallet, tx);
 		return sig;
 	}
-
-	async function getLocationFromCoords(lat: number, long: number): Promise<string> {
-		// there are limits, only 1per sec, so caching is needed or some better provider.
-		return `Kraków, Poland`;
-		// const response = await fetch(
-		// 	`https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${lat}&lon=${long}`
-		// );
-		// const data = await response.json();
-
-		// console.log(data.address);
-		// if (data.address.village) {
-		// 	return data.address.village;
-		// } else if (data.address.city && data.address.city_district) {
-		// 	return `${data.address.city}, ${data.address.city_district}`;
-		// } else {
-		// 	throw Error('No location found');
-		// }
-	}
 </script>
 
-<div class="rounded bg-[theme(colors.mint)] my-3 first:mt-0 last:mb-0 p-6">
-	<div class="flex justify-between items-center gap-x-3">
-		<div class="basis-5/6 flex flex-row justify-between">
-			<div class="basis-1/3 text-2xl font-semibold text-center hover:text-orange-700">
-				<h3>{shipmentData.price / 10 ** 9} SOL</h3>
-			</div>
-			<div class="basis-1/3">
-				{#if locations}
-					{@const len = locations.length}
+<div class="rounded bg-[theme(colors.mint)] my-3 first:mt-0 last:mb-0 p-3">
+	<div>
+		<div>
+			<h3 class="text-center text-3xl">{shipmentData.price / 10 ** 9} SOL</h3>
 
-					{#each locations as [location, value], index}
-						<!-- TODO: batching or keep locations on server -->
-						{#await getLocationFromCoords(value.latitude, value.longitude)}
-							<article aria-busy="true"></article>
-						{:then location}
-							{location}
-						{:catch error}
-							{value.latitude.toFixed(4)} {value.longitude.toFixed(4)}
-						{/await}
-
-						{#if index != len - 1}
-							{'→ '}
-						{/if}
-					{/each}
-				{:else}
-					<p>No location</p>
-				{/if}
-			</div>
-			<div class="basis-1/3">
-				{#if dimensions}
-					{@const len = dimensions.length}
-					{#each dimensions as [dimension, value], index}
-						{dimension[0]}: {value}
-
-						<!-- TODO: add these on blockchain, would be nice to have some objects 
-			representing different properties -->
-						{#if index == len - 1}
-							kg
-						{:else}
-							m
-						{/if}
-
-						{#if index == len - 2}
-							<br />
-						{/if}
-					{/each}
-				{:else}
-					<p>No dimensions</p>
-				{/if}
-			</div>
+			<ShipmentDataView shipmentData={shipmentData.shipment} />
 		</div>
-		<div class="hidden shrink-0 sm:flex sm:flex-col sm:items-end basis-1/6">
+		<div class="flex justify-center">
 			<SimpleButton
 				on:click={() => {
 					isBuyClicked = !isBuyClicked;
@@ -179,10 +118,6 @@
 			/>
 		</div>
 	</div>
-	<footer class="flex justify-between">
-		<span>Date: {new Date(shipmentData.shipment.when).toDateString()}</span>
-		<span>Deadline: {new Date(shipmentData.shipment.deadline).toDateString()}</span>
-	</footer>
 </div>
 
 <CancelConfirmModal bind:isModalOpen={isBuyClicked} confirmClickHandler={handleBuyOrder}>

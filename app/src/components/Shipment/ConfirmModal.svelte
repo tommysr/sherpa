@@ -6,24 +6,6 @@
 
 	let className = '';
 	export { className as class };
-
-	// $: {
-	// 	if (isModalOpen) {
-	// 		openModal();
-	// 	} else {
-	// 		closeModal();
-	// 	}
-	// }
-
-	// function openModal() {
-	// 	isModalOpen = true;
-	// 	modalElement.setAttribute('open', '');
-	// }
-
-	// function closeModal() {
-	// 	isModalOpen = false;
-	// 	modalElement.removeAttribute('open');
-	// }
 </script>
 
 <dialog class={className} bind:this={modalElement} {open}>
