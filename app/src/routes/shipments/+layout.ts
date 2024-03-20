@@ -57,6 +57,7 @@ export async function load({
 					'content-type': 'application/json'
 				}
 			}),
+			// This may not be good idea to fetch it here, but for now it's fine
 			fetch('/api/boughtShipments', {
 				method: 'GET',
 				headers: {
