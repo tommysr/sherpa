@@ -11,14 +11,17 @@
 
 	//wallets adapters
 	import type { Adapter } from '@solana/wallet-adapter-base';
-	import { PhantomWalletAdapter } from '@solana/wallet-adapter-wallets';
-
+	import {
+		LedgerWalletAdapter,
+		PhantomWalletAdapter,
+		TrezorWalletAdapter,
+		TrustWalletAdapter
+	} from '@solana/wallet-adapter-wallets';
 	//wallet components
+	import Navbar from '$src/components/Navigation/Navbar.svelte';
 	import AnchorConnectionProvider from '$src/components/Wallet/AnchorConnectionProvider.svelte';
 	import ConnectionProvider from '$src/components/Wallet/ConnectionProvider.svelte';
 	import WalletProvider from '$src/components/Wallet/WalletProvider.svelte';
-	import Navbar from '$src/components/Navigation/Navbar.svelte';
-
 	// solana
 	import { clusterApiUrl } from '@solana/web3.js';
 
@@ -28,7 +31,12 @@
 	const localStorageKey = 'walletAdapter';
 
 	onMount(async () => {
-		wallets = [new PhantomWalletAdapter()];
+		wallets = [
+			new PhantomWalletAdapter(),
+			new TrustWalletAdapter(),
+			new LedgerWalletAdapter(),
+			new TrezorWalletAdapter()
+		];
 	});
 </script>
 
