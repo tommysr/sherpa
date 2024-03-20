@@ -1,42 +1,131 @@
 <script lang="ts">
 	import BoughtShipmentCard from '$src/components/Shipment/BoughtShipmentCard.svelte';
 	import ShipmentsMap from '$src/components/ShipmentMap/ShipmentsMap.svelte';
-	import { searchableBoughtShipments } from '$src/stores/forwarderShipments';
-	import type { GeoLocation, Geography } from '$src/utils/idl/shipment';
+	import {
+		searchableBoughtShipments,
+		type SearchableBoughtOrder
+	} from '$src/stores/forwarderShipments';
+	import type {
+		ApiShipmentAccount,
+		GeoLocation,
+		Geography,
+		ShipmentAccount
+	} from '$src/utils/idl/shipment';
 	import type { ComponentEvents } from 'svelte';
 	import type { PageData } from './$types';
 	import { Marker, Popup } from 'svelte-maplibre';
 	import CategoryButton from '$src/components/Buttons/CategoryButton.svelte';
 	import SimpleButton from '$src/components/Buttons/SimpleButton.svelte';
+	import {
+		encodeName,
+		getBoughtShipmentAddress,
+		getCarrierAddress,
+		getForwarderAddress,
+		getOfferAddress
+	} from '$sdk/sdk';
+	import { PublicKey, Transaction } from '@solana/web3.js';
+	import { get } from 'svelte/store';
+	import { anchorStore } from '$src/stores/anchor';
+	import OfferDetailsModal from '$src/components/Offer/OfferDetailsModal.svelte';
+	import { BN } from 'bn.js';
+	import { walletStore } from '$src/stores/wallet';
+	import { useSignAndSendTransaction } from '$src/utils/wallet/singAndSendTx';
 
 	export let data: PageData;
+	let center: [number, number] = [19, 50];
+	let isOfferDetailsOpen: boolean = false;
+	let offerDetailsModal: OfferDetailsModal;
+	let isOfferChosen: boolean = false;
+	let shipmentChosen: SearchableBoughtOrder;
 
 	$: locationsOnMap = $searchableBoughtShipments.data.map((s) => s.account.shipment.geography);
 
 	$: carriers = data.carriers;
 
-	let center: [number, number] = [19, 50];
+	async function makeOffer(carrier: string) {
+		const { program, connection } = get(anchorStore);
+		const wallet = get(walletStore);
 
-	function handleCardClick(e: ComponentEvents<BoughtShipmentCard>['cardFocus']) {
-		const cardCoords = e.detail as Geography;
+		const carrierAddress = getCarrierAddress(program, new PublicKey(carrier));
 
-		const [lowerLongitude, higherLongitude] = [
-			cardCoords.from.longitude,
-			cardCoords.to.longitude
-		].sort();
+		const carrierAccount = await program.account.carrier.fetchNullable(carrierAddress);
 
-		const [lowerLatitude, higherLatitude] = [
-			cardCoords.from.latitude,
-			cardCoords.to.latitude
-		].sort();
+		if (!carrierAccount) {
+			throw new Error('Carrier account not found');
+		}
 
-		const middle = {
-			longitude: (lowerLongitude + higherLongitude) / 2,
-			latitude: (lowerLatitude + higherLatitude) / 2
-		};
+		const offerAddress = getOfferAddress(
+			program,
+			new PublicKey(carrier),
+			carrierAccount.offersCount
+		);
 
-		center = [middle.longitude, middle.latitude];
+		isOfferDetailsOpen = true;
+
+		// TODO: make cancelation
+		const { time, price } = await waitForOfferDetails();
+
+		const ix = await program.methods
+			.makeOffer(new BN(price), time)
+			.accounts({
+				offer: offerAddress,
+				shipment: new PublicKey(shipmentChosen.publicKey),
+				forwarder: getForwarderAddress(program, wallet.publicKey!),
+				carrier: carrierAddress,
+				signer: wallet.publicKey!
+			})
+			.instruction();
+
+		const tx = new Transaction().add(ix);
+		const sig = await useSignAndSendTransaction(connection, wallet, tx);
+		console.log(sig);
 	}
+	async function waitForOfferDetails(): Promise<{
+		price: number;
+		time: number;
+	}> {
+		return new Promise<{
+			price: number;
+			time: number;
+		}>((resolve) => {
+			offerDetailsModal.$on(
+				'offerDetails',
+				(e: ComponentEvents<OfferDetailsModal>['offerDetails']) => {
+					resolve(e.detail);
+				}
+			);
+		});
+	}
+
+	const handleMakeOfferButtonClick = (authority: string) => async (e: Event) => {
+		await makeOffer(authority);
+		console.log('make offer button clicked');
+	};
+
+	const handleCardClick =
+		(account: SearchableBoughtOrder) => (e: ComponentEvents<BoughtShipmentCard>['cardFocus']) => {
+			isOfferChosen = true;
+			shipmentChosen = account;
+
+			const cardCoords = e.detail as Geography;
+
+			const [lowerLongitude, higherLongitude] = [
+				cardCoords.from.longitude,
+				cardCoords.to.longitude
+			].sort();
+
+			const [lowerLatitude, higherLatitude] = [
+				cardCoords.from.latitude,
+				cardCoords.to.latitude
+			].sort();
+
+			const middle = {
+				longitude: (lowerLongitude + higherLongitude) / 2,
+				latitude: (lowerLatitude + higherLatitude) / 2
+			};
+
+			center = [middle.longitude, middle.latitude];
+		};
 </script>
 
 <svelte:head><title>Forwarder shipments list</title></svelte:head>
@@ -46,7 +135,10 @@
 		<div>
 			{#if $searchableBoughtShipments.filtered.length != 0}
 				{#each $searchableBoughtShipments.filtered as account}
-					<BoughtShipmentCard boughtShipmentAccount={account} on:cardFocus={handleCardClick} />
+					<BoughtShipmentCard
+						boughtShipmentAccount={account}
+						on:cardFocus={handleCardClick(account)}
+					/>
 				{/each}
 			{:else}
 				<p>Nothing found</p>
@@ -54,18 +146,13 @@
 		</div>
 		<div>
 			<ShipmentsMap locations={locationsOnMap} {center}>
-				<!-- <DefaultMarker lngLat={[location.from.longitude, location.from.latitude]}>
-					<Popup offset={[0, -10]}>
-						<div class="text-lg font-bold">Package source</div>
-					</Popup>
-				</DefaultMarker> -->
 				{#each carriers as { account }}
 					{@const {
 						location: { latitude, longitude },
 						time
 					} = account.availability}
 
-					{@const { name } = account}
+					{@const { name, authority, creator } = account}
 
 					<Marker
 						lngLat={[longitude, latitude]}
@@ -85,6 +172,7 @@
 								<SimpleButton
 									class="border-[theme(colors.mint)] text-[theme(colors.mint)]"
 									value={'make offer'}
+									on:click={handleMakeOfferButtonClick(creator)}
 								/>
 							</div>
 						</Popup>
@@ -94,3 +182,5 @@
 		</div>
 	</div>
 </main>
+
+<OfferDetailsModal bind:open={isOfferDetailsOpen} bind:this={offerDetailsModal} />
