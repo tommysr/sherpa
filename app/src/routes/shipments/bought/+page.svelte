@@ -4,8 +4,16 @@
 	import { searchableBoughtShipments } from '$src/stores/forwarderShipments';
 	import type { GeoLocation, Geography } from '$src/utils/idl/shipment';
 	import type { ComponentEvents } from 'svelte';
+	import type { PageData } from './$types';
+	import { Marker, Popup } from 'svelte-maplibre';
+	import CategoryButton from '$src/components/Buttons/CategoryButton.svelte';
+	import SimpleButton from '$src/components/Buttons/SimpleButton.svelte';
+
+	export let data: PageData;
 
 	$: locationsOnMap = $searchableBoughtShipments.data.map((s) => s.account.shipment.geography);
+
+	$: carriers = data.carriers;
 
 	let center: [number, number] = [19, 50];
 
@@ -45,7 +53,44 @@
 			{/if}
 		</div>
 		<div>
-			<ShipmentsMap locations={locationsOnMap} {center} />
+			<ShipmentsMap locations={locationsOnMap} {center}>
+				<!-- <DefaultMarker lngLat={[location.from.longitude, location.from.latitude]}>
+					<Popup offset={[0, -10]}>
+						<div class="text-lg font-bold">Package source</div>
+					</Popup>
+				</DefaultMarker> -->
+				{#each carriers as { account }}
+					{@const {
+						location: { latitude, longitude },
+						time
+					} = account.availability}
+
+					{@const { name } = account}
+
+					<Marker
+						lngLat={[longitude, latitude]}
+						on:click={() => console.log('clicked', time)}
+						class="grid h-8 w-8 place-items-center rounded-xl border border-2 border-[theme(colors.green)] bg-red-400 text-[theme(colors.green)]  shadow-2xl focus:outline-2 focus:outline-black"
+					>
+						<span>
+							{name}
+						</span>
+
+						<Popup openOn="hover" offset={[0, -10]}>
+							<div class="flex flex-col">
+								<span class="text-sm font-bold text-[theme(colors.mint)]"
+									>available time: {new Date(time).toUTCString()}
+								</span>
+
+								<SimpleButton
+									class="border-[theme(colors.mint)] text-[theme(colors.mint)]"
+									value={'make offer'}
+								/>
+							</div>
+						</Popup>
+					</Marker>
+				{/each}
+			</ShipmentsMap>
 		</div>
 	</div>
 </main>

@@ -27,6 +27,8 @@
 	{center}
 	bind:bounds
 >
+	<slot />
+
 	{#each locations as location}
 		<DefaultMarker lngLat={[location.from.longitude, location.from.latitude]}>
 			<Popup offset={[0, -10]}>
