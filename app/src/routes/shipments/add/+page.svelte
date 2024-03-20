@@ -41,10 +41,10 @@
 		if (orderStore.price! <= 0) {
 			throw new Error('Price must be greater than 0');
 		}
-		if (orderStore.when! < new Date()) {
+		if (orderStore.dates.when < new Date()) {
 			throw new Error('When must be in the future');
 		}
-		if (orderStore.deadline! < orderStore.when!) {
+		if (orderStore.dates.deadline < orderStore.dates.when) {
 			throw new Error('Deadline must be after when');
 		}
 
@@ -79,9 +79,8 @@
 		const shipment = getShipmentAddress(program, wallet.publicKey!, shipperAccount?.count || 0);
 		const order = get(formStore);
 
-		const { price, when, deadline } = order;
-		const { access, count, fragility, priority } = order.details;
-		const { depth, height, weight, width } = order.dimensions;
+		const { price, dates } = order;
+		const { deadline, when } = dates;
 		const { from, to } = order.location;
 
 		// typing XD
@@ -91,19 +90,8 @@
 		const createShipmentIx = await program.methods
 			.createShipment(new BN(price! * 10 ** 9), {
 				deadline: new BN(deadlineDate.valueOf()),
-				details: {
-					priority: priority ?? 0,
-					access: access ?? 0,
-					count: count ?? 1,
-					fragility: fragility ?? 0,
-					reserved: [0, 0, 0, 0]
-				},
-				dimensions: {
-					depth: depth ?? 0,
-					height: height ?? 0,
-					weight: weight ?? 0,
-					width: width ?? 0
-				},
+				details: order.details,
+				dimensions: order.dimensions,
 				geography: {
 					from: { latitude: from?.lat!, longitude: from?.lng! },
 					to: { latitude: to?.lat!, longitude: from?.lng! }
@@ -157,8 +145,8 @@
 			{#if $formStore.nextState == 'dimensions'}
 				<PricePick bind:price={$formStore.price} />
 				<table>
-					<DatePick name="when" bind:date={$formStore.when} />
-					<DatePick name="deadline" bind:date={$formStore.deadline} />
+					<DatePick name="when" bind:date={$formStore.dates.when} />
+					<DatePick name="deadline" bind:date={$formStore.dates.deadline} />
 				</table>
 				<LocationPick
 					bind:shipmentSourceCoords={$formStore.location.from}
@@ -166,21 +154,12 @@
 				/>
 			{:else if $formStore.nextState == 'properties'}
 				<DimensionsPick
-					bind:weightMetrics={$formStore.weightMetrics}
-					bind:distanceMetrics={$formStore.distanceMetrics}
-					bind:weight={$formStore.dimensions.weight}
-					bind:width={$formStore.dimensions.width}
-					bind:height={$formStore.dimensions.height}
-					bind:depth={$formStore.dimensions.depth}
+					bind:metrics={$formStore.metrics}
+					bind:dimensions={$formStore.dimensions}
 					bind:isMetricTon={$formStore.isMetricTon}
 				/>
 			{:else if $formStore.nextState == 'submit'}
-				<Details
-					bind:priority={$formStore.details.priority}
-					bind:count={$formStore.details.count}
-					bind:fragility={$formStore.details.fragility}
-					bind:access={$formStore.details.access}
-				/>
+				<Details bind:details={$formStore.details} />
 			{/if}
 
 			<SimpleButton value={$formStore.nextState} on:click={handleButtonClick} />

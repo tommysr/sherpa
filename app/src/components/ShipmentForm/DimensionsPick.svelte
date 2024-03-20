@@ -1,11 +1,13 @@
 <script lang="ts">
-	export let weightMetrics: string = 'kg';
-	export let distanceMetrics: string = 'cm';
-	export let weight: number | undefined = undefined;
-	export let width: number | undefined = undefined;
-	export let height: number | undefined = undefined;
-	export let depth: number | undefined = undefined;
+	import type { ShipmentDimensions } from '$src/utils/idl/shipment';
+
+	export let metrics: {
+		weight: string;
+		distance: string;
+	};
+
 	export let isMetricTon: boolean = false;
+	export let dimensions: ShipmentDimensions;
 </script>
 
 <h1>Dimensions</h1>
@@ -21,9 +23,9 @@
 		<fieldset>
 			<!-- <legend>Weight metrics:</legend> -->
 			<h4>Weight metrics</h4>
-			<input type="radio" id="kg" name="weight-metrics" bind:group={weightMetrics} value="kg" />
+			<input type="radio" id="kg" name="weight-metrics" bind:group={metrics.weight} value="kg" />
 			<label for="kg">kg</label>
-			<input type="radio" id="lb" name="weight-metrics" bind:group={weightMetrics} value="lb" />
+			<input type="radio" id="lb" name="weight-metrics" bind:group={metrics.weight} value="lb" />
 			<label for="lb">lb</label>
 		</fieldset>
 
@@ -35,7 +37,7 @@
 					type="radio"
 					id="cm"
 					name="distance-metrics"
-					bind:group={distanceMetrics}
+					bind:group={metrics.distance}
 					value="cm"
 				/>
 				<label for="cm">cm</label>
@@ -43,7 +45,7 @@
 					type="radio"
 					id="ft"
 					name="distance-metrics"
-					bind:group={distanceMetrics}
+					bind:group={metrics.distance}
 					value="ft"
 				/>
 				<label for="ft">ft</label>
@@ -55,7 +57,13 @@
 		<div>
 			<label for="amount">weight</label>
 
-			<input type="number" name="amount" placeholder="weight" required bind:value={weight} />
+			<input
+				type="number"
+				name="amount"
+				placeholder="weight"
+				required
+				bind:value={dimensions.weight}
+			/>
 		</div>
 		<!-- TODO: handle input validation, min, max, step and others -->
 
@@ -63,20 +71,38 @@
 			<div>
 				<label for="amount">width</label>
 
-				<input type="number" name="amount" placeholder="width" required bind:value={width} />
+				<input
+					type="number"
+					name="amount"
+					placeholder="width"
+					required
+					bind:value={dimensions.width}
+				/>
 			</div>
 
 			<div>
 				<label for="amount"
 					>height<label>
-						<input type="number" name="amount" placeholder="height" required bind:value={height} />
+						<input
+							type="number"
+							name="amount"
+							placeholder="height"
+							required
+							bind:value={dimensions.height}
+						/>
 					</label></label
 				>
 			</div>
 
 			<div>
 				<label for="amount">Depth</label>
-				<input type="number" name="amount" placeholder="depth" required bind:value={depth} />
+				<input
+					type="number"
+					name="amount"
+					placeholder="depth"
+					required
+					bind:value={dimensions.depth}
+				/>
 			</div>
 		{/if}
 	</div>
