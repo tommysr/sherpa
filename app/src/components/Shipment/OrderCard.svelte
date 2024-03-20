@@ -10,16 +10,17 @@
 	} from '$src/utils/idl/shipment';
 	import { get } from 'svelte/store';
 	import CancelConfirmModal from './CancelConfirmModal.svelte';
-	import Card from './Card.svelte';
 	import { PublicKey, Transaction, TransactionInstruction } from '@solana/web3.js';
-	import { getForwarderAddress, getShipperAddress } from '$src/lib/addresses';
+	import { getBoughtShipmentAddress, getForwarderAddress, getShipperAddress } from '$sdk/sdk';
 	import { walletStore } from '$src/stores/wallet';
 	import { web3Store } from '$src/stores/web3';
 	import { useSignAndSendTransaction } from '$src/utils/wallet/singAndSendTx';
-
-	type Entries<T> = {
-		[K in keyof T]: [K, T[K]];
-	}[keyof T][];
+	import { encodeName } from '$sdk/sdk';
+	import SimpleButton from '../Buttons/SimpleButton.svelte';
+	import type { Entries } from '$src/utils/types/object';
+	import NameModal from './NameModal.svelte';
+	import type { ComponentEvents } from 'svelte';
+	import ShipmentDataView from './ShipmentDataView.svelte';
 
 	export let shipmentAccount: ApiShipmentAccount;
 
@@ -30,13 +31,18 @@
 
 	let isBuyClicked: boolean = false;
 
-	async function registerForwarderIx(forwarder: PublicKey): Promise<TransactionInstruction> {
+	let nameModal: NameModal;
+	let isNameModalOpen: boolean = false;
+
+	async function registerForwarderIx(
+		forwarder: PublicKey,
+		name: string
+	): Promise<TransactionInstruction> {
 		const { program } = get(anchorStore);
-		const { connection } = get(web3Store);
 		const wallet = get(walletStore);
 
 		const registerShipperIx = await program.methods
-			.registerForwarder()
+			.registerForwarder(encodeName(name))
 			.accounts({
 				forwarder,
 				signer: wallet.publicKey!
@@ -46,105 +52,72 @@
 		return registerShipperIx;
 	}
 
+	async function waitForName(): Promise<string> {
+		return new Promise<string>((resolve) => {
+			nameModal.$on('name', (e: ComponentEvents<NameModal>['name']) => {
+				resolve(e.detail);
+			});
+		});
+	}
+
 	async function handleBuyOrder(e: Event): Promise<string> {
 		const { program } = get(anchorStore);
 		const wallet = get(walletStore);
 		const { connection } = get(web3Store);
+
+		// TODO: handle it
+		// if (!wallet.publicKey) {
+		// 	alert('Wallet not connected');
+		// 	return '';
+		// }
+
 		const forwarder = getForwarderAddress(program, wallet?.publicKey!);
+
 		const forwarderAccount = await program.account.forwarder.fetchNullable(forwarder);
 		const tx = new Transaction();
 
 		if (!forwarderAccount) {
-			const registerIx = await registerForwarderIx(forwarder);
+			isNameModalOpen = true;
+			const name = await waitForName();
+			const registerIx = await registerForwarderIx(forwarder, name);
 			tx.add(registerIx);
 		}
-		
+
 		const ix = await program.methods
 			.buyShipment()
 			.accounts({
-				shipper: getShipperAddress(program, new PublicKey(shipmentData.shipper)),
+				shipper: getShipperAddress(program, new PublicKey(shipmentAccount.account.shipper)),
 				shipment: new PublicKey(shipmentAccount.publicKey),
 				forwarder,
+				bought: getBoughtShipmentAddress(program, wallet.publicKey!, forwarderAccount?.count || 0),
 				signer: wallet.publicKey!
 			})
 			.instruction();
 
 		tx.add(ix);
+
 		const sig = await useSignAndSendTransaction(connection, wallet, tx);
 		return sig;
 	}
-
-	async function getLocationFromCoords(lat: number, long: number): Promise<string> {
-		const response = await fetch(
-			`https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${lat}&lon=${long}`
-		);
-		const data = await response.json();
-
-		console.log(data.address);
-		if (data.address.village) {
-			return data.address.village;
-		} else if (data.address.city && data.address.city_district) {
-			return `${data.address.city}, ${data.address.city_district}`;
-		} else {
-			throw Error('No location found');
-		}
-	}
 </script>
 
-<Card>
-	<svelte:fragment slot="first-info">
-		<h3>{shipmentData.price / 10 ** 9} SOL</h3>
-	</svelte:fragment>
-	<svelte:fragment slot="second-info">
-		{@const len = locations.length}
+<div class="rounded bg-[theme(colors.mint)] my-3 first:mt-0 last:mb-0 p-3">
+	<div>
+		<div>
+			<h3 class="text-center text-3xl">{shipmentData.price / 10 ** 9} SOL</h3>
 
-		{#each locations as [location, value], index}
-			<!-- TODO: batching or keep locations on server -->
-			{#await getLocationFromCoords(value.latitude, value.longitude)}
-				<article aria-busy="true"></article>
-			{:then location}
-				{location}
-			{:catch error}
-				{value.latitude.toFixed(4)} {value.longitude.toFixed(4)}
-			{/await}
-
-			{#if index != len - 1}
-				{'→ '}
-			{/if}
-		{/each}
-	</svelte:fragment>
-
-	<svelte:fragment slot="third-info">
-		{@const len = dimensions.length}
-		{#each dimensions as [dimension, value], index}
-			{dimension[0]}: {value}
-
-			<!-- TODO: add these on blockchain, would be nice to have some objects 
-			representing different properties -->
-			{#if index == len - 1}
-				kg
-			{:else}
-				m
-			{/if}
-
-			{#if index == len - 2}
-				<br />
-			{/if}
-		{/each}
-
-		<!--  -->
-	</svelte:fragment>
-	<svelte:fragment slot="fourth-info">
-		<button slot="footer" class="contrast" on:click={() => (isBuyClicked = !isBuyClicked)}>
-			Buy
-		</button>
-	</svelte:fragment>
-
-	<svelte:fragment slot="footer">
-		<span>Date: {new Date(shipmentData.shipment.when).toDateString()}</span>
-		<span>Deadline: {new Date(shipmentData.shipment.deadline).toDateString()}</span>
-	</svelte:fragment>
-</Card>
+			<ShipmentDataView shipmentData={shipmentData.shipment} />
+		</div>
+		<div class="flex justify-center">
+			<SimpleButton
+				on:click={() => {
+					isBuyClicked = !isBuyClicked;
+				}}
+				value="Buy"
+			/>
+		</div>
+	</div>
+</div>
 
 <CancelConfirmModal bind:isModalOpen={isBuyClicked} confirmClickHandler={handleBuyOrder}>
 	<h4 slot="header">Check your order</h4>
@@ -183,3 +156,5 @@
 		</article>
 	</svelte:fragment>
 </CancelConfirmModal>
+
+<NameModal bind:open={isNameModalOpen} bind:this={nameModal} />

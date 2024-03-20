@@ -1,8 +1,7 @@
 <script lang="ts">
-	export let count: number = 1;
-	export let fragility: number = 2;
-	export let priority: number = 3;
-	export let access: number = 4;
+	import type { ShipmentDetails } from '$src/utils/idl/shipment';
+
+	export let details: ShipmentDetails;
 </script>
 
 <div class="space">
@@ -15,7 +14,7 @@
 		step="1"
 		placeholder="1"
 		required
-		bind:value={count}
+		bind:value={details.count}
 	/>
 </div>
 
@@ -28,7 +27,7 @@
 	min="1"
 	max="5"
 	step="1"
-	bind:value={priority}
+	bind:value={details.priority}
 	required
 />
 <datalist id="datalist5values">
@@ -48,7 +47,7 @@
 	min="1"
 	max="5"
 	step="1"
-	bind:value={fragility}
+	bind:value={details.fragility}
 	required
 />
 <datalist id="datalist5values">
@@ -59,13 +58,13 @@
 	<option value="5">Max</option>
 </datalist>
 
-<select class="space" name="access"  required bind:value={access}>
-	<option selected disabled value=0> Tell how hard is to access source place </option>
-	<option value=1>Only car</option>
-	<option value=2>Truck up to 10t</option>
-	<option value=3>Truck over 10t</option>
-	<option value=4>Something else</option>
-	<option value=5>Can't tell</option>
+<select class="space" name="access" required bind:value={details.access}>
+	<option selected disabled value="0"> Tell how hard is to access source place </option>
+	<option value="1">Only car</option>
+	<option value="2">Truck up to 10t</option>
+	<option value="3">Truck over 10t</option>
+	<option value="4">Something else</option>
+	<option value="5">Can't tell</option>
 </select>
 
 <style lang="scss">

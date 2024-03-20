@@ -3,26 +3,24 @@
 	import Logo from '$lib/images/logo.png';
 </script>
 
-<header class="container">
-	<nav>
-		<div>
-			<a href="/orders"> <img src={Logo} alt="LOGO" /></a>
+<header class="bg-[theme(colors.turquoise)]">
+	<nav class="flex items-center justify-between p-3">
+		<div class="flex lg:flex-1">
+			<a class="-m-2 p-2" href="/shipments"> <img class="h-8 w-auto" src={Logo} alt="LOGO" /></a>
 		</div>
 
-		<ul>
-			<li><a href="/orders">Sellers</a></li>
-			<li><a href="/forwarder">Forwarders</a></li>
-			<li><a href="/carrier">Carriers</a></li>
-		</ul>
+		<div class="lg:flex lg:gap-x-10">
+			<a href="/shipments" class="text-sm font-semibold">Shippers</a>
+			<a href="/shipments/bought" class="text-sm font-semibold">Forwarders</a>
+			<!-- For now, because of anchor ;/ -->
+			<a href="/shipments/add" class="text-sm font-semibold">Add Shipment</a>
+		</div>
 
-		<div>
+		<div class="flex lg:flex-1 lg:justify-end">
 			<WalletMultiButton />
 		</div>
 	</nav>
 </header>
 
 <style lang="scss">
-	div {
-		margin-top: 20px;
-	}
 </style>

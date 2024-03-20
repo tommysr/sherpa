@@ -11,19 +11,20 @@
 	import type { Geography } from '$src/utils/idl/shipment';
 
 	export let locations: Geography[];
+	export let zoom: number = 10;
+	export let center: [number, number] = [19, 50];
 	let hovered: Geography;
 
 	// TODO: render based by current map borders?
 	let bounds: LngLatBoundsLike;
-	$: console.log(bounds);
 </script>
 
 <MapLibre
 	style="https://basemaps.cartocdn.com/gl/positron-gl-style/style.json"
 	class="map relative aspect-[9/16] max-h-[70vh] w-full sm:aspect-video sm:max-h-full"
 	standardControls
-	zoom={10}
-	center={[19, 50]}
+	{zoom}
+	{center}
 	bind:bounds
 >
 	{#each locations as location}

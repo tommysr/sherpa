@@ -1,4 +1,6 @@
 <script lang="ts">
+	import SimpleButton from '../Buttons/SimpleButton.svelte';
+
 	let modalElement: HTMLDialogElement;
 	let statusElement: HTMLDivElement;
 
@@ -58,17 +60,15 @@
 			{:else if status === 'Preparing transaction'}
 				<span aria-busy="true">Sending transaction...</span>
 			{:else if status === 'Transaction sent'}
-				<ins>Transaction sent: <a href="https://explorer.solana.com/tx/{signature}?cluster=devnet">explorer</a> </ins> 
+				<ins
+					>Transaction sent: <a href="https://explorer.solana.com/tx/{signature}?cluster=devnet"
+						>explorer</a
+					>
+				</ins>
 			{/if}
 			<span>
-				<button role="button" class="secondary" data-target="confirm-modal" on:click={closeModal}>
-					Cancel</button
-				><button
-					autofocus
-					data-target="confirm-modal"
-					on:click={handleConfirmClick}
-					disabled={confirmButtonDisabled}>confirm</button
-				>
+				<SimpleButton value="Cancel" on:click={closeModal} />
+				<SimpleButton value="confirm" on:click={handleConfirmClick} />
 			</span>
 		</footer>
 	</article>
