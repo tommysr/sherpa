@@ -40,7 +40,7 @@
 			placeholder="Search"
 			aria-label="Search"
 			bind:value={searchValue}
-			on:keydown
+			on:keyup
 		/>
 	</div>
 </div>

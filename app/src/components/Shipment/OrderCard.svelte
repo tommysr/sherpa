@@ -19,6 +19,7 @@
 	import SimpleButton from '../Buttons/SimpleButton.svelte';
 	import type { Entries } from '$src/utils/types/object';
 	import NameModal from './NameModal.svelte';
+	import type { ComponentEvents } from 'svelte';
 
 	export let shipmentAccount: ApiShipmentAccount;
 
@@ -52,7 +53,7 @@
 
 	async function waitForName(): Promise<string> {
 		return new Promise<string>((resolve) => {
-			nameModal.$on('name', (e: CustomEvent<Event> & { detail: string }) => {
+			nameModal.$on('name', (e: ComponentEvents<NameModal>['name']) => {
 				resolve(e.detail);
 			});
 		});

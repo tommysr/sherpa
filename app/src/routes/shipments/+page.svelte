@@ -1,8 +1,4 @@
 <script lang="ts">
-	// Components
-	import ScrollableMenu from '$src/components/Navigation/ScrollableMenu.svelte';
-	import CategoryButton from '$src/components/Buttons/CategoryButton.svelte';
-	import HotNavigation from '$src/components/Navigation/HotNavigation.svelte';
 	import OrderCard from '$src/components/Shipment/OrderCard.svelte';
 	import ShipmentsMap from '$src/components/ShipmentMap/ShipmentsMap.svelte';
 
@@ -11,58 +7,12 @@
 
 	export let data: PageData;
 
-	// $: shipments = $searchableShipments.data.filter((s) => s.account.owner == s.account.shipper)
 	$: locationsOnMap = $searchableShipments.data.map((s) => s.account.shipment.geography);
-
-	// TODO: make it dynamic or from server
-	const categories: string[] = [
-		'Normal',
-		'Big',
-		'Small',
-		'Freeze',
-		'Fragile',
-		'Perishable',
-		'Heavy',
-		'Hazardous',
-		'Oversized',
-		'Express',
-		'International',
-		'Domestic',
-		'Bulk',
-		'Liquid',
-		'Sensitive',
-		'Valuable',
-		'High Priority',
-		'Documents',
-		'Live Animals',
-		'Electronics'
-	];
-
-	function handleSearchKeydown(e: KeyboardEvent) {
-		if ($searchableShipments.searchString && e.key == 'Enter') {
-			searchableShipments.performSearch();
-		} else {
-			searchableShipments.purgeFiltered();
-		}
-	}
 </script>
 
 <svelte:head><title>Shipments list</title></svelte:head>
 
 <main class="container">
-	<ScrollableMenu>
-		{#each categories as category}
-			<CategoryButton on:click={() => console.log(`clicked category ${category}`)}
-				>{category}</CategoryButton
-			>
-		{/each}
-	</ScrollableMenu>
-
-	<HotNavigation
-		bind:searchValue={$searchableShipments.searchString}
-		on:keydown={handleSearchKeydown}
-	/>
-
 	<div class="grid">
 		<div class="px-5">
 			{#if $searchableShipments.filtered.length != 0}
