@@ -61,7 +61,6 @@
 	}
 
 	async function handleBuyOrder(e: Event): Promise<string> {
-		console.log('elo');
 		const { program } = get(anchorStore);
 		const wallet = get(walletStore);
 		const { connection } = get(web3Store);

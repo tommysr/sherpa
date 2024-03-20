@@ -4,6 +4,7 @@
 	import { anchorStore } from '$src/stores/anchor';
 	import { walletStore } from '$src/stores/wallet';
 	import { formStore } from '$stores/orderForm';
+	import { FormStates } from '$stores/orderForm';
 	import { web3Store } from '$src/stores/web3';
 	import { useSignAndSendTransaction } from '$src/utils/wallet/singAndSendTx';
 	import { Transaction, type PublicKey } from '@solana/web3.js';
@@ -49,9 +50,9 @@
 		}
 
 		if (orderStore.isMetricTon) {
-			orderStore.dimensions.depth = 0;
-			orderStore.dimensions.height = 0;
-			orderStore.dimensions.weight = 0;
+			$formStore.dimensions.depth = 0;
+			$formStore.dimensions.height = 0;
+			$formStore.dimensions.width = 0;
 		}
 	}
 
@@ -83,6 +84,8 @@
 		const { deadline, when } = dates;
 		const { from, to } = order.location;
 
+		console.log(order);
+
 		// typing XD
 		const deadlineDate = new Date(deadline!);
 		const whenDate = new Date(when!);
@@ -112,37 +115,33 @@
 
 	// Not sure if i can use $ in typescript, but seems it works
 	async function handleButtonClick(event: Event) {
-		if ($formStore.nextState === 'dimensions') {
-			$formStore.nextState = 'properties';
-		} else if ($formStore.nextState === 'properties') {
-			$formStore.nextState = 'submit';
-		}
+		const { currentState } = get(formStore);
 
-		if ($formStore.nextState === 'submit') {
+		if (currentState == FormStates.Properties) {
 			// open modal?
 			validateOrderForm();
 			await addOrder();
+
+			formStore.resetForm();
 		}
+
+		formStore.progressForm();
 	}
 
 	function handleBackButtonClick(event: Event) {
-		if ($formStore.nextState === 'properties') {
-			$formStore.nextState = 'dimensions';
-		} else if ($formStore.nextState === 'submit') {
-			$formStore.nextState = 'properties';
-		}
+		formStore.regressForm();
 	}
 </script>
 
 <!-- CONSIDER: avoid binding to much -->
 <main class="container">
 	<div class="form-box">
-		{#if $formStore.nextState != 'dimensions'}
+		{#if $formStore.currentState != FormStates.Main}
 			<button class="s-button" on:click={handleBackButtonClick}>back</button>
 		{/if}
 
 		<form method="post" on:submit|preventDefault={handleButtonClick}>
-			{#if $formStore.nextState == 'dimensions'}
+			{#if $formStore.currentState == FormStates.Main}
 				<PricePick bind:price={$formStore.price} />
 				<table>
 					<DatePick name="when" bind:date={$formStore.dates.when} />
@@ -152,17 +151,20 @@
 					bind:shipmentSourceCoords={$formStore.location.from}
 					bind:shipmentDestinationCoords={$formStore.location.to}
 				/>
-			{:else if $formStore.nextState == 'properties'}
+			{:else if $formStore.currentState == FormStates.Dimensions}
 				<DimensionsPick
 					bind:metrics={$formStore.metrics}
 					bind:dimensions={$formStore.dimensions}
 					bind:isMetricTon={$formStore.isMetricTon}
 				/>
-			{:else if $formStore.nextState == 'submit'}
+			{:else if $formStore.currentState == FormStates.Properties}
 				<Details bind:details={$formStore.details} />
 			{/if}
 
-			<SimpleButton value={$formStore.nextState} on:click={handleButtonClick} />
+			<SimpleButton
+				value={$formStore.currentState === FormStates.Properties ? 'submit' : 'next'}
+				on:click={handleButtonClick}
+			/>
 		</form>
 	</div>
 </main>
