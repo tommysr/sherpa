@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { createEventDispatcher } from 'svelte';
 	import ConfirmModal from '../Shipment/ConfirmModal.svelte';
-	const MINUTES_IN_SEC = 60;
+	const SECS_IN_MINUTE = 60;
 	const dispatch = createEventDispatcher();
 
 	export let open: boolean = false;
@@ -12,7 +12,7 @@
 	$: secs = timeInMinutes * 60;
 
 	async function handleNameConfirmClick(e: Event) {
-		if (price > 0 && secs > MINUTES_IN_SEC * 30) {
+		if (price > 0 && secs > SECS_IN_MINUTE * 30) {
 			open = false;
 
 			dispatch('offerDetails', { price, secs });

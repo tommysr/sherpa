@@ -1,51 +1,15 @@
 <script lang="ts">
 	import SimpleButton from '../Buttons/SimpleButton.svelte';
 
-	let modalElement: HTMLDialogElement;
-	let statusElement: HTMLDivElement;
+	export let open: boolean = false;
+	export let disabled: boolean = false;
 
-	// TODO: add these classes to html to prevent scrolling and add animationm
-	// const isOpenClass = 'modal-is-open';
-	// const openingClass = 'modal-is-opening';
-	// const closingClass = 'modal-is-closing';
-
-	export let isModalOpen: boolean = false;
-	export let confirmClickHandler: (e: Event) => Promise<string>;
-
-	let confirmButtonDisabled = false;
-	let status = 'confirm';
-	let signature: string;
-
-	// To open modal from other components
-	$: {
-		if (isModalOpen) {
-			openModal();
-		}
-	}
-
-	function openModal() {
-		isModalOpen = true;
-		modalElement.setAttribute('open', '');
-	}
-
-	function closeModal() {
-		isModalOpen = false;
-		modalElement.removeAttribute('open');
-	}
-
-	async function handleConfirmClick(e: Event) {
-		try {
-			status = 'Preparing transaction';
-			confirmButtonDisabled = true;
-			signature = await confirmClickHandler(e);
-			status = 'Transaction sent';
-		} catch (error) {
-			confirmButtonDisabled = false;
-		}
+	function closeModal(_e: Event) {
+		open = false;
 	}
 </script>
 
-<dialog id="confirm-modal" bind:this={modalElement}>
+<dialog {open}>
 	<article>
 		<header>
 			<slot name="header" />
@@ -54,21 +18,11 @@
 		<slot name="body" />
 
 		<footer>
-			<!-- should be outside of this component -->
-			{#if status === 'confirm'}
-				<span aria-busy="false">Click confirm to buy</span>
-			{:else if status === 'Preparing transaction'}
-				<span aria-busy="true">Sending transaction...</span>
-			{:else if status === 'Transaction sent'}
-				<ins
-					>Transaction sent: <a href="https://explorer.solana.com/tx/{signature}?cluster=devnet"
-						>explorer</a
-					>
-				</ins>
-			{/if}
+			<slot name="status" />
+
 			<span>
 				<SimpleButton value="Cancel" on:click={closeModal} />
-				<SimpleButton value="confirm" on:click={handleConfirmClick} />
+				<SimpleButton value="Confirm" on:click {disabled} />
 			</span>
 		</footer>
 	</article>

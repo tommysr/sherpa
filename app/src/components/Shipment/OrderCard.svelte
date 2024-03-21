@@ -21,6 +21,7 @@
 	import NameModal from './NameModal.svelte';
 	import type { ComponentEvents } from 'svelte';
 	import ShipmentDataView from './ShipmentDataView.svelte';
+	import TransactionSendModal from './TransactionSendModal.svelte';
 
 	export let shipmentAccount: ApiShipmentAccount;
 
@@ -60,16 +61,14 @@
 		});
 	}
 
-	async function handleBuyOrder(e: Event): Promise<string> {
+	async function handleBuyOrder(): Promise<{ signature: string }> {
 		const { program } = get(anchorStore);
 		const wallet = get(walletStore);
 		const { connection } = get(web3Store);
 
-		// TODO: handle it
-		// if (!wallet.publicKey) {
-		// 	alert('Wallet not connected');
-		// 	return '';
-		// }
+		if (!wallet.publicKey) {
+			throw 'wallet not connected';
+		}
 
 		const forwarder = getForwarderAddress(program, wallet?.publicKey!);
 
@@ -96,8 +95,13 @@
 
 		tx.add(ix);
 
-		const sig = await useSignAndSendTransaction(connection, wallet, tx);
-		return sig;
+		try {
+			const sig = await useSignAndSendTransaction(connection, wallet, tx);
+			return { signature: sig };
+		} catch (err) {
+			console.error(err);
+			throw 'signing failed';
+		}
 	}
 </script>
 
@@ -119,8 +123,7 @@
 	</div>
 </div>
 
-<CancelConfirmModal bind:isModalOpen={isBuyClicked} confirmClickHandler={handleBuyOrder}>
-	<h4 slot="header">Check your order</h4>
+<TransactionSendModal bind:open={isBuyClicked} sendTransactionHandler={handleBuyOrder}>
 	<svelte:fragment slot="body">
 		<article>
 			<header>Main factors</header>
@@ -155,6 +158,6 @@
 			{/each}
 		</article>
 	</svelte:fragment>
-</CancelConfirmModal>
+</TransactionSendModal>
 
 <NameModal bind:open={isNameModalOpen} bind:this={nameModal} />
