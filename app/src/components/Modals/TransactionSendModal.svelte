@@ -20,8 +20,11 @@
 
 			return res.signature;
 		} catch (err) {
-			reset();
 			throw err;
+		} finally {
+			setTimeout(() => {
+				reset();
+			}, 5000);
 		}
 	};
 </script>

@@ -26,47 +26,50 @@
 	import { PublicKey, Transaction } from '@solana/web3.js';
 	import { get } from 'svelte/store';
 	import { anchorStore } from '$src/stores/anchor';
-	import OfferDetailsModal from '$src/components/Offer/OfferDetailsModal.svelte';
 	import { BN } from 'bn.js';
 	import { walletStore } from '$src/stores/wallet';
 	import { useSignAndSendTransaction } from '$src/utils/wallet/singAndSendTx';
+	import TransactionSendModal from '$src/components/Modals/TransactionSendModal.svelte';
+	import type { Signature } from 'maplibre-gl';
 
+	const SECS_IN_MINUTE = 60;
 	export let data: PageData;
+
 	let center: [number, number] = [19, 50];
 	let isOfferDetailsOpen: boolean = false;
-	let offerDetailsModal: OfferDetailsModal;
 	let isOfferChosen: boolean = false;
 	let shipmentChosen: SearchableBoughtOrder;
+	let carrierAuthority: string;
+	let time: number;
+	let price: number;
 
+	$: timeInSecs = time * SECS_IN_MINUTE;
 	$: locationsOnMap = $searchableBoughtShipments.data.map((s) => s.account.shipment.geography);
-
 	$: carriers = data.carriers;
 
-	async function makeOffer(carrier: string) {
+	$: console.log(time, price, timeInSecs);
+
+	async function makeOffer(): Promise<{ signature: string }> {
 		const { program, connection } = get(anchorStore);
 		const wallet = get(walletStore);
 
-		const carrierAddress = getCarrierAddress(program, new PublicKey(carrier));
-
+		const carrierAddress = getCarrierAddress(program, new PublicKey(carrierAuthority));
 		const carrierAccount = await program.account.carrier.fetchNullable(carrierAddress);
 
 		if (!carrierAccount) {
-			throw new Error('Carrier account not found');
+			throw 'Carrier account not found';
 		}
+
+		validateMakeOfferParams();
 
 		const offerAddress = getOfferAddress(
 			program,
-			new PublicKey(carrier),
+			new PublicKey(carrierAuthority),
 			carrierAccount.offersCount
 		);
 
-		isOfferDetailsOpen = true;
-
-		// TODO: make cancelation
-		const { time, price } = await waitForOfferDetails();
-
 		const ix = await program.methods
-			.makeOffer(new BN(price), time)
+			.makeOffer(new BN(price), timeInSecs)
 			.accounts({
 				offer: offerAddress,
 				shipment: new PublicKey(shipmentChosen.publicKey),
@@ -77,29 +80,32 @@
 			.instruction();
 
 		const tx = new Transaction().add(ix);
-		const sig = await useSignAndSendTransaction(connection, wallet, tx);
-		console.log(sig);
-	}
-	async function waitForOfferDetails(): Promise<{
-		price: number;
-		time: number;
-	}> {
-		return new Promise<{
-			price: number;
-			time: number;
-		}>((resolve) => {
-			offerDetailsModal.$on(
-				'offerDetails',
-				(e: ComponentEvents<OfferDetailsModal>['offerDetails']) => {
-					resolve(e.detail);
-				}
-			);
-		});
+		try {
+			const sig = await useSignAndSendTransaction(connection, wallet, tx);
+
+			return { signature: sig };
+		} catch (err) {
+			throw err;
+		}
 	}
 
+	const validateMakeOfferParams = () => {
+		console.log(price, timeInSecs, price > 0 && timeInSecs > SECS_IN_MINUTE * 30);
+		if (!(price > 0 && timeInSecs > SECS_IN_MINUTE * 30)) {
+			throw 'Price must be higher than zero and time must be at least 30 minutes';
+		}
+	};
+
 	const handleMakeOfferButtonClick = (authority: string) => async (e: Event) => {
-		await makeOffer(authority);
-		console.log('make offer button clicked');
+		const { program } = get(anchorStore);
+		const wallet = get(walletStore);
+
+		if (wallet.publicKey) {
+			isOfferDetailsOpen = true;
+			carrierAuthority = authority;
+		} else {
+			alert('Please connect your wallet');
+		}
 	};
 
 	const handleCardClick =
@@ -183,4 +189,22 @@
 	</div>
 </main>
 
-<OfferDetailsModal bind:open={isOfferDetailsOpen} bind:this={offerDetailsModal} />
+<TransactionSendModal bind:open={isOfferDetailsOpen} sendTransactionHandler={makeOffer}>
+	<svelte:fragment slot="body">
+		<p>Enter the amount you want to pay and the time when the offer will expire.</p>
+
+		<input
+			class="w-full p-4 rounded-xl border border-[theme(colors.mint)] mt-4"
+			type="amount"
+			bind:value={time}
+			placeholder="enter expiration in minutes"
+		/>
+
+		<input
+			class="w-full p-4 rounded-xl border border-[theme(colors.mint)] mt-4"
+			type="amount"
+			bind:value={price}
+			placeholder="enter amount to pay"
+		/>
+	</svelte:fragment>
+</TransactionSendModal>
