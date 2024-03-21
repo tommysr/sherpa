@@ -4,10 +4,21 @@
 
 	import type { PageData } from './$types';
 	import { searchableShipments } from '$src/stores/searchableShipments';
+	import { walletStore } from '$src/stores/wallet';
 
 	export let data: PageData;
 
-	$: locationsOnMap = $searchableShipments.data.map((s) => s.account.shipment.geography);
+	$: if ($walletStore.publicKey) {
+		searchableShipments.update((s) => {
+			s.filtered = s.data.filter((s) => s.account.shipper !== s.account.owner);
+
+			s.data = s.filtered;
+
+			return s;
+		});
+	}
+
+	$: locationsOnMap = $searchableShipments.filtered.map((s) => s.account.shipment.geography);
 </script>
 
 <svelte:head><title>Shipments list</title></svelte:head>

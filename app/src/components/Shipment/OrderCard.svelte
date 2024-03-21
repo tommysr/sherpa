@@ -1,9 +1,7 @@
 <script lang="ts">
 	import { anchorStore } from '$src/stores/anchor';
 	import type {
-		Shipment,
 		ShipmentDimensions,
-		GeoLocation,
 		Geography,
 		ShipmentDetails,
 		ApiShipmentAccount
@@ -20,6 +18,7 @@
 
 	import ShipmentDataView from './ShipmentDataView.svelte';
 	import TransactionSendModal from '../Modals/TransactionSendModal.svelte';
+	import { searchableShipments } from '$src/stores/searchableShipments';
 
 	export let shipmentAccount: ApiShipmentAccount;
 
@@ -106,6 +105,12 @@
 
 		try {
 			const sig = await useSignAndSendTransaction(connection, wallet, tx);
+
+			const indexToRemove = $searchableShipments.data.findIndex(
+				(s) => s.publicKey === shipmentAccount.publicKey
+			);
+
+			searchableShipments.shrink(indexToRemove);
 			return { signature: sig };
 		} catch (err) {
 			throw 'signing failed';

@@ -30,7 +30,6 @@
 	import { walletStore } from '$src/stores/wallet';
 	import { useSignAndSendTransaction } from '$src/utils/wallet/singAndSendTx';
 	import TransactionSendModal from '$src/components/Modals/TransactionSendModal.svelte';
-	import type { Signature } from 'maplibre-gl';
 
 	const SECS_IN_MINUTE = 60;
 	export let data: PageData;
@@ -47,7 +46,15 @@
 	$: locationsOnMap = $searchableBoughtShipments.data.map((s) => s.account.shipment.geography);
 	$: carriers = data.carriers;
 
-	$: console.log(time, price, timeInSecs);
+	$: if ($walletStore.publicKey) {
+		searchableBoughtShipments.update((s) => {
+			s.filtered = s.data.filter((s) => s.account.buyer === $walletStore.publicKey?.toString());
+
+			s.data = s.filtered;
+
+			return s;
+		});
+	}
 
 	async function makeOffer(): Promise<{ signature: string }> {
 		const { program, connection } = get(anchorStore);
@@ -97,7 +104,6 @@
 	};
 
 	const handleMakeOfferButtonClick = (authority: string) => async (e: Event) => {
-		const { program } = get(anchorStore);
 		const wallet = get(walletStore);
 
 		if (wallet.publicKey) {
@@ -139,7 +145,9 @@
 <main class="container">
 	<div class="grid">
 		<div>
-			{#if $searchableBoughtShipments.filtered.length != 0}
+			{#if !$walletStore.publicKey}
+				<p>Please connect your wallet to view bought shipments</p>
+			{:else if $searchableBoughtShipments.filtered.length != 0}
 				{#each $searchableBoughtShipments.filtered as account}
 					<BoughtShipmentCard
 						boughtShipmentAccount={account}

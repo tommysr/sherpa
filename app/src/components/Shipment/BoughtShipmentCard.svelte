@@ -22,7 +22,7 @@
 			Shipper
 		</div>
 		{#if boughtShipmentAccount}
-			<div class="truncate">{boughtShipmentAccount.account.owner}</div>
+			<div class="truncate">{boughtShipmentAccount.account.creator}</div>
 		{:else}
 			<p>No bought shipment</p>
 		{/if}
