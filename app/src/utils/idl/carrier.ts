@@ -12,7 +12,7 @@ export type AccountName = {
 	value: number[];
 };
 
-export interface Carrier<Date, Key, Name> {
+export interface CarrierStruct<Date, Key, Name> {
 	creator: Key;
 	authority: Key;
 	name: Name;
@@ -21,5 +21,8 @@ export interface Carrier<Date, Key, Name> {
 	tasksCount: number;
 }
 
-export type CarrierAccount = ProgramAccount<Carrier<BN, PublicKey, AccountName>>;
-export type ApiCarrierAccount = ApiProgramAccount<Carrier<string, string, string>>;
+export type Carrier = CarrierStruct<BN, PublicKey, AccountName>;
+export type ApiCarrier = CarrierStruct<string, string, string>;
+
+export type CarrierAccount = ProgramAccount<Carrier>;
+export type ApiCarrierAccount = ApiProgramAccount<ApiCarrier>;

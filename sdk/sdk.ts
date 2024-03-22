@@ -108,6 +108,10 @@ export const getOfferAddress = (program, carrier: PublicKey, index: number) => {
   return offerAddress
 }
 
+export const getOfferAddresses = (program, carrier: PublicKey, count: number) => {
+  return Array.from({ length: count }, (_, i) => getOfferAddress(program, carrier, i))
+}
+
 export const getAcceptedOfferAddress = (program, carrier: PublicKey, index: number) => {
   const indexBuffer = Buffer.alloc(4)
   indexBuffer.writeInt32LE(index)
@@ -122,6 +126,10 @@ export const getAcceptedOfferAddress = (program, carrier: PublicKey, index: numb
   )
 
   return offerAddress
+}
+
+export const getAcceptedOfferAddresses = (program, carrier: PublicKey, count: number) => {
+  return Array.from({ length: count }, (_, i) => getAcceptedOfferAddress(program, carrier, i))
 }
 
 export const encodeName = (utf8Name: string) => {
