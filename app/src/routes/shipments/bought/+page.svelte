@@ -30,6 +30,7 @@
 	import { walletStore } from '$src/stores/wallet';
 	import { useSignAndSendTransaction } from '$src/utils/wallet/singAndSendTx';
 	import TransactionSendModal from '$src/components/Modals/TransactionSendModal.svelte';
+	import { walletModalStore } from '$src/stores/walletModalHelper';
 
 	const SECS_IN_MINUTE = 60;
 	export let data: PageData;
@@ -110,7 +111,7 @@
 			isOfferDetailsOpen = true;
 			carrierAuthority = authority;
 		} else {
-			alert('Please connect your wallet');
+			walletModalStore.openModal();
 		}
 	};
 
@@ -198,7 +199,7 @@
 </main>
 
 <TransactionSendModal bind:open={isOfferDetailsOpen} sendTransactionHandler={makeOffer}>
-	<svelte:fragment slot="body">
+	<svelte:fragment>
 		<p>Enter the amount you want to pay and the time when the offer will expire.</p>
 
 		<input

@@ -14,6 +14,10 @@
 		shouldSendTransaction = false;
 	}
 
+	interface $$Slots {
+		default: {};
+	}
+
 	const sendTransaction = async (): Promise<signature> => {
 		try {
 			const res = await sendTransactionHandler();
@@ -32,15 +36,14 @@
 <CancelConfirmModal
 	bind:open
 	bind:disabled
-	on:click={() => {
+	on:confirm={() => {
 		shouldSendTransaction = true;
-		disabled = true;
 	}}
 >
 	<h4 slot="header">Check your transaction</h4>
 
 	<svelte:fragment slot="body">
-		<slot name="body" />
+		<slot />
 	</svelte:fragment>
 
 	<svelte:fragment slot="status">

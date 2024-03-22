@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { walletStore, type WalletStore } from '$src/stores/wallet';
+	import { walletModalStore } from '$src/stores/walletModalHelper';
 	import WalletButton from './WalletButton.svelte';
 	import WalletConnectButton from './WalletConnectButton.svelte';
 	import WalletModal from './WalletModal.svelte';
@@ -8,9 +9,7 @@
 
 	$: ({ publicKey, wallet, disconnect, connect, select } = $walletStore);
 
-	let dropDrownVisible = false,
-		modalVisible = false,
-		copied = false;
+	let copied = false;
 
 	$: base58 = publicKey && publicKey?.toBase58();
 	$: content = showAddressContent($walletStore);
@@ -22,13 +21,14 @@
 		setTimeout(() => (copied = false), 400);
 	};
 
-	const openDropdown = () => (dropDrownVisible = true);
-	const closeDropdown = () => (dropDrownVisible = false);
+	const openDropdown = () => walletModalStore.openDropdown();
+	const closeDropdown = () => walletModalStore.closeDropdown();
+
 	const openModal = () => {
-		modalVisible = true;
+		walletModalStore.openModal();
 		closeDropdown();
 	};
-	const closeModal = () => (modalVisible = false);
+	const closeModal = () => walletModalStore.closeModal();
 
 	function showAddressContent(store: WalletStore) {
 		const base58 = store.publicKey?.toBase58();
@@ -105,13 +105,13 @@
 			</svelte:fragment>
 			{content}
 		</WalletButton>
-		{#if dropDrownVisible}
+		{#if $walletModalStore.isDropdownVisible}
 			<ul
 				aria-label="dropdown-list"
 				class="wallet-adapter-dropdown-list wallet-adapter-dropdown-list-active"
 				role="menu"
 				use:clickOutside={() => {
-					if (dropDrownVisible) {
+					if ($walletModalStore.isDropdownVisible) {
 						closeDropdown();
 					}
 				}}
@@ -133,6 +133,6 @@
 	</div>
 {/if}
 
-{#if modalVisible}
+{#if $walletModalStore.isModalVisible}
 	<WalletModal on:close={closeModal} on:connect={connectWallet} {maxNumberOfWallets} />
 {/if}

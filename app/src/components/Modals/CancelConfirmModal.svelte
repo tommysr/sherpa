@@ -1,11 +1,14 @@
 <script lang="ts">
+	import { createEventDispatcher } from 'svelte';
 	import SimpleButton from '../Buttons/SimpleButton.svelte';
-
 	export let open: boolean = false;
 	export let disabled: boolean = false;
 
-	function closeModal(_e: Event) {
-		open = false;
+	const dispatch = createEventDispatcher();
+
+	function handleConfirmClick() {
+		disabled = true;
+		dispatch('confirm');
 	}
 </script>
 
@@ -21,8 +24,13 @@
 			<slot name="status" />
 
 			<span>
-				<SimpleButton value="Cancel" on:click={closeModal} />
-				<SimpleButton value="Confirm" on:click {disabled} />
+				<SimpleButton
+					value="Cancel"
+					on:click={() => {
+						open = false;
+					}}
+				/>
+				<SimpleButton value="Confirm" on:click={handleConfirmClick} {disabled} />
 			</span>
 		</footer>
 	</article>

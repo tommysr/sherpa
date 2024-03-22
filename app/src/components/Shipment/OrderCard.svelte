@@ -19,6 +19,7 @@
 	import ShipmentDataView from './ShipmentDataView.svelte';
 	import TransactionSendModal from '../Modals/TransactionSendModal.svelte';
 	import { searchableShipments } from '$src/stores/searchableShipments';
+	import { walletModalStore } from '$src/stores/walletModalHelper';
 
 	export let shipmentAccount: ApiShipmentAccount;
 
@@ -73,7 +74,7 @@
 			forwarderCount = forwarderAccount?.count || 0;
 			isOpenedBuyModal = true;
 		} else {
-			alert('Please connect your wallet');
+			walletModalStore.openModal();
 		}
 	}
 
@@ -132,7 +133,7 @@
 </div>
 
 <TransactionSendModal bind:open={isOpenedBuyModal} sendTransactionHandler={handleBuyOrder}>
-	<svelte:fragment slot="body">
+	<svelte:fragment>
 		<article>
 			<header>Main factors</header>
 
