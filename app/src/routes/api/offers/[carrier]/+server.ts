@@ -4,7 +4,11 @@ import { get } from 'svelte/store';
 import { parseOfferToApiOffer } from '$src/utils/parse/offer';
 import { PublicKey } from '@solana/web3.js';
 import { getCarrierAddress, getOfferAddresses } from '$sdk/sdk.js';
-import type { ApiShipmentOffer, ShipmentOffer } from '$src/utils/idl/shipmentOffer.js';
+import type {
+	ApiShipmentOffer,
+	ApiShipmentOfferAccount,
+	ShipmentOffer
+} from '$src/utils/idl/shipmentOffer.js';
 
 export async function GET({ params }) {
 	const { program } = get(anchorStore);
@@ -26,9 +30,12 @@ export async function GET({ params }) {
 	const offers: (ShipmentOffer | null)[] =
 		await program.account.shipmentOffer.fetchMultiple(offerAddresses);
 
-	const apiOfferAccounts: ApiShipmentOffer[] = offers.flatMap((offer) => {
+	const apiOfferAccounts: ApiShipmentOfferAccount[] = offers.flatMap((offer, i) => {
 		if (offer) {
-			return parseOfferToApiOffer(offer);
+			return {
+				account: parseOfferToApiOffer(offer),
+				publicKey: offerAddresses[i].toString()
+			};
 		} else {
 			return [];
 		}
