@@ -1,45 +1,26 @@
-import { anchorStore } from '$src/stores/anchor';
+import { fetchAcceptedOffersAccountsFor } from '$src/lib/acceptedOffer.js';
+import { fetchOffersAccountsFor } from '$src/lib/offer.js';
+import { anchorStore } from '$src/stores/anchor.js';
+import { PublicKey } from '@solana/web3.js';
 import { error, json } from '@sveltejs/kit';
 import { get } from 'svelte/store';
-import { parseOfferToApiOffer } from '$src/utils/parse/offer';
-import { PublicKey } from '@solana/web3.js';
-import { getCarrierAddress, getOfferAddresses } from '$sdk/sdk.js';
-import type {
-	ApiShipmentOffer,
-	ApiShipmentOfferAccount,
-	ShipmentOffer
-} from '$src/utils/idl/shipmentOffer.js';
 
-export async function GET({ params }) {
+export async function GET({ params: { carrier } }) {
 	const { program } = get(anchorStore);
+	const carrierPubkey = new PublicKey(carrier);
 
-	const carrierAccount = await program.account.carrier.fetchNullable(
-		getCarrierAddress(program, new PublicKey(params.carrier))
-	);
+	try {
+		const [offers, acceptedOffers] = await Promise.all([
+			fetchOffersAccountsFor(program, carrierPubkey),
+			fetchAcceptedOffersAccountsFor(program, carrierPubkey)
+		]);
 
-	if (!carrierAccount) {
-		throw error(404, 'Carrier not found');
-	}
-
-	const offerAddresses = getOfferAddresses(
-		program,
-		new PublicKey(params.carrier),
-		carrierAccount.offersCount
-	);
-
-	const offers: (ShipmentOffer | null)[] =
-		await program.account.shipmentOffer.fetchMultiple(offerAddresses);
-
-	const apiOfferAccounts: ApiShipmentOfferAccount[] = offers.flatMap((offer, i) => {
-		if (offer) {
-			return {
-				account: parseOfferToApiOffer(offer),
-				publicKey: offerAddresses[i].toString()
-			};
+		return json({ offers, acceptedOffers });
+	} catch (err) {
+		if (typeof err === 'string') {
+			throw error(404, err);
 		} else {
-			return [];
+			throw error(500, 'unknown error');
 		}
-	});
-
-	return json(apiOfferAccounts);
+	}
 }

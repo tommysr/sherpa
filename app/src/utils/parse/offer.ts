@@ -1,17 +1,22 @@
-import type { ShipmentOffer, ApiShipmentOffer } from '../idl/shipmentOffer';
+import type BN from 'bn.js';
+import type { ShipmentOffer, ApiShipmentOffer, OfferDetails } from '../idl/shipmentOffer';
 import { parseShipmentDataToApiShipmentData } from './shipment';
 
-export function parseOfferToApiOffer(carrierAccount: ShipmentOffer): ApiShipmentOffer {
+export function parseOfferDetails(details: OfferDetails<BN, BN>): OfferDetails<number, string> {
 	return {
-		...carrierAccount,
-		owner: carrierAccount.owner.toString(),
-		submitted: carrierAccount.submitted.toNumber(),
-		timeout: carrierAccount.timeout.toNumber(),
-		shipment: parseShipmentDataToApiShipmentData(carrierAccount.shipment),
-		details: {
-			payment: carrierAccount.details.payment.toNumber(),
-			collateral: carrierAccount.details.collateral.toNumber(),
-			deadline: carrierAccount.details.deadline.toString()
-		}
+		payment: details.payment.toNumber(),
+		collateral: details.collateral.toNumber(),
+		deadline: details.deadline.toString()
+	};
+}
+
+export function parseOfferToApiOffer(offerAccount: ShipmentOffer): ApiShipmentOffer {
+	return {
+		...offerAccount,
+		owner: offerAccount.owner.toString(),
+		submitted: offerAccount.submitted.toNumber(),
+		timeout: offerAccount.timeout.toNumber(),
+		shipment: parseShipmentDataToApiShipmentData(offerAccount.shipment),
+		details: parseOfferDetails(offerAccount.details)
 	};
 }
