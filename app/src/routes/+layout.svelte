@@ -18,7 +18,6 @@
 		TrustWalletAdapter
 	} from '@solana/wallet-adapter-wallets';
 	//wallet components
-	import Navbar from '$src/components/Navigation/Navbar.svelte';
 	import AnchorConnectionProvider from '$src/components/Wallet/AnchorConnectionProvider.svelte';
 	import ConnectionProvider from '$src/components/Wallet/ConnectionProvider.svelte';
 	import WalletProvider from '$src/components/Wallet/WalletProvider.svelte';
@@ -43,5 +42,5 @@
 <AnchorConnectionProvider {network} />
 <ConnectionProvider {network} />
 <WalletProvider {localStorageKey} {wallets} autoConnect />
-<Navbar />
+<!-- <Navbar /> -->
 <slot />

@@ -2,7 +2,6 @@
 	import HotNavigation from '$src/components/Navigation/HotNavigation.svelte';
 	// Components
 	import OrderCard from '$src/components/Shipment/OrderCard.svelte';
-	import ShipmentsMap from '$src/components/ShipmentMap/ShipmentsMap.svelte';
 
 	import { searchableShipments } from '$src/stores/searchableShipments';
 
@@ -73,9 +72,9 @@
 		{/if}
 	</div>
 
-	<div class="hidden lg:block">
+	<!-- <div class="hidden lg:block">
 		<div class="p-5 bg-primary-200 rounded-lg"><ShipmentsMap locations={locationsOnMap} /></div>
-	</div>
+	</div> -->
 	<!-- Map should be fixed or floating, and on mobile in some access menu from the right side, to allow quick preview -->
 	<!-- CONSIDER: include filtering, more dynamic -->
 </main>
