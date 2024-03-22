@@ -13,9 +13,9 @@
 	width: 150px;
 	height: 100%;
 
-	background-color: transparent;
 	cursor: pointer;
 
+	background-color: var(--background);
 	font-size: 1rem;
 	padding: 7px 10px;
 	color: black;
@@ -26,22 +26,14 @@
 }
 
 .wallet-adapter-button-trigger {
-	border: 4px solid var(--background);
-	border-image-slice: 1;
-
-	border-left: 0;
-	border-right: 0;
-	border-top: 0;
-
-	background: linear-gradient(to left, var(--primary), var(--secondary));
-	-webkit-background-clip: text;
-	-moz-background-clip: text;
-	-webkit-text-fill-color: transparent;
-	-moz-text-fill-color: transparent;
+	background: linear-gradient(to right, var(--primary), var(--secondary)) border-box;
+	border-radius: 50em;
+	color: white;
+	background-color: white;
 }
 
 .wallet-adapter-button-trigger:hover {
-	border-image-source: linear-gradient(to left, var(--primary), var(--secondary));
+	// border-image-source: linear-gradient(to left, var(--primary), var(--secondary));
 }
 
 .wallet-adapter-button:not([disabled]):focus-visible {
@@ -151,7 +143,7 @@
 	left: 0;
 	right: 0;
 	bottom: 0;
-	z-index: 1040;
+	z-index: 1050;
 	overflow-y: auto;
 
 	@supports (-webkit-backdrop-filter: blur(10px)) or (backdrop-filter: blur(10px)) {
