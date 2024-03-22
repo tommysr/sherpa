@@ -38,7 +38,7 @@ export async function load({ fetch, params }): Promise<{ offers: ApiShipmentOffe
 	}
 
 	try {
-		const fetchedOffers = await fetch(`/api/offers/${params.carrier}`, {
+		const fetchedOffers = await fetch(`/api/offers/${params.carrierKey}`, {
 			method: 'GET',
 			headers: {
 				'content-type': 'application/json'
