@@ -205,8 +205,8 @@ body {
 	border-radius: 50%;
 }
 
-.bounce {
-	animation-name: bounce;
+.bounce-a {
+	animation-name: bounce-a;
 	animation-fill-mode: both;
 	animation-duration: 1s;
 }
@@ -252,7 +252,7 @@ body {
 	}
 }
 
-@keyframes bounce {
+@keyframes bounce-a {
 	0% {
 		opacity: 0;
 		transform: translateY(-2000px) rotate(-45deg);
