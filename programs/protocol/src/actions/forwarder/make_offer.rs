@@ -1,6 +1,6 @@
 use anchor_lang::prelude::*;
 
-use crate::{BoughtShipment, Carrier, Error, Forwarder, OfferDetails, OfferMade, ShipmentOffer};
+use crate::{Carrier, Error, Forwarder, OfferDetails, OfferMade, Shipment, ShipmentOffer};
 
 #[derive(Accounts)]
 pub struct MakeOffer<'info> {
@@ -12,10 +12,10 @@ pub struct MakeOffer<'info> {
     )]
     pub offer: AccountLoader<'info, ShipmentOffer>,
     #[account(mut,
-        seeds = [b"forwarded", forwarder.load().unwrap().creator.as_ref(), &shipment.load().unwrap().no.to_le_bytes()], bump,
-        constraint = shipment.load().unwrap().buyer == *signer.key @ Error::SignerNotAnOwner,
+        seeds = [b"shipment", shipment.load().unwrap().shipper.as_ref(), &shipment.load().unwrap().no.to_le_bytes()], bump,
+        constraint = shipment.load().unwrap().forwarder == *signer.key @ Error::SignerNotAnOwner,
     )]
-    pub shipment: AccountLoader<'info, BoughtShipment>,
+    pub shipment: AccountLoader<'info, Shipment>,
     #[account(mut,
         seeds = [b"forwarder", forwarder.load().unwrap().creator.as_ref()], bump,
         constraint = forwarder.load().unwrap().authority == *signer.key @ Error::SignerNotAnAuthority
@@ -33,30 +33,31 @@ pub struct MakeOffer<'info> {
 pub fn handler(ctx: Context<MakeOffer>, payment: u64, timeout: u32) -> Result<()> {
     let offer = &mut ctx.accounts.offer.load_init()?;
     let carrier = &mut ctx.accounts.carrier.load_mut()?;
+    let forwarder = &mut ctx.accounts.forwarder.load_mut()?;
     let shipment = &mut ctx.accounts.shipment.load_mut()?;
 
-    require_eq!(shipment.buyer, shipment.owner, Error::ShipmentSold);
+    require_eq!(shipment.carrier, Pubkey::default(), Error::ShipmentSold);
 
     let now = Clock::get()?.unix_timestamp;
 
     **offer = ShipmentOffer {
-        owner: carrier.creator,
+        offeror: forwarder.creator,
         details: OfferDetails {
             payment,
             collateral: 0,
             deadline: u64::MAX,
         },
-        shipment: shipment.shipment,
+        shipment: ctx.accounts.shipment.key(),
         submitted: now,
         timeout: now + timeout as i64,
         no: carrier.offers_count,
-        shipment_no: shipment.no,
+        reserved: [0; 4],
     };
 
     carrier.offers_count += 1;
 
     emit!(OfferMade {
-        from: ctx.accounts.forwarder.load()?.creator,
+        from: forwarder.creator,
         to: carrier.creator,
         offer: ctx.accounts.offer.key(),
     });

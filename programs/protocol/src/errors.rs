@@ -12,4 +12,12 @@ pub enum Error {
     SignerNotAnOwner = 3, // 1773
     #[msg("Shipment is already sold")]
     ShipmentSold = 4, // 1774
+    #[msg("Shipment is not for sale")]
+    ShipmentNotForSale = 5, // 1775
+    #[msg("Not enough funds to buy the shipment")]
+    NotEnoughFunds = 6, // 1776
+    #[msg("Shipment payment failed")]
+    ShipmentPaymentFailed = 7, // 1777
+    #[msg("Invalid shipper account")]
+    InvalidShipperAccount = 8, // 1778
 }

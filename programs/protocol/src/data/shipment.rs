@@ -53,8 +53,9 @@ pub struct ShipmentData {
 #[account(zero_copy)]
 #[derive(Debug, Default, PartialEq)]
 pub struct Shipment {
-    pub owner: Pubkey,
     pub shipper: Pubkey,
+    pub forwarder: Pubkey,
+    pub carrier: Pubkey,
     pub price: u64,
     pub no: u32,
     pub reserved: [u8; 4],
@@ -64,11 +65,10 @@ pub struct Shipment {
 
 #[account(zero_copy)]
 #[derive(Debug, Default, PartialEq)]
-pub struct BoughtShipment {
-    pub creator: Pubkey,
-    pub buyer: Pubkey,
-    pub owner: Pubkey,
+pub struct ForwardedShipment {
+    pub forwarder: Pubkey,
+    pub shipment: Pubkey,
+    pub resell_price: u64,
     pub no: u32,
     pub reserved: [u8; 4],
-    pub shipment: ShipmentData,
 }
