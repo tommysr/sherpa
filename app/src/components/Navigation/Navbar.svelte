@@ -80,7 +80,7 @@
 
 		<div
 			class={clsx(
-				'fixed left-0 top-0 flex flex-col h-screen w-full items-center justify-between bg-background',
+				'fixed left-0 z-20 top-0 flex flex-col h-screen w-full items-center justify-between bg-background',
 				!isNavbarOpen ? 'hidden' : ''
 			)}
 		>

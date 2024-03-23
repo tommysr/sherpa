@@ -1,4 +1,5 @@
 <script lang="ts">
+	import LayoutListWrapper from '$src/components/LayoutListWrapper.svelte';
 	import OrderListElement from '$src/components/Shipment/OrderListElement.svelte';
 	import ShipmentsMap from '$src/components/ShipmentMap/ShipmentsMap.svelte';
 	import WalletMultiButton from '$src/components/Wallet/WalletMultiButton.svelte';
@@ -8,42 +9,44 @@
 
 	$: isLocationSelected = false;
 	let selectedLocation: number | undefined = undefined;
+	let isMobileOpen = false;
 
 	function onMarkerClick(i: number) {
 		isLocationSelected = true;
 		selectedLocation = i;
+
+		if (isMobileOpen) {
+			isMobileOpen = false;
+		}
 	}
 
 	function onElementSelect(i: number) {
 		isLocationSelected = true;
 		selectedLocation = i;
+
+		if (isMobileOpen) {
+			isMobileOpen = false;
+		}
 	}
 </script>
 
-<main class="relative h-screen w-full">
-	<div class="absolute z-10 w-1/5 left-1/2 transform -translate-x-1/2 top-4">
+<main class="relative h-screen w-full overflow-hidden">
+	<div class="absolute z-10 w-3/4 md:w-1/3 left-1/2 transform -translate-x-1/2 top-4">
 		<div class="m-3 p-0.5 rounded-full bg-gradient-to-r from-primary to-secondary">
 			<label for="name" class="sr-only">Name</label>
 			<input
-				class="px-3 py-1.5 w-full rounded-full bg-background focus:outline-none"
+				class="px-3 py-1.5 w-full rounded-full bg-background focus:outline-none text-sm lg:text-md"
 				type="text"
 				id="name"
 				placeholder="Search"
 			/>
 		</div>
 	</div>
-	<div class="absolute top-7 right-7 z-10">
+	<div class="hidden md:block absolute top-7 right-7 z-10">
 		<WalletMultiButton onClose={() => {}} />
 	</div>
-	<div
-		class="absolute right-7 top-32 my-auto z-10 rounded-3xl h-3/4 w-1/5 p-4 shadow-xl overflow-y-auto bg-background"
-	>
-		<!-- {#if $searchableShipments.filtered.length != 0}
-			<OrderCardDemo shipmentAccount={$searchableShipments.filtered[selectedLocation]} />
-		{:else}
-			<p>Nothing found</p>
-		{/if} -->
 
+	<LayoutListWrapper bind:isMobileOpen>
 		{#if $searchableShipments.filtered.length != 0}
 			<ul>
 				{#each $searchableShipments.filtered as account, i}
@@ -58,6 +61,13 @@
 		{:else}
 			<p>Nothing found</p>
 		{/if}
+	</LayoutListWrapper>
+
+	<div class="hidden md:block">
+		<ShipmentsMap locations={locationsOnMap} {onMarkerClick} {selectedLocation} isMobile={false} />
 	</div>
-	<ShipmentsMap locations={locationsOnMap} {onMarkerClick} {selectedLocation} />
+
+	<div class="md:hidden">
+		<ShipmentsMap locations={locationsOnMap} {onMarkerClick} {selectedLocation} isMobile={true} />
+	</div>
 </main>

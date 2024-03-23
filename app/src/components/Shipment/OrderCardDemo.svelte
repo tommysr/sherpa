@@ -15,21 +15,7 @@
 	$: properties = Object.entries(shipmentData.shipment.details) as Entries<ShipmentDetails>;
 
 	async function getLocationFromCoords(lat: number, long: number): Promise<string> {
-		// there are limits, only 1per sec, so caching is needed or some better provider.
 		return `Kraków, Poland`;
-		// const response = await fetch(
-		// 	`https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${lat}&lon=${long}`
-		// );
-		// const data = await response.json();
-
-		// console.log(data.address);
-		// if (data.address.village) {
-		// 	return data.address.village;
-		// } else if (data.address.city && data.address.city_district) {
-		// 	return `${data.address.city}, ${data.address.city_district}`;
-		// } else {
-		// 	throw Error('No location found');
-		// }
 	}
 </script>
 
