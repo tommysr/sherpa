@@ -1,33 +1,39 @@
 <script lang="ts">
-	import type { Map as Map$1 } from 'maplibre-gl';
+	import { Map as Map$1 } from 'maplibre-gl';
 	import { GeoJSON as GeoJson, LineLayer, MapLibre, Marker } from 'svelte-maplibre';
 
 	import type { Geography } from '$src/utils/idl/shipment';
 	import clsx from 'clsx';
 
 	export let locations: Geography[];
-	export let onMarkerClick: (location: number) => void;
 	export let selectedLocation: number | undefined;
+	export let onMarkerClick: (location: number) => void;
+	export let isMobile: boolean;
 
 	const getMidPoint = ([x1, y1], [x2, y2]): [number, number] => [(x1 + x2) / 2, (y1 + y2) / 2];
 
-	function onMarkerChange(i: number, map: Map$1, location: Geography) {
-		onMarkerClick(i);
-		selectedLocation = i;
-
-		const midPoint = getMidPoint(
-			[location.from.longitude, location.from.latitude],
-			[location.to.longitude, location.to.latitude]
+	$: if (selectedLocation !== undefined) {
+		flyToLocation(
+			getMidPoint(
+				[locations[selectedLocation].from.longitude, locations[selectedLocation].from.latitude],
+				[locations[selectedLocation].to.longitude, locations[selectedLocation].to.latitude]
+			)
 		);
-		flyToLocation(map, midPoint);
 	}
 
-	function flyToLocation(map: Map$1, location: [number, number]) {
+	let map: Map$1;
+
+	function onMarkerChange(i: number) {
+		onMarkerClick(i);
+		selectedLocation = i;
+	}
+
+	function flyToLocation(location: [number, number]) {
 		map.flyTo({
 			center: location,
-			zoom: 8,
+			zoom: isMobile ? 7 : 8,
 			duration: 2000,
-			offset: [-200, 0]
+			offset: isMobile ? [0, -100] : [-200, 0]
 		});
 	}
 </script>
@@ -37,11 +43,11 @@
 	class="relative w-full sm:aspect-video h-screen z-0"
 	zoom={5}
 	center={[19, 50]}
-	let:map
+	on:load={(m) => (map = m.detail)}
 >
 	{#each locations as location, i}
 		<Marker
-			on:click={() => onMarkerChange(i, map, location)}
+			on:click={() => onMarkerChange(i)}
 			lngLat={[location.from.longitude, location.from.latitude]}
 		>
 			<div
