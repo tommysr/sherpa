@@ -6,11 +6,16 @@
 
 	const dispatch = createEventDispatcher();
 
-	function handleConfirmClick() {
-		disabled = true;
+	function onConfirmClick() {
 		dispatch('confirm');
 	}
+
+	function onClose() {
+		dispatch('close');
+	}
 </script>
+
+<!-- <svelte:window on:keyup={(e) => (e.key === 'Escape' ? dispatch('close') : null)} /> -->
 
 <dialog {open}>
 	<article>
@@ -24,13 +29,8 @@
 			<slot name="status" />
 
 			<span>
-				<SimpleButton
-					value="Cancel"
-					on:click={() => {
-						open = false;
-					}}
-				/>
-				<SimpleButton value="Confirm" on:click={handleConfirmClick} {disabled} />
+				<SimpleButton value="Cancel" on:click={onClose} />
+				<SimpleButton value="Confirm" on:click={onConfirmClick} {disabled} />
 			</span>
 		</footer>
 	</article>

@@ -32,12 +32,6 @@
 		showExtensionsAvailables = !showExtensionsAvailables;
 	}
 
-	function closeModal(e: MouseEvent) {
-		if (e.target === backdrop || e.target === container) {
-			dispatch('close');
-		}
-	}
-
 	function handleKeyup(e: KeyboardEvent) {
 		if (e.key == 'Escape') {
 			dispatch('close');
