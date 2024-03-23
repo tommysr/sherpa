@@ -194,6 +194,7 @@
 
 .wallet-adapter-modal-container {
 	display: flex;
+	z-index: 1050;
 	margin: 3rem;
 	min-height: calc(100vh - 6rem); /* 100vh - 2 * margin */
 	align-items: center;

@@ -42,7 +42,7 @@
 			/>
 		</div>
 	</div>
-	<div class="hidden md:block absolute top-7 right-7 z-10">
+	<div class="hidden md:block absolute top-7 right-7 z-40">
 		<WalletMultiButton onClose={() => {}} />
 	</div>
 
