@@ -58,8 +58,8 @@
 				{shipmentData.price / 10 ** 9} SOL
 			</p>
 		</div>
-		<div class="mt-3 xl:mt-10 flex items-center justify-between">
-			<p class="text-xs xl:sm font-medium text-gray-500 mr-6">
+		<div class="mt-3 xl:mt-5 flex items-center justify-between">
+			<p class="text-xs xl:sm font-medium text-gray-500 mr-6 xl:mr-12">
 				{#if locations}
 					{@const len = locations.length}
 					&#x2022;
