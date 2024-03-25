@@ -18,29 +18,6 @@
 		});
 	}
 
-	// TODO: make it dynamic or from server
-	const categories: string[] = [
-		'Normal',
-		'Big',
-		'Small',
-		'Freeze',
-		'Fragile',
-		'Perishable',
-		'Heavy',
-		'Hazardous',
-		'Oversized',
-		'Express',
-		'International',
-		'Domestic',
-		'Bulk',
-		'Liquid',
-		'Sensitive',
-		'Valuable',
-		'High Priority',
-		'Documents',
-		'Live Animals',
-		'Electronics'
-	];
 	function handleSearchKeydown(e: KeyboardEvent) {
 		if ($searchableShipments.searchString && e.key == 'Enter') {
 			searchableShipments.performSearch();
@@ -48,8 +25,6 @@
 			searchableShipments.purgeFiltered();
 		}
 	}
-
-	$: locationsOnMap = $searchableShipments.filtered.map((s) => s.account.shipment.geography);
 </script>
 
 <svelte:head><title>Shipments list</title></svelte:head>
