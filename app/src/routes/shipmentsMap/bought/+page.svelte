@@ -1,11 +1,18 @@
 <script lang="ts">
 	import LayoutListWrapper from '$src/components/LayoutListWrapper.svelte';
 	import BoughtOrderListElement from '$src/components/Shipment/BoughtOrderListElement.svelte';
-	import OrderListElement from '$src/components/Shipment/OrderListElement.svelte';
+	import CarrierListElement from '$src/components/Shipment/CarrierListElement.svelte';
+	import CarriersLocations from '$src/components/ShipmentMap/CarriersLocations.svelte';
 	import ShipmentsLocations from '$src/components/ShipmentMap/ShipmentsLocations.svelte';
+	import ViewListSwitch from '$src/components/Switches/ViewListSwitch.svelte';
 	import { searchableBoughtShipments } from '$src/stores/forwarderShipments';
-	import { searchableShipments } from '$src/stores/searchableShipments';
 	import { walletStore } from '$stores/wallet';
+	import type { PageData } from './$types';
+
+	enum OperationMode {
+		VIEW,
+		SELL
+	}
 
 	$: if ($walletStore.publicKey) {
 		searchableBoughtShipments.update((s) => {
@@ -17,16 +24,27 @@
 		});
 	}
 
+	$: carriers = data.carriers;
 	$: locationsOnMap = $searchableBoughtShipments.data.map((s) => s.account.shipment.geography);
-	$: isLocationSelected = false;
 	$: isWalletConnected = $walletStore.publicKey != null;
+	$: operationMode = operationModeSwitch ? OperationMode.SELL : OperationMode.VIEW;
 
+	export let data: PageData;
 	let selectedLocation: number | undefined = undefined;
+	let selectedCarrier: number | undefined = undefined;
 	let isMobileOpen = false;
+	let operationModeSwitch = false;
 
-	function onElementSelect(i: number) {
-		isLocationSelected = true;
+	function onShipmentElementSelect(i: number) {
 		selectedLocation = i;
+
+		if (isMobileOpen) {
+			isMobileOpen = false;
+		}
+	}
+
+	function onCarrierElementSelect(i: number) {
+		selectedCarrier = i;
 
 		if (isMobileOpen) {
 			isMobileOpen = false;
@@ -34,40 +52,55 @@
 	}
 
 	function onMarkerClick(i: number) {
-		isLocationSelected = true;
 		selectedLocation = i;
 
 		if (isMobileOpen) {
 			isMobileOpen = false;
 		}
 	}
+
+	function onCarrierMarkerClick(i: number) {
+		selectedCarrier = i;
+	}
 </script>
 
 <LayoutListWrapper bind:isMobileOpen>
-	{#if !isWalletConnected}
-		<p
-			class="mt-1 text-center text-lg bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent"
-		>
-			Please connect your wallet to view bought shipments
-		</p>
-	{:else if $searchableBoughtShipments.filtered.length != 0}
-		<ul>
-			{#each $searchableBoughtShipments.filtered as account, i}
-				<BoughtOrderListElement
-					on:click={() => onElementSelect(i)}
-					shipmentAccount={account}
-					{selectedLocation}
-					shipmentId={i}
-				/>
-			{/each}
-		</ul>
-	{:else}
-		<p
-			class="mt-1 text-center text-lg bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent"
-		>
-			Nothing found
-		</p>
-	{/if}
+	<ViewListSwitch left="shipments" right="carriers" bind:isRight={operationModeSwitch} />
+	<ul>
+		{#if !isWalletConnected}
+			<p
+				class="mt-1 text-center text-lg bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent"
+			>
+				Please connect your wallet to view bought shipments
+			</p>
+		{:else if $searchableBoughtShipments.filtered.length != 0}
+			{#if operationMode == OperationMode.SELL}
+				{#each carriers as carrier, i}
+					<CarrierListElement
+						on:click={() => onCarrierElementSelect(i)}
+						selectedLocation={selectedCarrier}
+						carrierAccount={carrier}
+						carrierId={i}
+					/>
+				{/each}
+			{:else}
+				{#each $searchableBoughtShipments.filtered as account, i}
+					<BoughtOrderListElement
+						on:click={() => onShipmentElementSelect(i)}
+						shipmentAccount={account}
+						{selectedLocation}
+						shipmentId={i}
+					/>
+				{/each}
+			{/if}
+		{:else}
+			<p
+				class="mt-1 text-center text-lg bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent"
+			>
+				Nothing found
+			</p>
+		{/if}
+	</ul>
 </LayoutListWrapper>
 
 <ShipmentsLocations
@@ -76,3 +109,12 @@
 	{selectedLocation}
 	isMobile={false}
 />
+
+{#if operationMode == OperationMode.SELL}
+	<CarriersLocations
+		{carriers}
+		{selectedCarrier}
+		onMarkerClick={onCarrierMarkerClick}
+		isMobile={false}
+	/>
+{/if}

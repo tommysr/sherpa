@@ -108,7 +108,7 @@
 		</div>
 	</div>
 
-	<div class="text-center pt-20">
+	<!-- <div class="text-center pt-20">
 		<button>Buy</button>
-	</div>
+	</div> -->
 </Modal>

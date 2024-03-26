@@ -6,10 +6,10 @@
 	import { walletStore } from '$stores/wallet';
 
 	$: locationsOnMap = $searchableShipments.filtered.map((s) => s.account.shipment.geography);
-	$: isLocationSelected = false;
 	let selectedLocation: number | undefined = undefined;
 	let isMobileOpen = false;
 
+	// probably to be deleted after merging transfers
 	$: if ($walletStore.publicKey) {
 		searchableShipments.update((s) => {
 			s.filtered = s.data.filter((s) => s.account.shipper !== s.account.owner);
@@ -21,7 +21,6 @@
 	}
 
 	function onElementSelect(i: number) {
-		isLocationSelected = true;
 		selectedLocation = i;
 
 		if (isMobileOpen) {
@@ -30,7 +29,6 @@
 	}
 
 	function onMarkerClick(i: number) {
-		isLocationSelected = true;
 		selectedLocation = i;
 
 		if (isMobileOpen) {

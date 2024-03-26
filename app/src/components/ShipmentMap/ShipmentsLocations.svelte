@@ -14,6 +14,7 @@
 
 	const getMidPoint = ([x1, y1], [x2, y2]): [number, number] => [(x1 + x2) / 2, (y1 + y2) / 2];
 
+	// TODO: consider bounds with current zoom, if they will include it
 	$: if (selectedLocation !== undefined) {
 		flyToLocation(
 			getMidPoint(

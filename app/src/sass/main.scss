@@ -193,6 +193,14 @@ body {
 	&.destination {
 		background: #f00;
 	}
+
+	&.carrier.inactive {
+		background: var(--primary-200);
+	}
+
+	&.carrier.active {
+		background: var(--primary-600);
+	}
 }
 
 .pin:after {

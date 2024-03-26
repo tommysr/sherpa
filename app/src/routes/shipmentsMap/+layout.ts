@@ -8,6 +8,8 @@ import type { ApiBoughtShipmentAccount } from '$src/utils/idl/boughtShipment';
 import type { ApiShipmentAccount } from '$src/utils/idl/shipment';
 
 import { error } from '@sveltejs/kit';
+import { getContext } from 'svelte';
+import type { MapContext } from 'svelte-maplibre/context.svelte';
 import { get } from 'svelte/store';
 
 function loadFromStores(): {
