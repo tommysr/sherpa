@@ -28,6 +28,7 @@
 	$: locationsOnMap = $searchableBoughtShipments.data.map((s) => s.account.shipment.geography);
 	$: isWalletConnected = $walletStore.publicKey != null;
 	$: operationMode = operationModeSwitch ? OperationMode.SELL : OperationMode.VIEW;
+	$: isExclusiveMode = operationMode == OperationMode.SELL && selectedLocation != undefined;
 
 	export let data: PageData;
 	let selectedLocation: number | undefined = undefined;
@@ -107,6 +108,7 @@
 	locations={locationsOnMap}
 	{onMarkerClick}
 	{selectedLocation}
+	exclusive={isExclusiveMode}
 	isMobile={false}
 />
 
@@ -114,6 +116,7 @@
 	<CarriersLocations
 		{carriers}
 		{selectedCarrier}
+		{selectedLocation}
 		onMarkerClick={onCarrierMarkerClick}
 		isMobile={false}
 	/>

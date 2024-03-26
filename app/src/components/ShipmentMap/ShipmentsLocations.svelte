@@ -12,6 +12,8 @@
 	export let onMarkerClick: (location: number) => void;
 	export let isMobile: boolean;
 
+	export let exclusive: boolean;
+
 	const getMidPoint = ([x1, y1], [x2, y2]): [number, number] => [(x1 + x2) / 2, (y1 + y2) / 2];
 
 	// TODO: consider bounds with current zoom, if they will include it
@@ -49,17 +51,21 @@
 </script>
 
 {#each locations as location, i}
-	<Marker
-		on:click={() => onMarkerChange(i)}
-		lngLat={[location.from.longitude, location.from.latitude]}
-	>
-		<div
-			class={clsx('pin bounce cursor-pointer', selectedLocation == i ? 'active' : 'inactive')}
-		></div>
-		{#if selectedLocation === i}
-			<div class="pulse"></div>
-		{/if}
-	</Marker>
+	{#if exclusive && selectedLocation !== i}
+		<div></div>
+	{:else}
+		<Marker
+			on:click={() => onMarkerChange(i)}
+			lngLat={[location.from.longitude, location.from.latitude]}
+		>
+			<div
+				class={clsx('pin bounce cursor-pointer', selectedLocation == i ? 'active' : 'inactive')}
+			></div>
+			{#if selectedLocation === i}
+				<div class="pulse"></div>
+			{/if}
+		</Marker>
+	{/if}
 
 	{#if selectedLocation === i}
 		<Marker lngLat={[location.to.longitude, location.to.latitude]}>

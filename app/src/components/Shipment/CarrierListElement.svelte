@@ -63,6 +63,6 @@
 	</div>
 </li>
 
-<!-- {#if selectedLocation === shipmentId && showModal}
+<!-- {#if selectedLocation === ca && showModal}
 	<BoughtShipmentShowModal {shipmentAccount} bind:showModal />
 {/if} -->

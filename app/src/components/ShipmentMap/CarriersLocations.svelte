@@ -1,6 +1,5 @@
 <script lang="ts">
-	import { GeoJSON as GeoJson, LineLayer, MapLibre, Marker } from 'svelte-maplibre';
-
+	import { Marker } from 'svelte-maplibre';
 	import clsx from 'clsx';
 	import { getContext } from 'svelte';
 	import type { MapContext } from 'svelte-maplibre/context.svelte';
@@ -8,6 +7,7 @@
 
 	export let carriers: ApiCarrierAccount[];
 	export let selectedCarrier: number | undefined;
+	export let selectedLocation: number | undefined;
 	export let onMarkerClick: (location: number) => void;
 	export let isMobile: boolean;
 
@@ -16,10 +16,12 @@
 	});
 
 	$: if (selectedCarrier !== undefined) {
-		flyToLocation([
-			locationsWithName[selectedCarrier].location.longitude,
-			locationsWithName[selectedCarrier].location.latitude
-		]);
+		if (locationsWithName[selectedCarrier]) {
+			flyToLocation([
+				locationsWithName[selectedCarrier].location.longitude,
+				locationsWithName[selectedCarrier].location.latitude
+			]);
+		}
 	}
 
 	let store = getContext<MapContext>(Symbol.for('svelte-maplibre')).map;

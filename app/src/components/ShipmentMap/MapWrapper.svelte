@@ -5,7 +5,7 @@
 	// export let unit: 'imperial' | 'metric' = 'metric';
 
 	$: style = darkMode
-		? 'https://basemaps.cartocdn.com/gl/dark-matter-gl-style/style.json'
+		? 'https://basemaps.cartocdn.com/gl/positron-gl-style/style.json'
 		: 'https://basemaps.cartocdn.com/gl/positron-gl-style/style.json';
 </script>
 

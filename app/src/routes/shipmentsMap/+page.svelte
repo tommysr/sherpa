@@ -59,6 +59,7 @@
 <ShipmentsLocations
 	locations={locationsOnMap}
 	{onMarkerClick}
+	exclusive={false}
 	{selectedLocation}
 	isMobile={false}
 />
