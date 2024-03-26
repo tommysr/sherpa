@@ -77,8 +77,6 @@
 		const unsubscribeShipmentBought = program.addEventListener(
 			'ShipmentTransferred',
 			async (event) => {
-				console.log(event);
-
 				const shipmentToRemove = event.before.toString();
 
 				const shipmentBoughtPublicKey = event.after;
