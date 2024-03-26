@@ -39,9 +39,10 @@ pub mod protocol {
     pub fn create_shipment(
         ctx: Context<CreateShipment>,
         price: u64,
+        name: Name,
         shipment: ShipmentData,
     ) -> Result<()> {
-        actions::create_shipment::handler(ctx, price, shipment)
+        actions::create_shipment::handler(ctx, price, name, shipment)
     }
 
     pub fn buy_shipment(ctx: Context<BuyShipment>) -> Result<()> {

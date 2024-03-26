@@ -115,7 +115,7 @@ describe('protocol', () => {
     })
 
     await program.methods
-      .createShipment(shipmentPrice, shipmentData)
+      .createShipment(shipmentPrice, encodeName('14 old socks'), shipmentData)
       .accounts({
         shipment: shipmentAddress,
         shipper: shipperAddress,
@@ -142,6 +142,7 @@ describe('protocol', () => {
     expect(shipmentAccount.shipment.dimensions).to.deep.equal(shipmentData.dimensions)
     expect(shipmentAccount.shipment.when.eq(shipmentData.when)).true
     expect(shipmentAccount.shipment.deadline.eq(shipmentData.deadline)).true
+    expect(decodeName(shipmentAccount.name)).eq('14 old socks')
 
     const shipperAccount = await program.account.shipper.fetch(shipperAddress)
     expect(shipperAccount.authority.equals(shipper.publicKey)).true
@@ -187,7 +188,7 @@ describe('protocol', () => {
     })
 
     await program.methods
-      .createShipment(shipmentPrice, shipmentData)
+      .createShipment(shipmentPrice, encodeName('Just some old rocks'), shipmentData)
       .accounts({
         shipment: shipmentAddress,
         shipper: shipperAddress,
@@ -213,6 +214,7 @@ describe('protocol', () => {
     expect(shipmentAccount.shipment.dimensions).to.deep.equal(shipmentData.dimensions)
     expect(shipmentAccount.shipment.when.eq(shipmentData.when)).true
     expect(shipmentAccount.shipment.deadline.eq(shipmentData.deadline)).true
+    expect(decodeName(shipmentAccount.name)).eq('Just some old rocks')
 
     const shipperAccount = await program.account.shipper.fetch(shipperAddress)
     expect(shipperAccount.authority.equals(shipper.publicKey)).true

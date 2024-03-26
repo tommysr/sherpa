@@ -59,6 +59,7 @@ pub struct Shipment {
     pub no: u32,
     pub reserved: [u8; 4],
     pub shipment: ShipmentData,
+    pub name: Name,
 }
 
 #[account(zero_copy)]
