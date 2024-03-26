@@ -31,13 +31,7 @@
 		shipment = $searchableBoughtShipments.filtered.at(selectedLocation);
 	}
 
-	$: shipmentData = shipment?.account;
 	$: timeInSecs = time * 60;
-	// $: dimensions = Object.entries(shipmentData.shipment.dimensions) as Entries<ShipmentDimensions>;
-	// $: locations = Object.entries(shipmentData.shipment.geography) as Entries<Geography>;
-	// $: properties = Object.entries(shipmentData.shipment.details) as Entries<ShipmentDetails>;
-
-	$: console.log(shipmentData?.owner);
 
 	let status = {
 		component: Empty,
@@ -45,7 +39,7 @@
 	};
 
 	const areMakeOfferParamsValid = () => {
-		if (price < 0 || time < 30) {
+		if (!price || !time || price < 0 || time < 30) {
 			return false;
 		}
 
@@ -70,14 +64,12 @@
 		}
 
 		if (!areMakeOfferParamsValid()) {
-			showError('name must be between 0 and 64 characters');
+			showError('price must be higher than zero and time greater than 30 minutes');
 			return;
 		}
 
 		status.component = Pending;
 		status.statusString = 'signing transaction, follow wallet instruction';
-
-		console.log(carrierAccount);
 
 		const tx = await getMakeOfferTx(
 			program,
@@ -114,85 +106,27 @@
 			</h2>
 		</div>
 
-		<div class="grid grid-cols-3 justify-items-center gap-y-4">
-			<div
-				class="col-span-3 grid grid-cols-3 opacity-80 items-center justify-items-center w-full text-white py-2 rounded-lg bg-gradient-to-r from-primary to-secondary"
-			>
-				<div class="">When</div>
-				<div class="">Deadline</div>
-				<div class="">Priority</div>
-			</div>
+		<span>
+			<input
+				class="w-full p-4 rounded-xl border border-primary-200 mt-4"
+				type="number"
+				bind:value={price}
+				placeholder="enter amount you want to offer"
+			/>
+		</span>
+		<span>
+			<input
+				class="w-full p-4 rounded-xl border border-primary-200 mt-4"
+				type="number"
+				bind:value={time}
+				placeholder="time in minutes after offer will be invalid"
+			/>
+		</span>
 
-			<!-- <div>
-				<span>{new Date(shipmentData.shipment.accoun.when).toLocaleDateString()}</span>
-			</div>
-			<div>
-				<span>{new Date(shipmentData.shipment.deadline).toLocaleDateString()}</span>
-			</div> -->
-			<div>
-				<span>High</span>
-			</div>
+		<svelte:component this={status.component} status={status.statusString} />
+
+		<div class="text-center pt-20">
+			<button on:click={handleMakeOfferClick}>Make offer</button>
 		</div>
-
-		<div class="grid grid-cols-3 justify-items-center gap-y-4">
-			<div
-				class="col-span-3 grid items-center opacity-80 justify-items-center w-full text-white py-2 rounded-lg bg-gradient-to-r from-primary to-secondary"
-			>
-				<div class="col-span-3">Locations</div>
-			</div>
-
-			<div class="col-span-3">
-				<!-- {#if locations}
-					{@const len = locations.length}
-
-					{#each locations as [location, value], index}
-						 TODO: batching or keep locations on server 
-						{#await getLocationFromCoords(value.latitude, value.longitude)}
-							<article aria-busy="true"></article>
-						{:then location}
-							{location}
-						{:catch error}
-							{value.latitude.toFixed(4)} {value.longitude.toFixed(4)}
-						{/await}
-
-						{#if index != len - 1}
-							{'→ '}
-						{/if}
-					{/each}
-				{:else}
-					<p>No location</p>
-				{/if} -->
-			</div>
-		</div>
-
-		<div class="grid grid-cols-3 justify-items-center gap-y-4">
-			<div
-				class="col-span-3 grid grid-cols-3 opacity-80 items-center justify-items-center w-full text-white py-2 rounded-lg bg-gradient-to-r from-primary to-secondary"
-			>
-				<div>Weight</div>
-				<div class="col-span-2">Depth x Height x Width</div>
-			</div>
-
-			<div>
-				<!-- {#if dimensions}
-					{dimensions[3][1]} kg
-				{:else}
-					<p>No dimensions</p>
-				{/if} -->
-			</div>
-			<div class="col-span-2">
-				<!-- {#if dimensions}
-					{dimensions[0][1]} x {dimensions[1][1]} x {dimensions[2][1]} cm
-				{:else}
-					<p>No dimensions</p>
-				{/if} -->
-			</div>
-		</div>
-	</div>
-
-	<svelte:component this={status.component} status={status.statusString} />
-
-	<div class="text-center pt-20">
-		<button on:click={handleMakeOfferClick}>Make offer</button>
-	</div>
-</Modal>
+	</div></Modal
+>
