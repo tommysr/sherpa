@@ -1,8 +1,10 @@
 <script lang="ts">
 	import clsx from 'clsx';
 	import type { ApiCarrierAccount } from '$src/utils/idl/carrier';
+	import BoughtShipmentShowModal from '../Modals/BoughtShipmentShowModal.svelte';
 
 	export let carrierAccount: ApiCarrierAccount;
+	export let selectedCarrier: number | undefined;
 	export let selectedLocation: number | undefined;
 	export let carrierId: number;
 
@@ -24,7 +26,7 @@
 	on:click
 	class={clsx(
 		'mt-4 rounded-lg shadow cursor-pointer',
-		selectedLocation == carrierId ? 'bg-secondary-100' : 'bg-white'
+		selectedCarrier == carrierId ? 'bg-secondary-100' : 'bg-white'
 	)}
 >
 	<div class="px-4 py-5 sm:px-6">
@@ -56,13 +58,17 @@
 				<span class={clsx('font-semibold', 'text-red-600')}>{carrier.availability.time}</span>
 			</p>
 
-			<button class="text-sm xl:text-md text-accent font-medium" on:click={() => (showModal = true)}
-				>Show</button
-			>
+			{#if selectedLocation}
+				<!-- TODO: maybe show always, but some kind of notification -->
+				<button
+					class="text-sm xl:text-md text-accent font-medium"
+					on:click={() => (showModal = true)}>Show</button
+				>
+			{/if}
 		</div>
 	</div>
 </li>
 
-<!-- {#if selectedLocation === ca && showModal}
-	<BoughtShipmentShowModal {shipmentAccount} bind:showModal />
-{/if} -->
+{#if selectedLocation && showModal}
+	<BoughtShipmentShowModal {carrierAccount} {selectedLocation} bind:showModal />
+{/if}

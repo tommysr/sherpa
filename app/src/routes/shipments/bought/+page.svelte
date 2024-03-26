@@ -56,64 +56,6 @@
 		});
 	}
 
-	async function makeOffer(): Promise<{ signature: string }> {
-		const { program, connection } = get(anchorStore);
-		const wallet = get(walletStore);
-
-		const carrierAddress = getCarrierAddress(program, new PublicKey(carrierAuthority));
-		const carrierAccount = await program.account.carrier.fetchNullable(carrierAddress);
-
-		if (!carrierAccount) {
-			throw 'Carrier account not found';
-		}
-
-		validateMakeOfferParams();
-
-		const offerAddress = getOfferAddress(
-			program,
-			new PublicKey(carrierAuthority),
-			carrierAccount.offersCount
-		);
-
-		const ix = await program.methods
-			.makeOffer(new BN(price), timeInSecs)
-			.accounts({
-				offer: offerAddress,
-				shipment: new PublicKey(shipmentChosen.publicKey),
-				forwarder: getForwarderAddress(program, wallet.publicKey!),
-				carrier: carrierAddress,
-				signer: wallet.publicKey!
-			})
-			.instruction();
-
-		const tx = new Transaction().add(ix);
-		try {
-			const sig = await useSignAndSendTransaction(connection, wallet, tx);
-
-			return { signature: sig };
-		} catch (err) {
-			throw err;
-		}
-	}
-
-	const validateMakeOfferParams = () => {
-		console.log(price, timeInSecs, price > 0 && timeInSecs > SECS_IN_MINUTE * 30);
-		if (!(price > 0 && timeInSecs > SECS_IN_MINUTE * 30)) {
-			throw 'Price must be higher than zero and time must be at least 30 minutes';
-		}
-	};
-
-	const handleMakeOfferButtonClick = (authority: string) => async (e: Event) => {
-		const wallet = get(walletStore);
-
-		if (wallet.publicKey) {
-			isOfferDetailsOpen = true;
-			carrierAuthority = authority;
-		} else {
-			walletStore.openModal();
-		}
-	};
-
 	const handleCardClick =
 		(account: SearchableBoughtOrder) => (e: ComponentEvents<BoughtShipmentCard>['cardFocus']) => {
 			isOfferChosen = true;
@@ -196,23 +138,3 @@
 		</div>
 	</div>
 </main>
-
-<TransactionSendModal bind:open={isOfferDetailsOpen} sendTransactionHandler={makeOffer}>
-	<svelte:fragment>
-		<p>Enter the amount you want to pay and the time when the offer will expire.</p>
-
-		<input
-			class="w-full p-4 rounded-xl border border-[theme(colors.mint)] mt-4"
-			type="amount"
-			bind:value={time}
-			placeholder="enter expiration in minutes"
-		/>
-
-		<input
-			class="w-full p-4 rounded-xl border border-[theme(colors.mint)] mt-4"
-			type="amount"
-			bind:value={price}
-			placeholder="enter amount to pay"
-		/>
-	</svelte:fragment>
-</TransactionSendModal>

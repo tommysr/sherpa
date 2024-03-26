@@ -4,18 +4,21 @@
 	import { getContext } from 'svelte';
 	import type { MapContext } from 'svelte-maplibre/context.svelte';
 	import type { ApiCarrierAccount } from '$src/utils/idl/carrier';
+	import type { LngLatBounds } from 'maplibre-gl';
 
 	export let carriers: ApiCarrierAccount[];
 	export let selectedCarrier: number | undefined;
-	export let selectedLocation: number | undefined;
 	export let onMarkerClick: (location: number) => void;
 	export let isMobile: boolean;
+
+	let store = getContext<MapContext>(Symbol.for('svelte-maplibre')).map;
+	let map: maplibregl.Map;
 
 	$: locationsWithName = carriers.map((carrier) => {
 		return { name: carrier.account.name, location: carrier.account.availability.location };
 	});
 
-	$: if (selectedCarrier !== undefined) {
+	$: if (selectedCarrier !== undefined && map) {
 		if (locationsWithName[selectedCarrier]) {
 			flyToLocation([
 				locationsWithName[selectedCarrier].location.longitude,
@@ -24,11 +27,21 @@
 		}
 	}
 
-	let store = getContext<MapContext>(Symbol.for('svelte-maplibre')).map;
-	let map: maplibregl.Map;
-
 	$: if ($store) {
 		map = $store;
+	}
+
+	$: if (map) {
+		map.on('dragend', (e) => {
+			const bounds = map.getBounds();
+			// TODO: add filtering
+			// filterByBounds(bounds);
+		});
+
+		map.on('zoomend', (e) => {
+			const bounds = map.getBounds();
+			// filterByBounds(bounds);
+		});
 	}
 
 	function onMarkerChange(i: number) {

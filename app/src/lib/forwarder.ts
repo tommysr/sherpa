@@ -1,11 +1,13 @@
 import {
 	encodeName,
 	getBoughtShipmentAddress,
+	getCarrierAddress,
 	getForwarderAddress,
+	getOfferAddress,
 	getShipperAddress
 } from '$sdk/sdk';
 import type { Protocol } from '$src/utils/idl/types/protocol';
-import type { Program } from '@coral-xyz/anchor';
+import type { BN, Program } from '@coral-xyz/anchor';
 import { Transaction, PublicKey, type TransactionInstruction, Connection } from '@solana/web3.js';
 
 export const fetchForwarderAccount = async (program: Program<Protocol>, owner: PublicKey) => {
@@ -70,4 +72,36 @@ export const getBuyShipmentTx = async (
 	tx.add(ix);
 
 	return tx;
+};
+
+export const getMakeOfferTx = async (
+	program: Program<Protocol>,
+	price: BN,
+	timeoutSecs: number,
+	signer: PublicKey,
+	shipment: PublicKey,
+	carrierAuthority: PublicKey
+): Promise<Transaction> => {
+	const carrier = getCarrierAddress(program, carrierAuthority);
+	const carrierAccount = await program.account.carrier.fetchNullable(carrier);
+
+	if (!carrierAccount) {
+		throw 'Carrier account not found';
+	}
+
+	const offer = getOfferAddress(program, carrierAuthority, carrierAccount.offersCount);
+	const forwarder = getForwarderAddress(program, signer);
+
+	const ix = await program.methods
+		.makeOffer(price, timeoutSecs)
+		.accounts({
+			offer,
+			shipment,
+			forwarder,
+			carrier,
+			signer
+		})
+		.instruction();
+
+	return new Transaction().add(ix);
 };

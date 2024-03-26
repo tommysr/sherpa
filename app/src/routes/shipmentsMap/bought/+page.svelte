@@ -22,6 +22,7 @@
 
 			return s;
 		});
+	} else {
 	}
 
 	$: carriers = data.carriers;
@@ -79,7 +80,8 @@
 				{#each carriers as carrier, i}
 					<CarrierListElement
 						on:click={() => onCarrierElementSelect(i)}
-						selectedLocation={selectedCarrier}
+						{selectedCarrier}
+						{selectedLocation}
 						carrierAccount={carrier}
 						carrierId={i}
 					/>
@@ -104,20 +106,21 @@
 	</ul>
 </LayoutListWrapper>
 
-<ShipmentsLocations
-	locations={locationsOnMap}
-	{onMarkerClick}
-	{selectedLocation}
-	exclusive={isExclusiveMode}
-	isMobile={false}
-/>
-
-{#if operationMode == OperationMode.SELL}
-	<CarriersLocations
-		{carriers}
-		{selectedCarrier}
+{#if isWalletConnected}
+	<ShipmentsLocations
+		locations={locationsOnMap}
+		{onMarkerClick}
 		{selectedLocation}
-		onMarkerClick={onCarrierMarkerClick}
+		exclusive={isExclusiveMode}
 		isMobile={false}
 	/>
+
+	{#if operationMode == OperationMode.SELL}
+		<CarriersLocations
+			{carriers}
+			{selectedCarrier}
+			onMarkerClick={onCarrierMarkerClick}
+			isMobile={false}
+		/>
+	{/if}
 {/if}
