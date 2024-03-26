@@ -3,11 +3,22 @@
 	import OrderListElement from '$src/components/Shipment/OrderListElement.svelte';
 	import ShipmentsLocations from '$src/components/ShipmentMap/ShipmentsLocations.svelte';
 	import { searchableShipments } from '$src/stores/searchableShipments';
+	import { walletStore } from '$stores/wallet';
 
-	$: locationsOnMap = $searchableShipments.data.map((s) => s.account.shipment.geography);
+	$: locationsOnMap = $searchableShipments.filtered.map((s) => s.account.shipment.geography);
 	$: isLocationSelected = false;
 	let selectedLocation: number | undefined = undefined;
 	let isMobileOpen = false;
+
+	$: if ($walletStore.publicKey) {
+		searchableShipments.update((s) => {
+			s.filtered = s.data.filter((s) => s.account.shipper !== s.account.owner);
+
+			s.data = s.filtered;
+
+			return s;
+		});
+	}
 
 	function onElementSelect(i: number) {
 		isLocationSelected = true;

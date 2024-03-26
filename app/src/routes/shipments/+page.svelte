@@ -8,16 +8,6 @@
 
 	export let data: PageData;
 
-	$: if ($walletStore.publicKey) {
-		searchableShipments.update((s) => {
-			s.filtered = s.data.filter((s) => s.account.shipper !== s.account.owner);
-
-			s.data = s.filtered;
-
-			return s;
-		});
-	}
-
 	function handleSearchKeydown(e: KeyboardEvent) {
 		if ($searchableShipments.searchString && e.key == 'Enter') {
 			searchableShipments.performSearch();

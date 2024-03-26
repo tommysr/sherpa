@@ -1,6 +1,32 @@
 <script lang="ts">
+	import { page } from '$app/stores';
 	import MapWrapper from '$src/components/ShipmentMap/MapWrapper.svelte';
 	import WalletMultiButton from '$src/components/Wallet/WalletMultiButton.svelte';
+	import {
+		searchableBoughtShipments,
+		type SearchableBoughtOrder
+	} from '$src/stores/forwarderShipments';
+	import type { SearchStore } from '$src/stores/search';
+	import { searchableShipments, type SearchableOrder } from '$src/stores/searchableShipments';
+
+	type EitherSearchStore = SearchStore<SearchableOrder> | SearchStore<SearchableBoughtOrder>;
+
+	let storeToSearchIn: EitherSearchStore;
+
+	$: pageUrl = $page.url.pathname;
+
+	$: if (pageUrl == '/shipmentsMap') {
+		storeToSearchIn = searchableShipments;
+	} else if (pageUrl == '/shipmentsMap/bought') {
+		storeToSearchIn = searchableBoughtShipments;
+	}
+	function handleSearchKeydown(e: KeyboardEvent) {
+		if ($storeToSearchIn.searchString && e.key == 'Enter') {
+			storeToSearchIn.performSearch();
+		} else {
+			storeToSearchIn.purgeFiltered();
+		}
+	}
 </script>
 
 <main class="relative h-screen w-full overflow-hidden">
@@ -12,6 +38,8 @@
 				type="text"
 				id="name"
 				placeholder="Search"
+				bind:value={$storeToSearchIn.searchString}
+				on:keydown={handleSearchKeydown}
 			/>
 		</div>
 	</div>
