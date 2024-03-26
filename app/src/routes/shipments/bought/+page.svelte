@@ -1,6 +1,6 @@
 <script lang="ts">
 	import BoughtShipmentCard from '$src/components/Shipment/BoughtShipmentCard.svelte';
-	import ShipmentsMap from '$src/components/ShipmentMap/ShipmentsMap.svelte';
+	import ShipmentsMap from '$src/components/ShipmentMap/ShipmentsLocations.svelte';
 	import {
 		searchableBoughtShipments,
 		type SearchableBoughtOrder
@@ -30,7 +30,6 @@
 	import { walletStore } from '$src/stores/wallet';
 	import { useSignAndSendTransaction } from '$src/utils/wallet/singAndSendTx';
 	import TransactionSendModal from '$src/components/Modals/TransactionSendModal.svelte';
-	import { walletModalStore } from '$src/stores/walletModalHelper';
 
 	const SECS_IN_MINUTE = 60;
 	export let data: PageData;
@@ -111,7 +110,7 @@
 			isOfferDetailsOpen = true;
 			carrierAuthority = authority;
 		} else {
-			walletModalStore.openModal();
+			walletStore.openModal();
 		}
 	};
 
@@ -160,7 +159,7 @@
 			{/if}
 		</div>
 		<div>
-			<ShipmentsMap locations={locationsOnMap} {center}>
+			<ShipmentsMap locations={locationsOnMap}>
 				{#each carriers as { account }}
 					{@const {
 						location: { latitude, longitude },
