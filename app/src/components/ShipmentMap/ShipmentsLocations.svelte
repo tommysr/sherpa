@@ -16,12 +16,14 @@
 
 	// TODO: consider bounds with current zoom, if they will include it
 	$: if (selectedLocation !== undefined) {
-		flyToLocation(
-			getMidPoint(
-				[locations[selectedLocation].from.longitude, locations[selectedLocation].from.latitude],
-				[locations[selectedLocation].to.longitude, locations[selectedLocation].to.latitude]
-			)
-		);
+		if (locations[selectedLocation]) {
+			flyToLocation(
+				getMidPoint(
+					[locations[selectedLocation].from.longitude, locations[selectedLocation].from.latitude],
+					[locations[selectedLocation].to.longitude, locations[selectedLocation].to.latitude]
+				)
+			);
+		}
 	}
 
 	let store = getContext<MapContext>(Symbol.for('svelte-maplibre')).map;
