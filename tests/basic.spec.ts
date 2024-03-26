@@ -85,10 +85,12 @@ describe('protocol', () => {
           latitude: 0,
           longitude: 0
         },
+        fromName: encodeName('Krakow, main square'),
         to: {
           latitude: 0,
           longitude: 0
-        }
+        },
+        toName: encodeName('Warsaw, main square')
       },
       dimensions: {
         weight: 0,
@@ -131,7 +133,11 @@ describe('protocol', () => {
     expect(shipmentAccount.owner.equals(shipper.publicKey)).true
     expect(shipmentAccount.price.eq(shipmentPrice)).true
     expect(shipmentAccount.no).eq(0)
-    expect(shipmentAccount.shipment.geography).to.deep.equal(shipmentData.geography)
+    expect(shipmentAccount.shipment.geography.from).to.deep.equal(shipmentData.geography.from)
+    expect(shipmentAccount.shipment.geography.to).to.deep.equal(shipmentData.geography.to)
+    expect(decodeName(shipmentAccount.shipment.geography.fromName)).eq('Krakow, main square')
+    expect(decodeName(shipmentAccount.shipment.geography.toName)).eq('Warsaw, main square')
+
     expect(shipmentAccount.shipment.details).to.deep.equal(shipmentData.details)
     expect(shipmentAccount.shipment.dimensions).to.deep.equal(shipmentData.dimensions)
     expect(shipmentAccount.shipment.when.eq(shipmentData.when)).true
@@ -151,10 +157,12 @@ describe('protocol', () => {
           latitude: 1,
           longitude: 1
         },
+        fromName: encodeName('Kielce'),
         to: {
           latitude: 1,
           longitude: 1
-        }
+        },
+        toName: encodeName('Mielno')
       },
       dimensions: {
         weight: 1,
@@ -196,7 +204,11 @@ describe('protocol', () => {
     expect(shipmentAccount.owner.equals(shipper.publicKey)).true
     expect(shipmentAccount.price.eq(shipmentPrice)).true
     expect(shipmentAccount.no).eq(1)
-    expect(shipmentAccount.shipment.geography).to.deep.equal(shipmentData.geography)
+    expect(shipmentAccount.shipment.geography.from).to.deep.equal(shipmentData.geography.from)
+    expect(shipmentAccount.shipment.geography.to).to.deep.equal(shipmentData.geography.to)
+    expect(decodeName(shipmentAccount.shipment.geography.fromName)).eq('Kielce')
+    expect(decodeName(shipmentAccount.shipment.geography.toName)).eq('Mielno')
+
     expect(shipmentAccount.shipment.details).to.deep.equal(shipmentData.details)
     expect(shipmentAccount.shipment.dimensions).to.deep.equal(shipmentData.dimensions)
     expect(shipmentAccount.shipment.when.eq(shipmentData.when)).true
