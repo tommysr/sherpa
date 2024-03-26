@@ -1,12 +1,20 @@
 <script lang="ts">
-	import type {
-		ApiShipmentAccount,
-		Geography,
-		ShipmentDetails,
-		ShipmentDimensions
-	} from '$src/utils/idl/shipment';
+	import type { ApiShipmentAccount, Geography, ShipmentDimensions } from '$src/utils/idl/shipment';
 	import type { Entries } from '$src/utils/types/object';
+	import { get } from 'svelte/store';
 	import Modal from './Modal.svelte';
+	import { PublicKey } from '@solana/web3.js';
+	import { anchorStore } from '$src/stores/anchor';
+	import { walletStore } from '$src/stores/wallet';
+	import { web3Store } from '$src/stores/web3';
+	import { useSignAndSendTransaction } from '$src/utils/wallet/singAndSendTx';
+	import { getBuyShipmentTx } from '$lib/forwarder';
+	import { userStore } from '$src/stores/user';
+	import { searchableShipments } from '$src/stores/searchableShipments';
+	import Pending from '../Statuses/Pending.svelte';
+	import Empty from '../Statuses/Empty.svelte';
+	import Error from '../Statuses/Error.svelte';
+	import TransactionSent from '../Statuses/TransactionSent.svelte';
 
 	export let showModal: boolean;
 	export let shipmentAccount: ApiShipmentAccount;
@@ -14,7 +22,71 @@
 	$: shipmentData = shipmentAccount.account;
 	$: dimensions = Object.entries(shipmentData.shipment.dimensions) as Entries<ShipmentDimensions>;
 	$: locations = Object.entries(shipmentData.shipment.geography) as Entries<Geography>;
-	$: properties = Object.entries(shipmentData.shipment.details) as Entries<ShipmentDetails>;
+	// $: properties = Object.entries(shipmentData.shipment.details) as Entries<ShipmentDetails>;
+
+	let status = {
+		component: Empty,
+		statusString: ''
+	};
+
+	function isAccountNameValid(name: string): boolean {
+		if (name.length == 0 || name.length > 64) {
+			return false;
+		}
+		return true;
+	}
+
+	function showError(error: string) {
+		status.component = Error;
+		status.statusString = error;
+	}
+
+	async function handleBuyClick() {
+		const { program } = get(anchorStore);
+		const wallet = get(walletStore);
+		const { connection } = get(web3Store);
+		const {
+			forwarder: { name }
+		} = get(userStore);
+
+		if (!$walletStore.publicKey) {
+			showModal = false;
+			walletStore.openModal();
+
+			return;
+		}
+
+		if (!isAccountNameValid(name)) {
+			showError('name must be between 0 and 64 characters');
+			return;
+		}
+
+		status.component = Pending;
+		status.statusString = 'signing transaction, follow wallet instruction';
+
+		const tx = await getBuyShipmentTx(
+			program,
+			$walletStore.publicKey,
+			new PublicKey(shipmentAccount.publicKey),
+			new PublicKey(shipmentAccount.account.shipper),
+			name
+		);
+
+		try {
+			const sig = await useSignAndSendTransaction(connection, wallet, tx);
+
+			const indexToRemove = $searchableShipments.data.findIndex(
+				(s) => s.publicKey === shipmentAccount.publicKey
+			);
+			searchableShipments.shrink(indexToRemove);
+
+			status.component = TransactionSent;
+			status.statusString = sig;
+			console.log(sig);
+		} catch (err) {
+			showError('signing failed');
+		}
+	}
 
 	async function getLocationFromCoords(lat: number, long: number): Promise<string> {
 		return `Kraków, Poland`;
@@ -107,7 +179,23 @@
 		</div>
 	</div>
 
+	{#if !$userStore.forwarder.registered}
+		<p>
+			You are not registered as a forwarder. Please enter your name to be registered as a forwarder.
+			This will allow you to buy shipment.
+		</p>
+
+		<input
+			class="w-full p-4 rounded-xl border border-primary-200 mt-4"
+			type="text"
+			bind:value={$userStore.forwarder.name}
+			placeholder="enter forwarder name to be registered"
+		/>
+	{/if}
+
+	<svelte:component this={status.component} status={status.statusString} />
+
 	<div class="text-center pt-20">
-		<button>Buy</button>
+		<button on:click={handleBuyClick}>Buy</button>
 	</div>
 </Modal>

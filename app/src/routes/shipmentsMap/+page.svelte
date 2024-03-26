@@ -40,7 +40,7 @@
 <LayoutListWrapper bind:isMobileOpen>
 	{#if $searchableShipments.filtered.length != 0}
 		<ul>
-			{#each $searchableShipments.filtered as account, i}
+			{#each $searchableShipments.filtered as account, i (account.publicKey)}
 				<OrderListElement
 					on:click={() => onElementSelect(i)}
 					shipmentAccount={account}

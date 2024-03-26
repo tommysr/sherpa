@@ -1,17 +1,40 @@
 <script lang="ts">
 	import { page } from '$app/stores';
+	import { decodeName } from '$sdk/sdk';
 	import MapWrapper from '$src/components/ShipmentMap/MapWrapper.svelte';
 	import WalletMultiButton from '$src/components/Wallet/WalletMultiButton.svelte';
+	import { fetchForwarderAccount } from '$src/lib/forwarder';
+	import { anchorStore } from '$src/stores/anchor';
 	import {
 		searchableBoughtShipments,
 		type SearchableBoughtOrder
 	} from '$src/stores/forwarderShipments';
 	import type { SearchStore } from '$src/stores/search';
 	import { searchableShipments, type SearchableOrder } from '$src/stores/searchableShipments';
+	import { userStore } from '$src/stores/user';
+	import { walletStore } from '$src/stores/wallet';
+	import type { ApiBoughtShipmentAccount, BoughtShipment } from '$src/utils/idl/boughtShipment';
+	import type { ApiShipmentAccount, Shipment } from '$src/utils/idl/shipment';
+	import { parseBoughtShipmentToApiBoughtShipment } from '$src/utils/parse/boughtShipment';
+	import { parseShipmentToApiShipment } from '$src/utils/parse/shipment';
+	import type { PublicKey } from '@solana/web3.js';
+	import type BN from 'bn.js';
+	import { onMount } from 'svelte';
+	import { get } from 'svelte/store';
 
 	type EitherSearchStore = SearchStore<SearchableOrder> | SearchStore<SearchableBoughtOrder>;
+	let storeToSearchIn: EitherSearchStore = searchableShipments;
+	let { program } = get(anchorStore);
 
-	let storeToSearchIn: EitherSearchStore;
+	$: if ($walletStore.publicKey) {
+		fetchForwarderAccount(program, $walletStore.publicKey).then(({ account, accountKey }) => {
+			if (account) {
+				userStore.registerForwarder(decodeName(account.name));
+			}
+		});
+	} else {
+		userStore.unregisterForwarder();
+	}
 
 	$: pageUrl = $page.url.pathname;
 
@@ -20,13 +43,81 @@
 	} else if (pageUrl == '/shipmentsMap/bought') {
 		storeToSearchIn = searchableBoughtShipments;
 	}
-	function handleSearchKeydown(e: KeyboardEvent) {
+
+	function handleSearchKeyUp(e: KeyboardEvent) {
 		if ($storeToSearchIn.searchString && e.key == 'Enter') {
 			storeToSearchIn.performSearch();
-		} else {
+		} else if ($storeToSearchIn.searchString) {
 			storeToSearchIn.purgeFiltered();
 		}
 	}
+
+	function subscribeToShipmentEvents(): number[] {
+		const unsubscribeShipmentCreated = program.addEventListener(
+			'ShipmentCreated',
+			async (event) => {
+				console.log(event);
+				const shipmentPublicKey = event.shipment;
+
+				const shipment: Shipment<BN, BN, PublicKey> =
+					await program.account.shipment.fetch(shipmentPublicKey);
+
+				const parsedShipment: ApiShipmentAccount = {
+					publicKey: shipmentPublicKey.toString(),
+					account: parseShipmentToApiShipment(shipment)
+				};
+
+				searchableShipments.extend({
+					...parsedShipment,
+					searchParams: parsedShipment.account.shipment.details.priority.toString()
+				});
+			}
+		);
+
+		const unsubscribeShipmentBought = program.addEventListener(
+			'ShipmentTransferred',
+			async (event) => {
+				console.log(event);
+
+				const shipmentToRemove = event.before.toString();
+
+				const shipmentBoughtPublicKey = event.after;
+
+				const boughtShipment: BoughtShipment<BN, BN, PublicKey> =
+					await program.account.boughtShipment.fetch(shipmentBoughtPublicKey);
+
+				const parsedShipment: ApiBoughtShipmentAccount = {
+					publicKey: shipmentBoughtPublicKey.toString(),
+					account: parseBoughtShipmentToApiBoughtShipment(boughtShipment)
+				};
+
+				searchableBoughtShipments.extend({
+					...parsedShipment,
+					searchParams: parsedShipment.account.shipment.details.priority.toString()
+				});
+
+				const { data } = get(searchableShipments);
+				const shipmentToRemoveIndex = data.findIndex(
+					(shipment) => shipment.publicKey === shipmentToRemove
+				);
+
+				if (shipmentToRemoveIndex !== -1) {
+					searchableShipments.shrink(shipmentToRemoveIndex);
+				}
+			}
+		);
+
+		return [unsubscribeShipmentBought, unsubscribeShipmentCreated];
+	}
+
+	onMount(() => {
+		const unsubscribe = subscribeToShipmentEvents();
+		return () => {
+			for (const listener of unsubscribe) {
+				program.removeEventListener(listener);
+			}
+		};
+	});
 </script>
 
 <main class="relative h-screen w-full overflow-hidden">
@@ -39,7 +130,7 @@
 				id="name"
 				placeholder="Search"
 				bind:value={$storeToSearchIn.searchString}
-				on:keydown={handleSearchKeydown}
+				on:keyup={handleSearchKeyUp}
 			/>
 		</div>
 	</div>
