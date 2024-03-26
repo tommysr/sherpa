@@ -1,4 +1,4 @@
-import type { ApiCarrierAccount } from '$src/utils/idl/carrier.js';
+import type { ApiCarrierAccount } from '$src/utils/idl/carrier';
 import { error } from '@sveltejs/kit';
 
 /** @type {import('./$types').PageLoad } */

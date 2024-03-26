@@ -3,6 +3,8 @@ use anchor_lang::prelude::{
     *,
 };
 
+use crate::Name;
+
 #[zero_copy]
 #[derive(Debug, Default, PartialEq, BorshSerialize, BorshDeserialize)]
 pub struct ShipmentDetails {
@@ -33,7 +35,9 @@ pub struct GeoLocation {
 #[derive(Debug, Default, PartialEq, BorshSerialize, BorshDeserialize)]
 pub struct Geography {
     pub from: GeoLocation,
+    pub from_name: Name,
     pub to: GeoLocation,
+    pub to_name: Name,
 }
 
 #[zero_copy]

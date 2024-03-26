@@ -1,15 +1,18 @@
 <script lang="ts">
 	import { page } from '$app/stores';
-	import CategoryButton from '$src/components/Buttons/CategoryButton.svelte';
-	import HotNavigation from '$src/components/Navigation/HotNavigation.svelte';
-	import ScrollableMenu from '$src/components/Navigation/ScrollableMenu.svelte';
+	import { decodeName } from '$sdk/sdk';
+	import MapWrapper from '$src/components/ShipmentMap/MapWrapper.svelte';
+	import WalletMultiButton from '$src/components/Wallet/WalletMultiButton.svelte';
+	import { fetchForwarderAccount } from '$src/lib/forwarder';
+	import { anchorStore } from '$src/stores/anchor';
 	import {
 		searchableBoughtShipments,
 		type SearchableBoughtOrder
 	} from '$src/stores/forwarderShipments';
 	import type { SearchStore } from '$src/stores/search';
 	import { searchableShipments, type SearchableOrder } from '$src/stores/searchableShipments';
-	import { anchorStore } from '$src/stores/anchor';
+	import { userStore } from '$src/stores/user';
+	import { walletStore } from '$src/stores/wallet';
 	import type { ApiBoughtShipmentAccount, BoughtShipment } from '$src/utils/idl/boughtShipment';
 	import type { ApiShipmentAccount, Shipment } from '$src/utils/idl/shipment';
 	import { parseBoughtShipmentToApiBoughtShipment } from '$src/utils/parse/boughtShipment';
@@ -18,56 +21,34 @@
 	import type BN from 'bn.js';
 	import { onMount } from 'svelte';
 	import { get } from 'svelte/store';
-	const { program } = get(anchorStore);
-
-	let searchString: string;
 
 	type EitherSearchStore = SearchStore<SearchableOrder> | SearchStore<SearchableBoughtOrder>;
+	let storeToSearchIn: EitherSearchStore = searchableShipments;
+	let { program } = get(anchorStore);
 
-	let currentShipmentsStore: EitherSearchStore = searchableShipments;
-
-	$: {
-		switch ($page.url.pathname) {
-			case '/shipments':
-				$searchableShipments.searchString = searchString;
-				currentShipmentsStore = searchableShipments;
-				break;
-			case '/shipments/bought':
-				$searchableBoughtShipments.searchString = searchString;
-				currentShipmentsStore = searchableBoughtShipments;
-				break;
-		}
+	$: if ($walletStore.publicKey) {
+		fetchForwarderAccount(program, $walletStore.publicKey).then(({ account, accountKey }) => {
+			if (account) {
+				userStore.registerForwarder(decodeName(account.name));
+			}
+		});
+	} else {
+		userStore.unregisterForwarder();
 	}
 
-	// TODO: make it dynamic or from server
-	const categories: string[] = [
-		'Normal',
-		'Big',
-		'Small',
-		'Freeze',
-		'Fragile',
-		'Perishable',
-		'Heavy',
-		'Hazardous',
-		'Oversized',
-		'Express',
-		'International',
-		'Domestic',
-		'Bulk',
-		'Liquid',
-		'Sensitive',
-		'Valuable',
-		'High Priority',
-		'Documents',
-		'Live Animals',
-		'Electronics'
-	];
+	$: pageUrl = $page.url.pathname;
+
+	$: if (pageUrl == '/shipmentsMap') {
+		storeToSearchIn = searchableShipments;
+	} else if (pageUrl == '/shipmentsMap/bought') {
+		storeToSearchIn = searchableBoughtShipments;
+	}
 
 	function handleSearchKeyUp(e: KeyboardEvent) {
-		if (searchString && e.key == 'Enter') {
-			currentShipmentsStore.performSearch();
-		} else if (!searchString) {
-			currentShipmentsStore.purgeFiltered();
+		if ($storeToSearchIn.searchString && e.key == 'Enter') {
+			storeToSearchIn.performSearch();
+		} else if ($storeToSearchIn.searchString) {
+			storeToSearchIn.purgeFiltered();
 		}
 	}
 
@@ -96,8 +77,6 @@
 		const unsubscribeShipmentBought = program.addEventListener(
 			'ShipmentTransferred',
 			async (event) => {
-				console.log(event);
-
 				const shipmentToRemove = event.before.toString();
 
 				const shipmentBoughtPublicKey = event.after;
@@ -139,14 +118,33 @@
 	});
 </script>
 
-<ScrollableMenu>
-	{#each categories as category}
-		<CategoryButton on:click={() => console.log(`clicked category ${category}`)}
-			>{category}</CategoryButton
-		>
-	{/each}
-</ScrollableMenu>
+<main class="relative h-screen w-full overflow-hidden">
+	<div class="absolute z-10 w-3/4 md:w-1/3 xl:w-1/4 left-1/2 transform -translate-x-1/2 top-4">
+		<div class="m-3 p-0.5 rounded-full bg-gradient-to-r from-primary to-secondary">
+			<label for="name" class="sr-only">Name</label>
+			<input
+				class="px-3 py-1.5 w-full rounded-full bg-background focus:outline-none text-sm lg:text-md"
+				type="text"
+				id="name"
+				placeholder="Search"
+				bind:value={$storeToSearchIn.searchString}
+				on:keyup={handleSearchKeyUp}
+			/>
+		</div>
+	</div>
+	<div class="hidden md:block absolute top-7 right-7 z-40">
+		<WalletMultiButton onClose={() => {}} />
+	</div>
 
-<HotNavigation bind:searchValue={searchString} on:keyup={handleSearchKeyUp} />
+	<div class="hidden md:block">
+		<MapWrapper>
+			<slot />
+		</MapWrapper>
+	</div>
 
-<slot />
+	<div class="md:hidden">
+		<MapWrapper>
+			<slot />
+		</MapWrapper>
+	</div>
+</main>
