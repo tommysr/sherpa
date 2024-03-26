@@ -1,17 +1,54 @@
 import {
 	searchableBoughtShipments,
 	type SearchableBoughtOrder
-} from '$src/stores/forwarderShipments.js';
+} from '$src/stores/forwarderShipments';
 import type { SearchableOrder } from '$src/stores/searchableShipments';
 import { searchableShipments } from '$src/stores/searchableShipments';
-import type { ApiBoughtShipmentAccount } from '$src/utils/idl/boughtShipment.js';
+import type { ApiBoughtShipmentAccount } from '$src/utils/idl/boughtShipment';
 import type { ApiShipmentAccount } from '$src/utils/idl/shipment';
+
 import { error } from '@sveltejs/kit';
+import { get } from 'svelte/store';
+
+function loadFromStores(): {
+	orders: ApiShipmentAccount[];
+	boughtOrders: ApiBoughtShipmentAccount[];
+} | null {
+	const { data: shipments } = get(searchableShipments);
+	const { data: boughtShipments } = get(searchableBoughtShipments);
+	const len = shipments.length;
+
+	if (len > 0) {
+		return {
+			orders: shipments.map(({ account, publicKey }) => {
+				return {
+					account,
+					publicKey
+				};
+			}),
+			boughtOrders: boughtShipments.map(({ account, publicKey }) => {
+				return {
+					account,
+					publicKey
+				};
+			})
+		};
+	} else {
+		return null;
+	}
+}
 
 /** @type {import('./$types').PageLoad } */
 export async function load({
 	fetch
 }): Promise<{ orders: ApiShipmentAccount[]; boughtOrders: ApiBoughtShipmentAccount[] }> {
+	console.log('loading shipments');
+	const fromStores = loadFromStores();
+
+	if (fromStores) {
+		return fromStores;
+	}
+
 	try {
 		const [fetchedOrders, fetchedBoughtOrders] = await Promise.all([
 			fetch('/api/shipments', {
@@ -49,8 +86,6 @@ export async function load({
 				};
 			}
 		);
-
-		console.log(orders, boughtOrders);
 
 		searchableShipments.default(searchableOrders);
 		searchableBoughtShipments.default(searchableBoughtOrders);
