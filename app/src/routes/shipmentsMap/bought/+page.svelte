@@ -22,7 +22,6 @@
 
 			return s;
 		});
-	} else {
 	}
 
 	$: carriers = data.carriers;
