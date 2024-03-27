@@ -3,7 +3,7 @@ use anchor_lang::prelude::{
     *,
 };
 
-use crate::Name;
+use crate::{Channel, Name};
 
 #[zero_copy]
 #[derive(Debug, Default, PartialEq, BorshSerialize, BorshDeserialize)]
@@ -57,10 +57,11 @@ pub struct Shipment {
     pub forwarder: Pubkey,
     pub carrier: Pubkey,
     pub price: u64,
+    pub name: Name,
+    pub channel: Channel,
+    pub shipment: ShipmentData,
     pub no: u32,
     pub reserved: [u8; 4],
-    pub shipment: ShipmentData,
-    pub name: Name,
 }
 
 #[account(zero_copy)]

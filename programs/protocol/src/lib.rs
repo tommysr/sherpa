@@ -56,4 +56,12 @@ pub mod protocol {
     pub fn accept_offer(ctx: Context<AcceptOffer>) -> Result<()> {
         actions::accept_offer::handler(ctx)
     }
+
+    pub fn open_channel(ctx: Context<OpenChannel>, key: Public) -> Result<()> {
+        actions::channel::open_channel::handler(ctx, key)
+    }
+
+    pub fn send_message(ctx: Context<SendMessage>, key: Public, message: Name) -> Result<()> {
+        actions::channel::send_message::handler(ctx, key, message)
+    }
 }

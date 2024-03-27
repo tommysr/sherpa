@@ -20,4 +20,6 @@ pub enum Error {
     ShipmentPaymentFailed = 7, // 1777
     #[msg("Invalid shipper account")]
     InvalidShipperAccount = 8, // 1778
+    #[msg("Only the shipper an the carrier can send messages")]
+    SignerNotInChannel,
 }

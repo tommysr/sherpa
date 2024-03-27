@@ -4,7 +4,11 @@ import { Protocol } from '../target/types/protocol'
 import { Keypair, PublicKey, SystemProgram } from '@solana/web3.js'
 import { ONE_HOUR, ONE_SOL, U64_MAX, awaitedAirdrops } from './utils'
 import {
+  DF_BASE,
+  DF_MODULUS,
+  decodeKey,
   decodeName,
+  encodeKey,
   encodeName,
   getAcceptedOfferAddress,
   getBoughtShipmentAddress,
@@ -39,7 +43,7 @@ describe('protocol', () => {
     await awaitedAirdrops(
       program.provider.connection,
       [admin.publicKey, shipper.publicKey, forwarder.publicKey, carrier.publicKey],
-      1e12
+      1e9
     )
   })
 
@@ -115,7 +119,7 @@ describe('protocol', () => {
     })
 
     await program.methods
-      .createShipment(shipmentPrice, encodeName('14 old socks'), shipmentData)
+      .createShipment(shipmentPrice, encodeName('Just a pair of socks'), shipmentData)
       .accounts({
         shipment: shipmentAddress,
         shipper: shipperAddress,
@@ -143,7 +147,7 @@ describe('protocol', () => {
     expect(shipmentAccount.shipment.dimensions).to.deep.equal(shipmentData.dimensions)
     expect(shipmentAccount.shipment.when.eq(shipmentData.when)).true
     expect(shipmentAccount.shipment.deadline.eq(shipmentData.deadline)).true
-    expect(decodeName(shipmentAccount.name)).eq('14 old socks')
+    expect(decodeName(shipmentAccount.name)).eq('Just a pair of socks')
 
     const shipperAccount = await program.account.shipper.fetch(shipperAddress)
     expect(shipperAccount.authority.equals(shipper.publicKey)).true
@@ -189,7 +193,7 @@ describe('protocol', () => {
     })
 
     await program.methods
-      .createShipment(shipmentPrice, encodeName('Just some old rocks'), shipmentData)
+      .createShipment(shipmentPrice, encodeName('Some pretty rocks'), shipmentData)
       .accounts({
         shipment: shipmentAddress,
         shipper: shipperAddress,
@@ -216,7 +220,7 @@ describe('protocol', () => {
     expect(shipmentAccount.shipment.dimensions).to.deep.equal(shipmentData.dimensions)
     expect(shipmentAccount.shipment.when.eq(shipmentData.when)).true
     expect(shipmentAccount.shipment.deadline.eq(shipmentData.deadline)).true
-    expect(decodeName(shipmentAccount.name)).eq('Just some old rocks')
+    expect(decodeName(shipmentAccount.name)).eq('Some pretty rocks')
 
     const shipperAccount = await program.account.shipper.fetch(shipperAddress)
     expect(shipperAccount.authority.equals(shipper.publicKey)).true
@@ -404,4 +408,52 @@ describe('protocol', () => {
 
     program.removeEventListener(subscriptionId)
   })
+
+  it('open channel', async () => {
+    const shipmentAddress = getShipmentAddress(program, shipper.publicKey, 0)
+
+    const secret = new BN(4)
+    const shared = DF_BASE.pow(secret).mod(DF_MODULUS)
+
+    await program.methods
+      .openChannel(encodeKey(shared))
+      .accounts({
+        shipment: shipmentAddress,
+        signer: shipper.publicKey
+      })
+      .signers([shipper])
+      .rpc()
+
+    const shipmentAccount = await program.account.shipment.fetch(shipmentAddress)
+
+    expect(decodeKey(shipmentAccount.channel.shipper).eq(shared)).true
+  })
+
+  it('accept channel', async () => {
+    const shipmentAddress = getShipmentAddress(program, shipper.publicKey, 0)
+
+    const secret = new BN(3)
+    const shared = DF_BASE.pow(secret).mod(DF_MODULUS)
+
+    const shipmentAccountBefore = await program.account.shipment.fetch(shipmentAddress)
+    const other = decodeKey(shipmentAccountBefore.channel.shipper)
+    const key = other.pow(secret).mod(DF_MODULUS)
+
+    expect(key.eqn(18)).true
+
+    // TODO: Actually encrypt here
+    await program.methods
+      .sendMessage(encodeKey(shared), encodeName('Hello!'))
+      .accounts({
+        shipment: shipmentAddress,
+        signer: carrier.publicKey
+      })
+      .signers([carrier])
+      .rpc()
+
+    const shipmentAccount = await program.account.shipment.fetch(shipmentAddress)
+
+    expect(decodeKey(shipmentAccount.channel.carrier).eq(shared)).true
+  })
+
 })
