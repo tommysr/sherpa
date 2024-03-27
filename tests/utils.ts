@@ -3,7 +3,7 @@ import BN from 'bn.js'
 
 export const ONE_SOL = new BN('1000000000')
 export const ONE_HOUR = 3600
-export const U32_MAX = new BN(2).pow(new BN(64)).subn(1)
+export const U64_MAX = new BN(2).pow(new BN(64)).subn(1)
 
 export const awaitedAirdrop = async (
   connection: Connection,
@@ -25,10 +25,18 @@ export const awaitedAirdrop = async (
 
 export const awaitedAirdrops = async (
   connection: Connection,
-  publicKey: PublicKey[],
+  publicKeys: PublicKey[],
   amount: number
 ) => {
-  await Promise.all(publicKey.map(async pk => awaitedAirdrop(connection, pk, amount)))
+  let airdrops: Promise<void>[] = []
+
+  while (amount > 1e9) {
+    airdrops = airdrops.concat(publicKeys.map(async pk => awaitedAirdrop(connection, pk, 1e9)))
+    amount -= 1e9
+  }
+  airdrops = airdrops.concat(publicKeys.map(async pk => awaitedAirdrop(connection, pk, amount)))
+
+  await Promise.all(airdrops)
 }
 
 export const sleep = async (arg0: number) => {

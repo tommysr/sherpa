@@ -1,10 +1,14 @@
 import * as anchor from '@coral-xyz/anchor'
 import { BN, Program } from '@coral-xyz/anchor'
 import { Protocol } from '../target/types/protocol'
-import { Keypair, SystemProgram } from '@solana/web3.js'
-import { ONE_HOUR, ONE_SOL, U32_MAX, awaitedAirdrops } from './utils'
+import { Keypair, PublicKey, SystemProgram } from '@solana/web3.js'
+import { ONE_HOUR, ONE_SOL, U64_MAX, awaitedAirdrops } from './utils'
 import {
+  DF_BASE,
+  DF_MODULUS,
+  decodeKey,
   decodeName,
+  encodeKey,
   encodeName,
   getAcceptedOfferAddress,
   getBoughtShipmentAddress,
@@ -78,7 +82,7 @@ describe('protocol', () => {
 
   it('create shipment', async () => {
     const shipmentAddress = getShipmentAddress(program, shipper.publicKey, 0)
-    const shipmentPrice = new BN(4200).mul(ONE_SOL)
+    const shipmentPrice = ONE_SOL.divn(2)
     const shipmentData = {
       geography: {
         from: {
@@ -115,7 +119,7 @@ describe('protocol', () => {
     })
 
     await program.methods
-      .createShipment(shipmentPrice, encodeName('14 old socks'), shipmentData)
+      .createShipment(shipmentPrice, encodeName('Just a pair of socks'), shipmentData)
       .accounts({
         shipment: shipmentAddress,
         shipper: shipperAddress,
@@ -130,7 +134,8 @@ describe('protocol', () => {
     const shipmentAccount = await program.account.shipment.fetch(shipmentAddress)
 
     expect(shipmentAccount.shipper.equals(shipper.publicKey)).true
-    expect(shipmentAccount.owner.equals(shipper.publicKey)).true
+    expect(shipmentAccount.forwarder.equals(new PublicKey(0))).true
+    expect(shipmentAccount.carrier.equals(new PublicKey(0))).true
     expect(shipmentAccount.price.eq(shipmentPrice)).true
     expect(shipmentAccount.no).eq(0)
     expect(shipmentAccount.shipment.geography.from).to.deep.equal(shipmentData.geography.from)
@@ -142,7 +147,7 @@ describe('protocol', () => {
     expect(shipmentAccount.shipment.dimensions).to.deep.equal(shipmentData.dimensions)
     expect(shipmentAccount.shipment.when.eq(shipmentData.when)).true
     expect(shipmentAccount.shipment.deadline.eq(shipmentData.deadline)).true
-    expect(decodeName(shipmentAccount.name)).eq('14 old socks')
+    expect(decodeName(shipmentAccount.name)).eq('Just a pair of socks')
 
     const shipperAccount = await program.account.shipper.fetch(shipperAddress)
     expect(shipperAccount.authority.equals(shipper.publicKey)).true
@@ -151,7 +156,7 @@ describe('protocol', () => {
 
   it('create second shipment', async () => {
     const shipmentAddress = getShipmentAddress(program, shipper.publicKey, 1)
-    const shipmentPrice = new BN(2100).mul(ONE_SOL)
+    const shipmentPrice = new BN(3).mul(ONE_SOL)
     const shipmentData = {
       geography: {
         from: {
@@ -188,7 +193,7 @@ describe('protocol', () => {
     })
 
     await program.methods
-      .createShipment(shipmentPrice, encodeName('Just some old rocks'), shipmentData)
+      .createShipment(shipmentPrice, encodeName('Some pretty rocks'), shipmentData)
       .accounts({
         shipment: shipmentAddress,
         shipper: shipperAddress,
@@ -202,7 +207,8 @@ describe('protocol', () => {
 
     const shipmentAccount = await program.account.shipment.fetch(shipmentAddress)
     expect(shipmentAccount.shipper.equals(shipper.publicKey)).true
-    expect(shipmentAccount.owner.equals(shipper.publicKey)).true
+    expect(shipmentAccount.forwarder.equals(new PublicKey(0))).true
+    expect(shipmentAccount.carrier.equals(new PublicKey(0))).true
     expect(shipmentAccount.price.eq(shipmentPrice)).true
     expect(shipmentAccount.no).eq(1)
     expect(shipmentAccount.shipment.geography.from).to.deep.equal(shipmentData.geography.from)
@@ -214,7 +220,7 @@ describe('protocol', () => {
     expect(shipmentAccount.shipment.dimensions).to.deep.equal(shipmentData.dimensions)
     expect(shipmentAccount.shipment.when.eq(shipmentData.when)).true
     expect(shipmentAccount.shipment.deadline.eq(shipmentData.deadline)).true
-    expect(decodeName(shipmentAccount.name)).eq('Just some old rocks')
+    expect(decodeName(shipmentAccount.name)).eq('Some pretty rocks')
 
     const shipperAccount = await program.account.shipper.fetch(shipperAddress)
     expect(shipperAccount.authority.equals(shipper.publicKey)).true
@@ -241,38 +247,48 @@ describe('protocol', () => {
 
   it('buy shipment', async () => {
     const shipmentAddress = getShipmentAddress(program, shipper.publicKey, 0)
-    const boughtShipmentAddress = getBoughtShipmentAddress(program, forwarder.publicKey, 0)
+    const forwardedShipmentAddress = getBoughtShipmentAddress(program, forwarder.publicKey, 0)
+
+    const balanceBefore = await connection.getBalance(forwarder.publicKey)
 
     const subscriptionId = program.addEventListener('ShipmentTransferred', event => {
       expect(event.seller.equals(shipperAddress)).true
       expect(event.buyer.equals(forwarderAddress)).true
       expect(event.before.equals(shipmentAddress)).true
-      expect(event.after.equals(boughtShipmentAddress)).true
+      expect(event.after.equals(forwardedShipmentAddress)).true
     })
 
     await program.methods
       .buyShipment()
       .accounts({
-        bought: boughtShipmentAddress,
+        bought: forwardedShipmentAddress,
         shipment: shipmentAddress,
         shipper: shipperAddress,
         forwarder: forwarderAddress,
         signer: forwarder.publicKey,
-        systemProgram: SystemProgram.programId
+        shipmentOwner: shipper.publicKey
       })
       .signers([forwarder])
       .rpc()
 
+    const balanceAfter = await connection.getBalance(forwarder.publicKey)
+    expect(balanceBefore - balanceAfter > ONE_SOL.divn(2).toNumber()).true
+
     const shipmentAccount = await program.account.shipment.fetch(shipmentAddress)
-    expect(shipmentAccount.owner.equals(forwarder.publicKey)).true
+    expect(shipmentAccount.shipper.equals(shipper.publicKey)).true
+    expect(shipmentAccount.forwarder.equals(forwarder.publicKey)).true
+    expect(shipmentAccount.carrier.equals(new PublicKey(0))).true
 
     const forwarderAccount = await program.account.forwarder.fetch(forwarderAddress)
     expect(forwarderAccount.count).eq(1)
 
-    const boughtShipment = await program.account.boughtShipment.fetch(boughtShipmentAddress)
-    expect(boughtShipment.owner.equals(forwarder.publicKey)).true
-    expect(boughtShipment.no).eq(0)
-    expect(boughtShipment.shipment).to.deep.equal(shipmentAccount.shipment)
+    const forwardedShipment = await program.account.forwardedShipment.fetch(
+      forwardedShipmentAddress
+    )
+    expect(forwardedShipment.forwarder.equals(forwarder.publicKey)).true
+    expect(forwardedShipment.shipment.equals(shipmentAddress)).true
+    expect(forwardedShipment.no).eq(0)
+    expect(forwardedShipment.resellPrice.eq(U64_MAX)).true
 
     program.removeEventListener(subscriptionId)
   })
@@ -308,7 +324,7 @@ describe('protocol', () => {
 
   it('make offer', async () => {
     const offerAddress = getOfferAddress(program, carrier.publicKey, 0)
-    const shipmentAddress = getBoughtShipmentAddress(program, forwarder.publicKey, 0)
+    const shipmentAddress = getShipmentAddress(program, shipper.publicKey, 0)
 
     const subscriptionId = program.addEventListener('OfferMade', event => {
       expect(event.from.equals(forwarder.publicKey)).true
@@ -328,16 +344,16 @@ describe('protocol', () => {
       .signers([forwarder])
       .rpc()
 
-    const boughtShipment = await program.account.boughtShipment.fetch(shipmentAddress)
-    expect(boughtShipment.buyer.equals(forwarder.publicKey)).true
-    expect(boughtShipment.owner.equals(forwarder.publicKey)).true
+    const shipmentAccount = await program.account.shipment.fetch(shipmentAddress)
+    expect(shipmentAccount.shipper.equals(shipper.publicKey)).true
+    expect(shipmentAccount.forwarder.equals(forwarder.publicKey)).true
+    expect(shipmentAccount.carrier.equals(new PublicKey(0))).true
 
     const offerAccount = await program.account.shipmentOffer.fetch(offerAddress)
-    expect(offerAccount.owner.equals(carrier.publicKey)).true
+    expect(offerAccount.offeror.equals(forwarder.publicKey)).true
     expect(offerAccount.details.payment.eq(ONE_SOL)).true
     expect(offerAccount.details.collateral.eqn(0)).true
-    expect(offerAccount.details.deadline.eq(U32_MAX)).true
-    expect(offerAccount.shipment).to.deep.equal(boughtShipment.shipment)
+    expect(offerAccount.details.deadline.eq(U64_MAX)).true
 
     const carrierAccount = await program.account.carrier.fetch(carrierAddress)
     expect(carrierAccount.offersCount).eq(1)
@@ -348,7 +364,7 @@ describe('protocol', () => {
 
   it('accept offer', async () => {
     const offerAddress = getOfferAddress(program, carrier.publicKey, 0)
-    const shipmentAddress = getBoughtShipmentAddress(program, forwarder.publicKey, 0)
+    const shipmentAddress = getShipmentAddress(program, shipper.publicKey, 0)
     const taskAddress = getAcceptedOfferAddress(program, carrier.publicKey, 0)
 
     const subscriptionId = program.addEventListener('OfferAccepted', event => {
@@ -356,6 +372,8 @@ describe('protocol', () => {
       expect(event.to.equals(carrier.publicKey)).true
       expect(event.offer.equals(offerAddress)).true
     })
+
+    const offerAccount = await program.account.shipmentOffer.fetch(offerAddress)
 
     await program.methods
       .acceptOffer()
@@ -365,21 +383,24 @@ describe('protocol', () => {
         shipment: shipmentAddress,
         forwarder: forwarderAddress,
         carrier: carrierAddress,
-        signer: carrier.publicKey
+        signer: carrier.publicKey,
+        offerOwner: forwarder.publicKey
       })
       .signers([carrier])
       .rpc()
 
-    const shipmentAccount = await program.account.boughtShipment.fetch(shipmentAddress)
-    expect(shipmentAccount.buyer.equals(forwarder.publicKey)).true
-    expect(shipmentAccount.owner.equals(carrier.publicKey)).true
+    const shipmentAccount = await program.account.shipment.fetch(shipmentAddress)
+    expect(shipmentAccount.shipper.equals(shipper.publicKey)).true
+    expect(shipmentAccount.forwarder.equals(forwarder.publicKey)).true
+    expect(shipmentAccount.carrier.equals(carrier.publicKey)).true
 
-    const offerAccount = await program.account.shipmentOffer.fetch(offerAddress)
-    expect(offerAccount.owner.equals(carrier.publicKey)).true
+    const offerAccountAfter = await program.account.shipmentOffer.fetchNullable(offerAddress)
+    expect(offerAccountAfter).null
 
     const taskAccount = await program.account.acceptedOffer.fetch(taskAddress)
     expect(taskAccount.owner.equals(carrier.publicKey)).true
-    expect(taskAccount.shipment).to.deep.equal(shipmentAccount.shipment)
+    expect(taskAccount.shipment.equals(shipmentAddress)).true
+    expect(taskAccount.shipment.equals(offerAccount.shipment)).true
     expect(taskAccount.details.payment.eq(offerAccount.details.payment)).true
     expect(taskAccount.details.collateral.eq(offerAccount.details.collateral)).true
     expect(taskAccount.details.deadline.eq(offerAccount.details.deadline)).true
@@ -387,4 +408,52 @@ describe('protocol', () => {
 
     program.removeEventListener(subscriptionId)
   })
+
+  it('open channel', async () => {
+    const shipmentAddress = getShipmentAddress(program, shipper.publicKey, 0)
+
+    const secret = new BN(4)
+    const shared = DF_BASE.pow(secret).mod(DF_MODULUS)
+
+    await program.methods
+      .openChannel(encodeKey(shared))
+      .accounts({
+        shipment: shipmentAddress,
+        signer: shipper.publicKey
+      })
+      .signers([shipper])
+      .rpc()
+
+    const shipmentAccount = await program.account.shipment.fetch(shipmentAddress)
+
+    expect(decodeKey(shipmentAccount.channel.shipper).eq(shared)).true
+  })
+
+  it('accept channel', async () => {
+    const shipmentAddress = getShipmentAddress(program, shipper.publicKey, 0)
+
+    const secret = new BN(3)
+    const shared = DF_BASE.pow(secret).mod(DF_MODULUS)
+
+    const shipmentAccountBefore = await program.account.shipment.fetch(shipmentAddress)
+    const other = decodeKey(shipmentAccountBefore.channel.shipper)
+    const key = other.pow(secret).mod(DF_MODULUS)
+
+    expect(key.eqn(18)).true
+
+    // TODO: Actually encrypt here
+    await program.methods
+      .sendMessage(encodeKey(shared), encodeName('Hello!'))
+      .accounts({
+        shipment: shipmentAddress,
+        signer: carrier.publicKey
+      })
+      .signers([carrier])
+      .rpc()
+
+    const shipmentAccount = await program.account.shipment.fetch(shipmentAddress)
+
+    expect(decodeKey(shipmentAccount.channel.carrier).eq(shared)).true
+  })
+
 })

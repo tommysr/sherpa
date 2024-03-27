@@ -1,4 +1,5 @@
 mod carrier;
+mod channel;
 mod forwarder;
 mod name;
 mod offer;
@@ -7,6 +8,7 @@ mod shipper;
 mod state;
 
 pub use carrier::*;
+pub use channel::*;
 pub use forwarder::*;
 pub use name::*;
 pub use offer::*;

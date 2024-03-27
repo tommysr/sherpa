@@ -3,7 +3,7 @@ use anchor_lang::prelude::{
     *,
 };
 
-use crate::Name;
+use crate::{Channel, Name};
 
 #[zero_copy]
 #[derive(Debug, Default, PartialEq, BorshSerialize, BorshDeserialize)]
@@ -53,22 +53,23 @@ pub struct ShipmentData {
 #[account(zero_copy)]
 #[derive(Debug, Default, PartialEq)]
 pub struct Shipment {
-    pub owner: Pubkey,
     pub shipper: Pubkey,
+    pub forwarder: Pubkey,
+    pub carrier: Pubkey,
     pub price: u64,
+    pub name: Name,
+    pub channel: Channel,
+    pub shipment: ShipmentData,
     pub no: u32,
     pub reserved: [u8; 4],
-    pub shipment: ShipmentData,
-    pub name: Name,
 }
 
 #[account(zero_copy)]
 #[derive(Debug, Default, PartialEq)]
-pub struct BoughtShipment {
-    pub creator: Pubkey,
-    pub buyer: Pubkey,
-    pub owner: Pubkey,
+pub struct ForwardedShipment {
+    pub forwarder: Pubkey,
+    pub shipment: Pubkey,
+    pub resell_price: u64,
     pub no: u32,
     pub reserved: [u8; 4],
-    pub shipment: ShipmentData,
 }

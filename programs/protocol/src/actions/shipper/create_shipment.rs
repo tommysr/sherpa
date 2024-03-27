@@ -1,6 +1,6 @@
 use anchor_lang::prelude::*;
 
-use crate::{Error, Name, Shipment, ShipmentCreated, ShipmentData, Shipper};
+use crate::{Channel, Error, Name, Shipment, ShipmentCreated, ShipmentData, Shipper};
 
 #[derive(Accounts)]
 pub struct CreateShipment<'info> {
@@ -25,13 +25,15 @@ pub fn handler(ctx: Context<CreateShipment>, price: u64, name: Name, shipment: S
     let account = &mut ctx.accounts.shipment.load_init()?;
     
     **account = Shipment {
-        owner: *ctx.accounts.signer.key,
         shipper: *ctx.accounts.signer.key,
+        forwarder: Pubkey::default(),
+        carrier: Pubkey::default(),
         price,
         no: shipper.count,
         reserved: [0; 4],
         shipment,
         name,
+        channel: Channel::default()
     };
     
     shipper.count += 1;
