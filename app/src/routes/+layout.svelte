@@ -23,6 +23,8 @@
 	import WalletProvider from '$src/components/Wallet/WalletProvider.svelte';
 	// solana
 	import { clusterApiUrl } from '@solana/web3.js';
+	import CustomNotification from '$src/components/Notification/CustomNotification.svelte';
+	import Notifications from '$src/components/Notification/Notifications.svelte';
 
 	let wallets: Adapter[];
 	// it's a solana devnet cluster, but consider changing it to more performant provider
@@ -42,5 +44,7 @@
 <AnchorConnectionProvider {network} />
 <ConnectionProvider {network} />
 <WalletProvider {localStorageKey} {wallets} autoConnect />
-<!-- <Navbar /> -->
-<slot />
+
+<Notifications notificationComponent={CustomNotification}>
+	<slot />
+</Notifications>
