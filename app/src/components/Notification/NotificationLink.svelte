@@ -2,18 +2,18 @@
 	export let signature: string;
 </script>
 
-<span>
+<span class="flex items-center">
 	<!-- svelte-ignore security-anchor-rel-noreferrer -->
 	<a
 		href={`https://explorer.solana.com/tx/${signature}?cluster=devnet`}
-		class="text-sm"
+		class="text-sm flex items-center decoration-transparent"
 		target="_blank"
-		>Open explorer <svg
+		>Open explorer<svg
 			xmlns="http://www.w3.org/2000/svg"
-			width="10"
-			height="10"
-			fill="#4e4e4e"
-			class="bi bi-box-arrow-up-right"
+			width="11"
+			height="11"
+			fill="#000"
+			class="ml-2"
 			viewBox="0 0 16 16"
 		>
 			<path
@@ -27,22 +27,3 @@
 		</svg></a
 	>
 </span>
-
-<style lang="scss">
-	span {
-		display: flex;
-		align-items: center;
-
-		a {
-			display: flex;
-			align-items: center;
-
-			text-decoration: none;
-			color: #4e4e4e;
-
-			svg {
-				margin-left: 0.5rem;
-			}
-		}
-	}
-</style>

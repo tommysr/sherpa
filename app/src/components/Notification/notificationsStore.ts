@@ -25,6 +25,24 @@ export interface IUpdateNotification {
 
 export const notificationStore = writable<INotification[]>([]);
 
+/**
+ * Create a new notification
+ * @param data Notification data
+ * @returns Notification ID
+ * @example
+ * const notification = createNotification({
+ * 	text: 'Swap',
+ * 	type: 'loading'
+ * });
+ *
+ * await new Promise((resolve) => setTimeout(resolve, 4000));
+ *
+ * updateNotification(notification, {
+ * 	text: 'Swap',
+ * 	type: 'success',
+ * 	signature
+ * });
+ */
 export const createNotification = (data: ICreateNotification): string => {
 	const id = uuidv4();
 	notificationStore.update((store) => {
@@ -35,6 +53,10 @@ export const createNotification = (data: ICreateNotification): string => {
 	return id;
 };
 
+/**
+ * Remove a notification
+ * @param uid Notification ID
+ */
 export const removeNotification = (uid: string) => {
 	notificationStore.update((store) => {
 		const newStore = store.filter(({ id }) => id !== uid);
@@ -42,6 +64,11 @@ export const removeNotification = (uid: string) => {
 	});
 };
 
+/**
+ * Update a notification
+ * @param uid Notification ID
+ * @param data Notification data
+ */
 export const updateNotification = (uid: string, data: IUpdateNotification) => {
 	notificationStore.update((store) => {
 		const index = store.findIndex(({ id }) => id !== uid);
@@ -50,6 +77,9 @@ export const updateNotification = (uid: string, data: IUpdateNotification) => {
 	});
 };
 
+/**
+ * Clear all notifications
+ */
 export const clearNotifications = () => {
 	notificationStore.set([]);
 };

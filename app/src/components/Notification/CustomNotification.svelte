@@ -16,10 +16,10 @@
 		>
 			<svg
 				xmlns="http://www.w3.org/2000/svg"
-				width="20"
-				height="20"
+				width="22"
+				height="22"
 				fill="#16df16e5"
-				class="bi bi-check-circle-fill"
+				class="bi bi-check-circle-fill mr-2 ml-1"
 				viewBox="0 0 16 16"
 			>
 				<path
@@ -35,8 +35,8 @@
 		>
 			<svg
 				xmlns="http://www.w3.org/2000/svg"
-				width="20"
-				height="20"
+				width="22"
+				height="22"
 				fill="#ca2c2c"
 				class="bi bi-x-circle-fill"
 				viewBox="0 0 16 16"
@@ -54,8 +54,8 @@
 		>
 			<svg
 				xmlns="http://www.w3.org/2000/svg"
-				width="20"
-				height="20"
+				width="22"
+				height="22"
 				fill="#df9432"
 				class="bi bi-question-circle-fill"
 				viewBox="0 0 16 16"

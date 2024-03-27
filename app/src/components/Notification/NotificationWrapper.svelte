@@ -12,8 +12,9 @@
 	>
 		<h2>{title}</h2>
 	</div>
-	<div class="flex items-center space-x-2">
+	<div class="flex items-center space-x-2 h-9">
 		<slot />
+
 		{#if signature}<NotificationLink {signature} />{/if}
 
 		{#if text}
