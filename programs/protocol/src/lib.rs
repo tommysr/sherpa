@@ -10,7 +10,7 @@ use events::*;
 
 use anchor_lang::prelude::*;
 
-declare_id!("2hLH8kSCZB8DswFRukGEW3x3eahQ9K1pf5BTBUiEZZ7t");
+declare_id!("A8AT8JTCpT4BuTfxXB5rFc6a1iGYayYr8fxUF6D1gdnH");
 
 #[program]
 pub mod protocol {
