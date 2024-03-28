@@ -19,3 +19,4 @@ name = "protocol"
 [dependencies]
 anchor-lang = "0.29.0"
 bytemuck = "1.14.3"
+uint = "0.8.0"

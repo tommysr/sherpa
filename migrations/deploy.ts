@@ -63,7 +63,7 @@ const run = async () => {
   if (!shipmentExists) {
     const shipmentPrice = new BN(5).mul(ONE_SOL)
     await program.methods
-      .createShipment(shipmentPrice, crateFromSchoolToAirport)
+      .createShipment(shipmentPrice, encodeName('Świerze Boróweczki'), crateFromSchoolToAirport)
       .accounts({
         shipment: shipmentAddress,
         shipper: shipperAddress,
