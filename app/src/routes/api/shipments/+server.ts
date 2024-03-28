@@ -1,7 +1,7 @@
 import { anchorStore } from '$src/stores/anchor';
 import { error, json } from '@sveltejs/kit';
 import { get } from 'svelte/store';
-import type { ApiShipmentAccount, ShipmentAccount } from '$src/utils/idl/shipment';
+import type { ApiShipmentAccount, ShipmentAccount } from '$src/utils/account/shipment';
 import { parseShipmentToApiShipment } from '$src/utils/parse/shipment';
 
 export async function GET() {

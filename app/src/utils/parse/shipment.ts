@@ -1,17 +1,33 @@
 import type { PublicKey } from '@solana/web3.js';
-import type { Shipment } from '../idl/shipment';
+import type { Public, Shipment } from '../account/shipment';
+import type { AccountName } from '../account/common';
+
+import { decodeKey, decodeName } from '$sdk/sdk';
 import type BN from 'bn.js';
 
 export function parseShipmentToApiShipment(
-	shipmentAcc: Shipment<BN, BN, PublicKey>
-): Shipment<string, number, string> {
+	shipmentAcc: Shipment<Public<BN>, AccountName, AccountName, BN, BN, PublicKey>
+): Shipment<string, string, string, string, number, string> {
 	return {
 		...shipmentAcc,
-		owner: shipmentAcc.owner.toString(),
+		// : shipmentAcc.owner.toString(),
 		shipper: shipmentAcc.shipper.toString(),
+		carrier: shipmentAcc.carrier.toString(),
+		forwarder: shipmentAcc.forwarder.toString(),
 		price: shipmentAcc.price.toNumber(),
+		name: decodeName(shipmentAcc.name),
+		channel: {
+			carrier: decodeKey(shipmentAcc.channel.carrier).toString(),
+			shipper: decodeKey(shipmentAcc.channel.shipper).toString(),
+			data: decodeName(shipmentAcc.channel.data).toString()
+		},
 		shipment: {
 			...shipmentAcc.shipment,
+			geography: {
+				...shipmentAcc.shipment.geography,
+				fromName: decodeName(shipmentAcc.shipment.geography.fromName),
+				toName: decodeName(shipmentAcc.shipment.geography.toName)
+			},
 			dimensions: {
 				depth: shipmentAcc.shipment.dimensions.depth / 1000,
 				height: shipmentAcc.shipment.dimensions.height / 1000,
