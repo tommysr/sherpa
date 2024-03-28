@@ -1,6 +1,10 @@
 <script lang="ts">
 	import { page } from '$app/stores';
 	import { decodeName } from '$sdk/sdk';
+	import {
+		createNotification,
+		updateNotification
+	} from '$src/components/Notification/notificationsStore';
 	import MapWrapper from '$src/components/ShipmentMap/MapWrapper.svelte';
 	import WalletMultiButton from '$src/components/Wallet/WalletMultiButton.svelte';
 	import { fetchForwarderAccount } from '$src/lib/forwarder';
