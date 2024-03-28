@@ -1,8 +1,6 @@
-use anchor_lang::prelude::*;
+use anchor_lang::{prelude::*, solana_program::system_instruction};
 
-use crate::{
-    AcceptedOffer, BoughtShipment, Carrier, Error, Forwarder, OfferAccepted, ShipmentOffer,
-};
+use crate::{AcceptedOffer, Carrier, Error, Forwarder, OfferAccepted, Shipment, ShipmentOffer};
 
 #[derive(Accounts)]
 pub struct AcceptOffer<'info> {
@@ -14,13 +12,13 @@ pub struct AcceptOffer<'info> {
     pub task: AccountLoader<'info, AcceptedOffer>,
     #[account(mut,
         seeds = [b"offer", carrier.load().unwrap().creator.as_ref(), &offer.load().unwrap().no.to_le_bytes()], bump,
-        // close = signer,
+        close = signer,
     )]
     pub offer: AccountLoader<'info, ShipmentOffer>,
     #[account(mut,
-        seeds = [b"forwarded", forwarder.load().unwrap().creator.as_ref(), &offer.load().unwrap().shipment_no.to_le_bytes()], bump,
+        seeds = [b"shipment", shipment.load().unwrap().shipper.as_ref(), &shipment.load().unwrap().no.to_le_bytes()], bump,
     )]
-    pub shipment: AccountLoader<'info, BoughtShipment>,
+    pub shipment: AccountLoader<'info, Shipment>,
     #[account(mut,
         seeds = [b"forwarder", forwarder.load().unwrap().creator.as_ref()], bump,
     )]
@@ -32,6 +30,11 @@ pub struct AcceptOffer<'info> {
     pub carrier: AccountLoader<'info, Carrier>,
     #[account(mut)]
     pub signer: Signer<'info>,
+    #[account(mut,
+        constraint = offer_owner.key() == offer.load().unwrap().offeror @ Error::InvalidShipperAccount,
+    )]
+    /// CHECK: The account of the offerer
+    pub offer_owner: AccountInfo<'info>,
     pub system_program: Program<'info, System>,
 }
 
@@ -41,14 +44,21 @@ pub fn handler(ctx: Context<AcceptOffer>) -> Result<()> {
     let carrier = &mut ctx.accounts.carrier.load_mut()?;
     let shipment = &mut ctx.accounts.shipment.load_mut()?;
 
-    require_eq!(shipment.buyer, shipment.owner, Error::ShipmentSold);
+    // check if the shipment is for sale
+    require_eq!(shipment.carrier, Pubkey::default(), Error::ShipmentSold);
+    shipment.carrier = carrier.creator;
 
-    shipment.owner = carrier.creator;
+    // lock the funds as a collateral
+    require_gte!(
+        ctx.accounts.forwarder.get_lamports(),
+        offer.details.collateral,
+        Error::NotEnoughFunds
+    );
 
     **task = AcceptedOffer {
         owner: carrier.creator,
         details: offer.details,
-        shipment: shipment.shipment,
+        shipment: ctx.accounts.shipment.key(),
         no: carrier.tasks_count,
         accepted: Clock::get()?.unix_timestamp,
         reserved: [0; 4],
@@ -57,10 +67,36 @@ pub fn handler(ctx: Context<AcceptOffer>) -> Result<()> {
     carrier.tasks_count += 1;
 
     emit!(OfferAccepted {
-        from: shipment.buyer,
-        to: shipment.owner,
+        from: shipment.forwarder,
+        to: shipment.shipper,
         offer: ctx.accounts.offer.key(),
     });
+
+    ctx.accounts
+        .carrier
+        .sub_lamports(offer.details.collateral)
+        .map_err(|_| Error::ShipmentPaymentFailed)?;
+    ctx.accounts
+        .task
+        .add_lamports(offer.details.collateral)
+        .map_err(|_| Error::ShipmentPaymentFailed)?;
+
+    // Invoke the transfer instruction
+    let transfer_instruction = system_instruction::transfer(
+        ctx.accounts.signer.key,
+        ctx.accounts.offer_owner.key,
+        shipment.price,
+    );
+
+    anchor_lang::solana_program::program::invoke_signed(
+        &transfer_instruction,
+        &[
+            ctx.accounts.signer.to_account_info(),
+            ctx.accounts.offer_owner.clone(),
+            ctx.accounts.system_program.to_account_info(),
+        ],
+        &[],
+    )?;
 
     Ok(())
 }
