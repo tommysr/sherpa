@@ -9,6 +9,7 @@
 	import clsx from 'clsx';
 	import BoughtShipmentShowModal from '../Modals/BoughtShipmentShowModal.svelte';
 	import type { ApiBoughtShipmentAccount } from '$src/utils/idl/boughtShipment';
+	import type { ApiCarrierAccount } from '$src/utils/idl/carrier';
 
 	export let shipmentAccount: ApiBoughtShipmentAccount;
 	export let selectedLocation: number | undefined;
@@ -86,13 +87,9 @@
 				<span class={clsx('font-semibold', getPriorityColor(priority))}>{priority}</span>
 			</p>
 
-			<button class="text-sm xl:text-md text-accent font-medium" on:click={() => (showModal = true)}
+			<!-- <button class="text-sm xl:text-md text-accent font-medium" on:click={() => (showModal = true)}
 				>Show</button
-			>
+			> -->
 		</div>
 	</div>
 </li>
-
-{#if selectedLocation === shipmentId && showModal}
-	<BoughtShipmentShowModal {shipmentAccount} bind:showModal />
-{/if}
