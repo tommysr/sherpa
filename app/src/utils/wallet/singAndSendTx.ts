@@ -25,8 +25,7 @@ export async function useSignAndSendTransaction(
 		// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
 		signedTransaction = await wallet.signTransaction!(transaction);
 	} catch (error) {
-		console.error(error);
-		return 'signing error';
+		throw 'signing error';
 	}
 
 	try {
@@ -39,7 +38,6 @@ export async function useSignAndSendTransaction(
 		}
 		return sig;
 	} catch (error) {
-		console.error(error);
-		return 'sending error';
+		throw 'sending error';
 	}
 }

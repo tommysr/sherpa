@@ -1,5 +1,5 @@
 import * as anchor from '@coral-xyz/anchor'
-import { BN, Program } from '@coral-xyz/anchor'
+import { Program } from '@coral-xyz/anchor'
 import { PublicKey } from '@solana/web3.js'
 import type { Protocol } from '../target/types/protocol'
 
@@ -12,9 +12,8 @@ export const BOUGHT_SHIPMENT_SEED = 'forwarded'
 export const OFFER_SEED = 'offer'
 export const ACCEPTED_OFFER_SEED = 'task'
 
-export const DF_BASE = new BN(5)
-export const DF_MODULUS = new BN(23)
-
+// export const DF_BASE = new BN(5)
+// export const DF_MODULUS = new BN(23)
 
 export const getStateAddress = (program: Program<Protocol>) => {
   const [stateAddress, stateBump] = PublicKey.findProgramAddressSync(
@@ -179,59 +178,58 @@ export const decodeName = (encoded: { value: number[] }): string => {
   return anchor.utils.bytes.utf8.decode(Buffer.from(result))
 }
 
-export const encodeKey = (key: BN) => {
-  const single = new BN(2).pow(new BN(64))
-  let value = [key.mod(single)]
+// export const encodeKey = (key: BN) => {
+//   const single = new BN(2).pow(new BN(64))
+//   let value = [key.mod(single)]
 
-  let remaining = key
-  
-  while(key.gte(single)) {
-    remaining = remaining.div(single)
-    value.push(remaining.mod(single))
-  }
+//   let remaining = key
 
-  if (value.length > 4) {
-    throw new Error('key too long')
-  }
+//   while (key.gte(single)) {
+//     remaining = remaining.div(single)
+//     value.push(remaining.mod(single))
+//   }
 
-  while (value.length < 4) {
-    value.push(new BN(0))
-  }
+//   if (value.length > 4) {
+//     throw new Error('key too long')
+//   }
 
-  return { value }
-}
+//   while (value.length < 4) {
+//     value.push(new BN(0))
+//   }
 
-export const decodeKey = (encoded: { value: BN[] }) => {
-  const single = new BN(2).pow(new BN(64))
-  let result = new BN(0)
+//   return { value }
+// }
 
-  let remaining = new BN(1)
+// export const decodeKey = (encoded: { value: BN[] }) => {
+//   const single = new BN(2).pow(new BN(64))
+//   let result = new BN(0)
 
+//   let remaining = new BN(1)
 
-  for (let i = 0; i < encoded.value.length; i++) {
-    result = result.add(encoded.value[i].mul(remaining))
-    remaining = remaining.mul(single)
-  }
+//   for (let i = 0; i < encoded.value.length; i++) {
+//     result = result.add(encoded.value[i].mul(remaining))
+//     remaining = remaining.mul(single)
+//   }
 
-  return result
-}
+//   return result
+// }
 
-export const encrypt = (plain: string, key: BN) => {
-  const encoded = encodeName(plain)
-  let multiplier = new BN(1)
+// export const encrypt = (plain: string, key: BN) => {
+//   const encoded = encodeName(plain)
+//   let multiplier = new BN(1)
 
-  const r = new BN(0)
+//   const r = new BN(0)
 
-  while (encoded.value.length > 0) {
-    r.add(new BN(encoded.value.pop()!).mul(multiplier))
-    multiplier = multiplier.muln(256)
-  }
+//   while (encoded.value.length > 0) {
+//     r.add(new BN(encoded.value.pop()!).mul(multiplier))
+//     multiplier = multiplier.muln(256)
+//   }
 
-  if (r.gte(DF_MODULUS)) {
-    throw new Error('message too large')
-  }
+//   if (r.gte(DF_MODULUS)) {
+//     throw new Error('message too large')
+//   }
 
-  return encodeKey(r.add(DF_MODULUS).add(key).mod(DF_MODULUS))
-}
+//   return encodeKey(r.add(DF_MODULUS).add(key).mod(DF_MODULUS))
+// }
 
-export const decrypt = (encrypted: BN, key: BN) => {}
+// export const decrypt = (encrypted: BN, key: BN) => {}

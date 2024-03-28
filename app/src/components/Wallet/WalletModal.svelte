@@ -1,9 +1,9 @@
 <script lang="ts">
-	import { slide } from 'svelte/transition';
 	import { walletStore } from '$src/stores/wallet';
-	import { createEventDispatcher } from 'svelte';
-	import WalletButton from './WalletButton.svelte';
 	import type { WalletName } from '@solana/wallet-adapter-base';
+	import { createEventDispatcher } from 'svelte';
+	import { slide } from 'svelte/transition';
+	import WalletButton from './WalletButton.svelte';
 
 	export let maxNumberOfWallets: number;
 
@@ -30,12 +30,6 @@
 
 	function toggleExtensionsAvailables() {
 		showExtensionsAvailables = !showExtensionsAvailables;
-	}
-
-	function closeModal(e: MouseEvent) {
-		if (e.target === backdrop || e.target === container) {
-			dispatch('close');
-		}
 	}
 
 	function handleKeyup(e: KeyboardEvent) {
@@ -68,9 +62,7 @@
 	<div class="wallet-adapter-modal-container" bind:this={container}>
 		<div class="wallet-adapter-modal-wrapper">
 			<h1 class="wallet-adapter-modal-title">
-				{walletsAvailable
-					? 'Connect a wallet on Solana to continue'
-					: `You'll need a wallet on Solana to continue`}
+				{walletsAvailable ? 'Connect a wallet' : `You'll need a wallet on Solana to continue`}
 			</h1>
 
 			<button on:click={() => dispatch('close')} class="wallet-adapter-modal-button-close">
@@ -100,29 +92,9 @@
 					{/each}
 				</ul>
 
-				{#if $walletStore.wallets.length > maxNumberOfWallets}
-					<button
-						class="wallet-adapter-modal-list-more"
-						style="justify-content: space-between;"
-						class:wallet-adapter-modal-collapse-button-active={showMoreOptions}
-						on:click={() => toggleMoreOptions()}
-					>
-						<span>
-							{showMoreOptions ? 'Less' : 'More'} options
-						</span>
-
-						<svg
-							width="13"
-							height="7"
-							viewBox="0 0 13 7"
-							xmlns="http://www.w3.org/2000/svg"
-							class:wallet-adapter-modal-list-more-icon-rotate={showMoreOptions}
-							><path
-								d="M0.71418 1.626L5.83323 6.26188C5.91574 6.33657 6.0181 6.39652 6.13327 6.43762C6.24844 6.47872 6.37371 6.5 6.50048 6.5C6.62725 6.5 6.75252 6.47872 6.8677 6.43762C6.98287 6.39652 7.08523 6.33657 7.16774 6.26188L12.2868 1.626C12.7753 1.1835 12.3703 0.5 11.6195 0.5H1.37997C0.629216 0.5 0.224175 1.1835 0.71418 1.626Z"
-							/></svg
-						>
-					</button>
-				{/if}
+				<p class="wallet-adapter-modal-disclamer">
+					By connecting your wallet, you agree to our Terms of Service and our Privacy Policy.
+				</p>
 			{:else}
 				<div class="wallet-adapter-modal-middle">
 					<svg

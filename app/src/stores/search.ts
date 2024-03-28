@@ -45,7 +45,14 @@ const addItem = <T>(item: T) => {
 
 const removeItem = <T>(index: number) => {
 	return (s: StoreInt<T>) => {
-		s.data.splice(index, 1);
+		const deleted = s.data.splice(index, 1)[0];
+
+		if (s.searchState === 'performed') {
+			s.filtered = s.filtered.filter((i) => {
+				return i !== deleted;
+			});
+		}
+
 		return s;
 	};
 };
