@@ -1,8 +1,4 @@
 <script lang="ts">
-	// CONSIDER: this scss file import some picocss stylesheets and
-	// pico overrides the default styles of some components like button, input, etc.
-	// so, it's ruining the default styles of components like Map
-
 	// sass
 	import '$src/sass/main.scss';
 
@@ -17,13 +13,14 @@
 		TrezorWalletAdapter,
 		TrustWalletAdapter
 	} from '@solana/wallet-adapter-wallets';
+
 	//wallet components
 	import AnchorConnectionProvider from '$src/components/Wallet/AnchorConnectionProvider.svelte';
 	import ConnectionProvider from '$src/components/Wallet/ConnectionProvider.svelte';
 	import WalletProvider from '$src/components/Wallet/WalletProvider.svelte';
+
 	// solana
 	import { clusterApiUrl } from '@solana/web3.js';
-	import CustomNotification from '$src/components/Notification/CustomNotification.svelte';
 	import Notifications from '$src/components/Notification/Notifications.svelte';
 
 	let wallets: Adapter[];
@@ -45,6 +42,6 @@
 <ConnectionProvider {network} />
 <WalletProvider {localStorageKey} {wallets} autoConnect />
 
-<Notifications notificationComponent={CustomNotification}>
+<Notifications>
 	<slot />
 </Notifications>
