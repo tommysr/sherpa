@@ -5,9 +5,18 @@
 	import WalletMultiButton from '$src/components/Wallet/WalletMultiButton.svelte';
 	import { fetchForwarderAccount } from '$src/lib/forwarder';
 	import { anchorStore } from '$src/stores/anchor';
+	import { forwardedShipmentsMeta } from '$src/stores/forwarderShipments';
 	import { searchableShipments } from '$src/stores/searchableShipments';
 	import { userStore } from '$src/stores/user';
 	import { walletStore } from '$src/stores/wallet';
+	import type {
+		ApiForwardedShipmentAccount,
+		FetchedForwardedShipment
+	} from '$src/utils/account/forwardedShipment';
+	import type { ApiShipmentAccount, FetchedShipment } from '$src/utils/account/shipment';
+	import { parseForwardedShipmentToApiForwardedShipment } from '$src/utils/parse/forwardedShipment';
+	import { parseShipmentToApiShipment } from '$src/utils/parse/shipment';
+	import { onMount } from 'svelte';
 	import { get } from 'svelte/store';
 
 	const { program } = get(anchorStore);
@@ -23,8 +32,6 @@
 		userStore.unregisterForwarder();
 	}
 
-	$: pageUrl = $page.url.pathname;
-
 	function handleSearchKeyUp(e: KeyboardEvent) {
 		if ($storeToSearchIn.searchString && e.key == 'Enter') {
 			storeToSearchIn.performSearch();
@@ -33,71 +40,72 @@
 		}
 	}
 
-	// function subscribeToShipmentEvents(): number[] {
-	// 	const unsubscribeShipmentCreated = program.addEventListener(
-	// 		'ShipmentCreated',
-	// 		async (event) => {
-	// 			console.log(event);
-	// 			const shipmentPublicKey = event.shipment;
+	function subscribeToShipmentEvents(): number[] {
+		const unsubscribeShipmentCreated = program.addEventListener(
+			'ShipmentCreated',
+			async (event) => {
+				console.log(event);
+				const shipmentPublicKey = event.shipment;
 
-	// 			const shipment: FetchedShipment = await program.account.shipment.fetch(shipmentPublicKey);
+				const shipment: FetchedShipment = await program.account.shipment.fetch(shipmentPublicKey);
 
-	// 			const parsedShipment: ApiShipmentAccount = {
-	// 				publicKey: shipmentPublicKey.toString(),
-	// 				account: parseShipmentToApiShipment(shipment)
-	// 			};
+				const parsedShipment: ApiShipmentAccount = {
+					publicKey: shipmentPublicKey.toString(),
+					account: parseShipmentToApiShipment(shipment)
+				};
 
-	// 			searchableShipments.extend({
-	// 				...parsedShipment,
-	// 				searchParams: parsedShipment.account.shipment.details.priority.toString()
-	// 			});
-	// 		}
-	// 	);
+				searchableShipments.extend({
+					...parsedShipment,
+					searchParams: parsedShipment.account.shipment.details.priority.toString()
+				});
+			}
+		);
 
-	// const unsubscribeShipmentBought = program.addEventListener(
-	// 	'ShipmentTransferred',
-	// 	async (event) => {
-	// 		const shipmentToRemove = event.before.toString();
+		const unsubscribeForwardedShipment = program.addEventListener(
+			'ShipmentTransferred',
+			async (event) => {
+				console.log(event);
+				const shipmentToRemove = event.before.toString();
 
-	// 		const forwardedShipmentPublicKey = event.after;
+				const forwardedShipmentPublicKey = event.after;
 
-	// 		const forwardedShipment: FetchedForwardedShipment =
-	// 			await program.account.forwardedShipment.fetch(forwardedShipmentPublicKey);
+				const forwardedShipment: FetchedForwardedShipment =
+					await program.account.forwardedShipment.fetch(forwardedShipmentPublicKey);
 
-	// 		const parsedShipment: ApiForwardedShipmentAccount = {
-	// 			publicKey: forwardedShipmentPublicKey.toString(),
-	// 			account: parseForwardedShipmentToApiForwardedShipment(forwardedShipment)
-	// 		};
+				const parsedShipment: ApiForwardedShipmentAccount = {
+					publicKey: forwardedShipmentPublicKey.toString(),
+					account: parseForwardedShipmentToApiForwardedShipment(forwardedShipment)
+				};
 
-	// 		searchableBoughtShipments.extend({
-	// 			...parsedShipment,
-	// 			searchParams: parsedShipment.account.shipment.details.priority.toString()
-	// 		});
+				forwardedShipmentsMeta.update((meta) => {
+					meta.push(parsedShipment);
+					return meta;
+				});
 
-	// 		const { data } = get(searchableShipments);
-	// 		const shipmentToRemoveIndex = data.findIndex(
-	// 			(shipment) => shipment.publicKey === shipmentToRemove
-	// 		);
+				// TODO: change in searchableOrders
 
-	// 		if (shipmentToRemoveIndex !== -1) {
-	// 			searchableShipments.shrink(shipmentToRemoveIndex);
-	// 		}
-	// 	}
-	// );
+				// const { data } = get(searchableShipments);
+				// const shipmentToRemoveIndex = data.findIndex(
+				// 	(shipment) => shipment.publicKey === shipmentToRemove
+				// );
 
-	// return [unsubscribeShipmentBought, unsubscribeShipmentCreated];
+				// if (shipmentToRemoveIndex !== -1) {
+				// 	searchableShipments.shrink(shipmentToRemoveIndex);
+				// }
+			}
+		);
 
-	// 	return [unsubscribeShipmentCreated];
-	// }
+		return [unsubscribeForwardedShipment, unsubscribeShipmentCreated];
+	}
 
-	// onMount(() => {
-	// 	const unsubscribe = subscribeToShipmentEvents();
-	// 	return () => {
-	// 		for (const listener of unsubscribe) {
-	// 			program.removeEventListener(listener);
-	// 		}
-	// 	};
-	// });
+	onMount(() => {
+		const unsubscribe = subscribeToShipmentEvents();
+		return () => {
+			for (const listener of unsubscribe) {
+				program.removeEventListener(listener);
+			}
+		};
+	});
 </script>
 
 <main class="relative h-screen w-full overflow-hidden">
