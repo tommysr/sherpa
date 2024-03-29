@@ -24,7 +24,6 @@ export function createUserStore() {
 
 	return {
 		subscribe,
-		set,
 		registerForwarder: (name: string) => {
 			update((store) => {
 				store.forwarder.registered = true;
@@ -34,10 +33,28 @@ export function createUserStore() {
 			});
 		},
 
+		registerShipper: (name: string) => {
+			update((store) => {
+				store.shipper.registered = true;
+				store.shipper.name = name;
+
+				return store;
+			});
+		},
+
 		unregisterForwarder: () => {
 			update((store) => {
 				store.forwarder.registered = false;
 				store.forwarder.name = '';
+
+				return store;
+			});
+		},
+
+		unregisterShipper: () => {
+			update((store) => {
+				store.shipper.registered = false;
+				store.shipper.name = '';
 
 				return store;
 			});

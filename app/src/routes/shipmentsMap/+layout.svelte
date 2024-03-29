@@ -1,9 +1,9 @@
 <script lang="ts">
-	import { page } from '$app/stores';
 	import { decodeName } from '$sdk/sdk';
 	import MapWrapper from '$src/components/ShipmentMap/MapWrapper.svelte';
 	import WalletMultiButton from '$src/components/Wallet/WalletMultiButton.svelte';
 	import { fetchForwarderAccount } from '$src/lib/forwarder';
+	import { fetchShipperAccount } from '$src/lib/shipper';
 	import { anchorStore } from '$src/stores/anchor';
 	import { forwardedShipmentsMeta } from '$src/stores/forwarderShipments';
 	import { searchableShipments } from '$src/stores/searchableShipments';
@@ -28,8 +28,15 @@
 				userStore.registerForwarder(decodeName(account.name));
 			}
 		});
+
+		fetchShipperAccount(program, $walletStore.publicKey).then(({ account, accountKey }) => {
+			if (account) {
+				userStore.registerShipper(decodeName(account.name));
+			}
+		});
 	} else {
 		userStore.unregisterForwarder();
+		userStore.unregisterShipper();
 	}
 
 	function handleSearchKeyUp(e: KeyboardEvent) {
