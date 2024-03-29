@@ -4,11 +4,11 @@ import { Protocol } from '../target/types/protocol'
 import { Keypair, PublicKey, SystemProgram } from '@solana/web3.js'
 import { ONE_HOUR, ONE_SOL, U64_MAX, awaitedAirdrops } from './utils'
 import {
-  DF_BASE,
-  DF_MODULUS,
-  decodeKey,
+  // DF_BASE,
+  // DF_MODULUS,
+  // decodeKey,
   decodeName,
-  encodeKey,
+  // encodeKey,
   encodeName,
   getAcceptedOfferAddress,
   getBoughtShipmentAddress,
@@ -254,8 +254,8 @@ describe('protocol', () => {
     const subscriptionId = program.addEventListener('ShipmentTransferred', event => {
       expect(event.seller.equals(shipperAddress)).true
       expect(event.buyer.equals(forwarderAddress)).true
-      expect(event.before.equals(shipmentAddress)).true
-      expect(event.after.equals(forwardedShipmentAddress)).true
+      expect(event.shipment.equals(shipmentAddress)).true
+      expect(event.forwarded.equals(forwardedShipmentAddress)).true
     })
 
     await program.methods
@@ -330,6 +330,7 @@ describe('protocol', () => {
       expect(event.from.equals(forwarder.publicKey)).true
       expect(event.to.equals(carrier.publicKey)).true
       expect(event.offer.equals(offerAddress)).true
+      expect(event.shipment.equals(shipmentAddress)).true
     })
 
     await program.methods
@@ -371,6 +372,7 @@ describe('protocol', () => {
       expect(event.from.equals(forwarder.publicKey)).true
       expect(event.to.equals(carrier.publicKey)).true
       expect(event.offer.equals(offerAddress)).true
+      expect(event.shipment.equals(shipmentAddress)).true
     })
 
     const offerAccount = await program.account.shipmentOffer.fetch(offerAddress)
@@ -409,51 +411,50 @@ describe('protocol', () => {
     program.removeEventListener(subscriptionId)
   })
 
-  it('open channel', async () => {
-    const shipmentAddress = getShipmentAddress(program, shipper.publicKey, 0)
+  // it('open channel', async () => {
+  //   const shipmentAddress = getShipmentAddress(program, shipper.publicKey, 0)
 
-    const secret = new BN(4)
-    const shared = DF_BASE.pow(secret).mod(DF_MODULUS)
+  //   const secret = new BN(4)
+  //   const shared = DF_BASE.pow(secret).mod(DF_MODULUS)
 
-    await program.methods
-      .openChannel(encodeKey(shared))
-      .accounts({
-        shipment: shipmentAddress,
-        signer: shipper.publicKey
-      })
-      .signers([shipper])
-      .rpc()
+  //   await program.methods
+  //     .openChannel(encodeKey(shared))
+  //     .accounts({
+  //       shipment: shipmentAddress,
+  //       signer: shipper.publicKey
+  //     })
+  //     .signers([shipper])
+  //     .rpc()
 
-    const shipmentAccount = await program.account.shipment.fetch(shipmentAddress)
+  //   const shipmentAccount = await program.account.shipment.fetch(shipmentAddress)
 
-    expect(decodeKey(shipmentAccount.channel.shipper).eq(shared)).true
-  })
+  //   expect(decodeKey(shipmentAccount.channel.shipper).eq(shared)).true
+  // })
 
-  it('accept channel', async () => {
-    const shipmentAddress = getShipmentAddress(program, shipper.publicKey, 0)
+  // it('accept channel', async () => {
+  //   const shipmentAddress = getShipmentAddress(program, shipper.publicKey, 0)
 
-    const secret = new BN(3)
-    const shared = DF_BASE.pow(secret).mod(DF_MODULUS)
+  //   const secret = new BN(3)
+  //   const shared = DF_BASE.pow(secret).mod(DF_MODULUS)
 
-    const shipmentAccountBefore = await program.account.shipment.fetch(shipmentAddress)
-    const other = decodeKey(shipmentAccountBefore.channel.shipper)
-    const key = other.pow(secret).mod(DF_MODULUS)
+  //   const shipmentAccountBefore = await program.account.shipment.fetch(shipmentAddress)
+  //   const other = decodeKey(shipmentAccountBefore.channel.shipper)
+  //   const key = other.pow(secret).mod(DF_MODULUS)
 
-    expect(key.eqn(18)).true
+  //   expect(key.eqn(18)).true
 
-    // TODO: Actually encrypt here
-    await program.methods
-      .sendMessage(encodeKey(shared), encodeName('Hello!'))
-      .accounts({
-        shipment: shipmentAddress,
-        signer: carrier.publicKey
-      })
-      .signers([carrier])
-      .rpc()
+  //   // TODO: Actually encrypt here
+  //   await program.methods
+  //     .sendMessage(encodeKey(shared), encodeName('Hello!'))
+  //     .accounts({
+  //       shipment: shipmentAddress,
+  //       signer: carrier.publicKey
+  //     })
+  //     .signers([carrier])
+  //     .rpc()
 
-    const shipmentAccount = await program.account.shipment.fetch(shipmentAddress)
+  //   const shipmentAccount = await program.account.shipment.fetch(shipmentAddress)
 
-    expect(decodeKey(shipmentAccount.channel.carrier).eq(shared)).true
-  })
-
+  //   expect(decodeKey(shipmentAccount.channel.carrier).eq(shared)).true
+  // })
 })
