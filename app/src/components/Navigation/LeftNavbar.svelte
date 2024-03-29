@@ -70,7 +70,7 @@
 	<svg
 		xmlns="http://www.w3.org/2000/svg"
 		viewBox="0 0 512 512"
-		class={clsx('fixed z-10 right-0 w-12 m-5 cursor-pointer', isNavbarOpen ? 'hidden' : '')}
+		class={clsx('fixed z-30 right-0 w-12 m-5 cursor-pointer', isNavbarOpen ? 'hidden' : '')}
 		on:click={() => (isNavbarOpen = !isNavbarOpen)}
 	>
 		<path
@@ -87,7 +87,7 @@
 	<svg
 		xmlns="http://www.w3.org/2000/svg"
 		viewBox="0 0 512 512"
-		class={clsx('fixed z-10 right-0 w-12 m-5 cursor-pointer', !isNavbarOpen ? 'hidden' : '')}
+		class={clsx('fixed z-30 right-0 w-12 m-5 cursor-pointer', !isNavbarOpen ? 'hidden' : '')}
 		on:click={() => (isNavbarOpen = !isNavbarOpen)}
 	>
 		<path
