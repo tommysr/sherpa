@@ -4,23 +4,22 @@
 		Geography,
 		ShipmentDetails,
 		ShipmentDimensions
-	} from '$src/utils/idl/shipment';
+	} from '$src/utils/account/shipment';
 	import type { Entries } from '$src/utils/types/object';
 	import clsx from 'clsx';
 	import BoughtShipmentShowModal from '../Modals/BoughtShipmentShowModal.svelte';
-	import type { ApiBoughtShipmentAccount } from '$src/utils/idl/boughtShipment';
-	import type { ApiCarrierAccount } from '$src/utils/idl/carrier';
+	import type { ApiForwardedShipmentAccount } from '$src/utils/account/forwardedShipment';
 
-	export let shipmentAccount: ApiBoughtShipmentAccount;
+	export let shipmentAccount: ApiForwardedShipmentAccount;
 	export let selectedLocation: number | undefined;
 	export let shipmentId: number;
 
 	let showModal = false;
 
 	$: shipmentData = shipmentAccount.account;
-	$: dimensions = Object.entries(shipmentData.shipment.dimensions) as Entries<ShipmentDimensions>;
-	$: locations = Object.entries(shipmentData.shipment.geography) as Entries<Geography>;
-	$: properties = Object.entries(shipmentData.shipment.details) as Entries<ShipmentDetails>;
+	// $: dimensions = Object.entries(shipmentData.shipment.dimensions) as Entries<ShipmentDimensions>;
+	// $: locations = Object.entries(shipmentData.shipment.geography) as Entries<Geography<string>>;
+	// $: properties = Object.entries(shipmentData.shipment.details) as Entries<ShipmentDetails>;
 
 	async function getLocationFromCoords(lat: number, long: number): Promise<string> {
 		return `Kraków, Poland`;
@@ -62,26 +61,6 @@
 		</div>
 		<div class="mt-3 xl:mt-5 flex items-center justify-between">
 			<p class="text-xs xl:sm font-medium text-gray-500 mr-6 xl:mr-12">
-				{#if locations}
-					{@const len = locations.length}
-					&#x2022;
-					{#each locations as [location, value], index}
-						<!-- TODO: batching or keep locations on server -->
-						{#await getLocationFromCoords(value.latitude, value.longitude)}
-							<article aria-busy="true"></article>
-						{:then location}
-							{location}
-						{:catch error}
-							{value.latitude.toFixed(4)} {value.longitude.toFixed(4)}
-						{/await}
-
-						{#if index != len - 1}
-							{'→ '}
-						{/if}
-					{/each}
-				{:else}
-					<p>No location</p>
-				{/if}
 				<br />
 				&#x2022; Priority:
 				<span class={clsx('font-semibold', getPriorityColor(priority))}>{priority}</span>
@@ -93,3 +72,7 @@
 		</div>
 	</div>
 </li>
+<!-- 
+{#if selectedLocation === shipmentId && showModal}
+	<BoughtShipmentShowModal {shipmentAccount} bind:showModal />
+{/if} -->

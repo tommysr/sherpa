@@ -91,13 +91,16 @@
 		const whenDate = new Date(when!);
 
 		const createShipmentIx = await program.methods
-			.createShipment(new BN(price! * 10 ** 9), {
+			.createShipment(new BN(price! * 10 ** 9), encodeName('TODO'), {
 				deadline: new BN(deadlineDate.valueOf()),
 				details: order.details,
 				dimensions: order.dimensions,
 				geography: {
 					from: { latitude: from?.lat!, longitude: from?.lng! },
-					to: { latitude: to?.lat!, longitude: from?.lng! }
+					fromName: encodeName('cracow TODO'),
+					to: { latitude: to?.lat!, longitude: from?.lng! },
+
+					toName: encodeName('warsaw TODO')
 				},
 				when: new BN(whenDate.valueOf())
 			})

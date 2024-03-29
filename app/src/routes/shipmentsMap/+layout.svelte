@@ -1,34 +1,17 @@
 <script lang="ts">
 	import { page } from '$app/stores';
 	import { decodeName } from '$sdk/sdk';
-	import {
-		createNotification,
-		updateNotification
-	} from '$src/components/Notification/notificationsStore';
 	import MapWrapper from '$src/components/ShipmentMap/MapWrapper.svelte';
 	import WalletMultiButton from '$src/components/Wallet/WalletMultiButton.svelte';
 	import { fetchForwarderAccount } from '$src/lib/forwarder';
 	import { anchorStore } from '$src/stores/anchor';
-	import {
-		searchableBoughtShipments,
-		type SearchableBoughtOrder
-	} from '$src/stores/forwarderShipments';
-	import type { SearchStore } from '$src/stores/search';
-	import { searchableShipments, type SearchableOrder } from '$src/stores/searchableShipments';
+	import { searchableShipments } from '$src/stores/searchableShipments';
 	import { userStore } from '$src/stores/user';
 	import { walletStore } from '$src/stores/wallet';
-	import type { ApiBoughtShipmentAccount, BoughtShipment } from '$src/utils/idl/boughtShipment';
-	import type { ApiShipmentAccount, Shipment } from '$src/utils/idl/shipment';
-	import { parseBoughtShipmentToApiBoughtShipment } from '$src/utils/parse/boughtShipment';
-	import { parseShipmentToApiShipment } from '$src/utils/parse/shipment';
-	import type { PublicKey } from '@solana/web3.js';
-	import type BN from 'bn.js';
-	import { onMount } from 'svelte';
 	import { get } from 'svelte/store';
 
-	type EitherSearchStore = SearchStore<SearchableOrder> | SearchStore<SearchableBoughtOrder>;
-	let storeToSearchIn: EitherSearchStore = searchableShipments;
-	let { program } = get(anchorStore);
+	const { program } = get(anchorStore);
+	let storeToSearchIn = searchableShipments;
 
 	$: if ($walletStore.publicKey) {
 		fetchForwarderAccount(program, $walletStore.publicKey).then(({ account, accountKey }) => {
@@ -42,12 +25,6 @@
 
 	$: pageUrl = $page.url.pathname;
 
-	$: if (pageUrl == '/shipmentsMap') {
-		storeToSearchIn = searchableShipments;
-	} else if (pageUrl == '/shipmentsMap/bought') {
-		storeToSearchIn = searchableBoughtShipments;
-	}
-
 	function handleSearchKeyUp(e: KeyboardEvent) {
 		if ($storeToSearchIn.searchString && e.key == 'Enter') {
 			storeToSearchIn.performSearch();
@@ -56,70 +33,71 @@
 		}
 	}
 
-	function subscribeToShipmentEvents(): number[] {
-		const unsubscribeShipmentCreated = program.addEventListener(
-			'ShipmentCreated',
-			async (event) => {
-				console.log(event);
-				const shipmentPublicKey = event.shipment;
+	// function subscribeToShipmentEvents(): number[] {
+	// 	const unsubscribeShipmentCreated = program.addEventListener(
+	// 		'ShipmentCreated',
+	// 		async (event) => {
+	// 			console.log(event);
+	// 			const shipmentPublicKey = event.shipment;
 
-				const shipment: Shipment<BN, BN, PublicKey> =
-					await program.account.shipment.fetch(shipmentPublicKey);
+	// 			const shipment: FetchedShipment = await program.account.shipment.fetch(shipmentPublicKey);
 
-				const parsedShipment: ApiShipmentAccount = {
-					publicKey: shipmentPublicKey.toString(),
-					account: parseShipmentToApiShipment(shipment)
-				};
+	// 			const parsedShipment: ApiShipmentAccount = {
+	// 				publicKey: shipmentPublicKey.toString(),
+	// 				account: parseShipmentToApiShipment(shipment)
+	// 			};
 
-				searchableShipments.extend({
-					...parsedShipment,
-					searchParams: parsedShipment.account.shipment.details.priority.toString()
-				});
-			}
-		);
+	// 			searchableShipments.extend({
+	// 				...parsedShipment,
+	// 				searchParams: parsedShipment.account.shipment.details.priority.toString()
+	// 			});
+	// 		}
+	// 	);
 
-		const unsubscribeShipmentBought = program.addEventListener(
-			'ShipmentTransferred',
-			async (event) => {
-				const shipmentToRemove = event.before.toString();
+	// const unsubscribeShipmentBought = program.addEventListener(
+	// 	'ShipmentTransferred',
+	// 	async (event) => {
+	// 		const shipmentToRemove = event.before.toString();
 
-				const shipmentBoughtPublicKey = event.after;
+	// 		const forwardedShipmentPublicKey = event.after;
 
-				const boughtShipment: BoughtShipment<BN, BN, PublicKey> =
-					await program.account.boughtShipment.fetch(shipmentBoughtPublicKey);
+	// 		const forwardedShipment: FetchedForwardedShipment =
+	// 			await program.account.forwardedShipment.fetch(forwardedShipmentPublicKey);
 
-				const parsedShipment: ApiBoughtShipmentAccount = {
-					publicKey: shipmentBoughtPublicKey.toString(),
-					account: parseBoughtShipmentToApiBoughtShipment(boughtShipment)
-				};
+	// 		const parsedShipment: ApiForwardedShipmentAccount = {
+	// 			publicKey: forwardedShipmentPublicKey.toString(),
+	// 			account: parseForwardedShipmentToApiForwardedShipment(forwardedShipment)
+	// 		};
 
-				searchableBoughtShipments.extend({
-					...parsedShipment,
-					searchParams: parsedShipment.account.shipment.details.priority.toString()
-				});
+	// 		searchableBoughtShipments.extend({
+	// 			...parsedShipment,
+	// 			searchParams: parsedShipment.account.shipment.details.priority.toString()
+	// 		});
 
-				const { data } = get(searchableShipments);
-				const shipmentToRemoveIndex = data.findIndex(
-					(shipment) => shipment.publicKey === shipmentToRemove
-				);
+	// 		const { data } = get(searchableShipments);
+	// 		const shipmentToRemoveIndex = data.findIndex(
+	// 			(shipment) => shipment.publicKey === shipmentToRemove
+	// 		);
 
-				if (shipmentToRemoveIndex !== -1) {
-					searchableShipments.shrink(shipmentToRemoveIndex);
-				}
-			}
-		);
+	// 		if (shipmentToRemoveIndex !== -1) {
+	// 			searchableShipments.shrink(shipmentToRemoveIndex);
+	// 		}
+	// 	}
+	// );
 
-		return [unsubscribeShipmentBought, unsubscribeShipmentCreated];
-	}
+	// return [unsubscribeShipmentBought, unsubscribeShipmentCreated];
 
-	onMount(() => {
-		const unsubscribe = subscribeToShipmentEvents();
-		return () => {
-			for (const listener of unsubscribe) {
-				program.removeEventListener(listener);
-			}
-		};
-	});
+	// 	return [unsubscribeShipmentCreated];
+	// }
+
+	// onMount(() => {
+	// 	const unsubscribe = subscribeToShipmentEvents();
+	// 	return () => {
+	// 		for (const listener of unsubscribe) {
+	// 			program.removeEventListener(listener);
+	// 		}
+	// 	};
+	// });
 </script>
 
 <main class="relative h-screen w-full overflow-hidden">

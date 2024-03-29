@@ -1,6 +1,6 @@
 <script lang="ts">
 	import clsx from 'clsx';
-	import type { ApiCarrierAccount } from '$src/utils/idl/carrier';
+	import type { ApiCarrierAccount } from '$src/utils/account/carrier';
 	import BoughtShipmentShowModal from '../Modals/BoughtShipmentShowModal.svelte';
 
 	export let carrierAccount: ApiCarrierAccount;
