@@ -2,7 +2,7 @@ import type { PublicKey } from '@solana/web3.js';
 import type { Public, Shipment } from '../account/shipment';
 import type { AccountName } from '../account/common';
 
-import { decodeKey, decodeName } from '$sdk/sdk';
+import { decodeName } from '$sdk/sdk';
 import type BN from 'bn.js';
 
 export function parseShipmentToApiShipment(
@@ -17,8 +17,8 @@ export function parseShipmentToApiShipment(
 		price: shipmentAcc.price.toNumber(),
 		name: decodeName(shipmentAcc.name),
 		channel: {
-			carrier: decodeKey(shipmentAcc.channel.carrier).toString(),
-			shipper: decodeKey(shipmentAcc.channel.shipper).toString(),
+			carrier: shipmentAcc.channel.carrier.value[0].toString(),
+			shipper: shipmentAcc.channel.shipper.value[0].toString(),
 			data: decodeName(shipmentAcc.channel.data).toString()
 		},
 		shipment: {
