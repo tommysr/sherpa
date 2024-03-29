@@ -319,6 +319,7 @@ describe('protocol', () => {
     expect(decodeName(carrierAccount.name)).eq('Carol')
     expect(carrierAccount.availability.time.eq(availability.time)).true
     expect(carrierAccount.availability.location).to.deep.equal(availability.location)
+    expect(decodeName(carrierAccount.availability.locationName)).eq('Krakow')
     expect(carrierAccount.offersCount).eq(0)
     expect(carrierAccount.tasksCount).eq(0)
   })
