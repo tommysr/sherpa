@@ -3,7 +3,6 @@
 	import OrderListElement from '$src/components/Shipment/OrderListElement.svelte';
 	import ShipmentsLocations from '$src/components/ShipmentMap/ShipmentsLocations.svelte';
 	import { searchableShipments } from '$src/stores/searchableShipments';
-	import { walletStore } from '$stores/wallet';
 
 	$: locationsOnMap = $searchableShipments.filtered.map((s) => s.account.shipment.geography);
 	let selectedLocation: number | undefined = undefined;
@@ -41,18 +40,20 @@
 
 <LayoutListWrapper bind:isMobileOpen>
 	{#if $searchableShipments.filtered.length != 0}
-		<ul>
-			{#each $searchableShipments.filtered as account, i (account.publicKey)}
-				<OrderListElement
-					on:click={() => onElementSelect(i)}
-					shipmentAccount={account}
-					{selectedLocation}
-					shipmentId={i}
-				/>
-			{/each}
-		</ul>
+		<div class="h-full flex items-start">
+			<ul>
+				{#each $searchableShipments.filtered as account, i (account.publicKey)}
+					<OrderListElement
+						on:click={() => onElementSelect(i)}
+						shipmentAccount={account}
+						{selectedLocation}
+						shipmentId={i}
+					/>
+				{/each}
+			</ul>
+		</div>
 	{:else}
-		<p>Nothing found</p>
+		<p class="text-xl text-gray-500">Nothing found</p>
 	{/if}
 </LayoutListWrapper>
 

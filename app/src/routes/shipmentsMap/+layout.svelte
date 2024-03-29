@@ -126,7 +126,7 @@
 	<div class="m-3 p-0.5 rounded-full bg-gradient-to-r from-primary to-secondary">
 		<label for="name" class="sr-only">Name</label>
 		<input
-			class="px-3 py-1.5 w-full rounded-full bg-background focus:outline-none text-sm lg:text-md"
+			class="px-3 py-1.5 w-full rounded-full bg-background focus:outline-none text-sm md:text-lg"
 			type="text"
 			id="name"
 			placeholder="Search"
