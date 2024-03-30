@@ -11,6 +11,7 @@
 		className
 	)}
 	disabled={$$props.disabled}
+	type={$$props.type}
 	on:click
 >
 	{#if $$slots['icon']}

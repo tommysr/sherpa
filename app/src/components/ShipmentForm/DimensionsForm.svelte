@@ -7,8 +7,9 @@
 	export let initialValues;
 	export let onSubmit;
 	export let onBack;
+	export let showModal = true;
 
-	const { form, data } = createForm({
+	const { form, data, errors } = createForm({
 		extend: reporter,
 		onSubmit,
 		initialValues
@@ -30,15 +31,6 @@
 	</div>
 
 	<DimensionsPick />
-
-	<ValidationMessage for="price" let:messages={message}>
-		{#if message}
-			<div class="bg-red-200 border-l-4 mt-3 border-red-400 text-orange-700 p-2" role="alert">
-				<p class="font-bold">Invalid dimension</p>
-				<p>{message || ''}</p>
-			</div>
-		{/if}
-	</ValidationMessage>
 
 	<div class="flex justify-center mt-4 gap-x-2">
 		<Button on:click={() => onBack($data)}>Prev</Button>

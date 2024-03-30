@@ -9,6 +9,7 @@
 	export let onSubmit;
 	export let onBack;
 	export let accountName: string = '';
+	export let showModal = true;
 
 	const isNameInvalid = (name: string) => {
 		return !name || name.length == 0 || name.length > 64;
