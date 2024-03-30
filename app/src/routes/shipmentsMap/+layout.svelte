@@ -1,13 +1,14 @@
 <script lang="ts">
 	import { page } from '$app/stores';
+	import type { PublicKey } from '@solana/web3.js';
+	import type BN from 'bn.js';
+	import { onMount } from 'svelte';
+	import { get } from 'svelte/store';
+
 	import { decodeName } from '$sdk/sdk';
-	import {
-		createNotification,
-		updateNotification
-	} from '$src/components/Notification/notificationsStore';
-	import MapWrapper from '$src/components/ShipmentMap/MapWrapper.svelte';
-	import WalletMultiButton from '$src/components/Wallet/WalletMultiButton.svelte';
+
 	import { fetchForwarderAccount } from '$src/lib/forwarder';
+
 	import { anchorStore } from '$src/stores/anchor';
 	import {
 		searchableBoughtShipments,
@@ -17,14 +18,11 @@
 	import { searchableShipments, type SearchableOrder } from '$src/stores/searchableShipments';
 	import { userStore } from '$src/stores/user';
 	import { walletStore } from '$src/stores/wallet';
+
 	import type { ApiBoughtShipmentAccount, BoughtShipment } from '$src/utils/idl/boughtShipment';
 	import type { ApiShipmentAccount, Shipment } from '$src/utils/idl/shipment';
 	import { parseBoughtShipmentToApiBoughtShipment } from '$src/utils/parse/boughtShipment';
 	import { parseShipmentToApiShipment } from '$src/utils/parse/shipment';
-	import type { PublicKey } from '@solana/web3.js';
-	import type BN from 'bn.js';
-	import { onMount } from 'svelte';
-	import { get } from 'svelte/store';
 
 	type EitherSearchStore = SearchStore<SearchableOrder> | SearchStore<SearchableBoughtOrder>;
 	let storeToSearchIn: EitherSearchStore = searchableShipments;
@@ -122,33 +120,20 @@
 	});
 </script>
 
-<main class="relative h-screen w-full overflow-hidden">
-	<div class="absolute z-10 w-3/4 md:w-1/3 xl:w-1/4 left-1/2 transform -translate-x-1/2 top-4">
-		<div class="m-3 p-0.5 rounded-full bg-gradient-to-r from-primary to-secondary">
-			<label for="name" class="sr-only">Name</label>
-			<input
-				class="px-3 py-1.5 w-full rounded-full bg-background focus:outline-none text-sm lg:text-md"
-				type="text"
-				id="name"
-				placeholder="Search"
-				bind:value={$storeToSearchIn.searchString}
-				on:keyup={handleSearchKeyUp}
-			/>
-		</div>
+<div
+	class="absolute z-10 w-3/4 md:w-1/3 xl:w-1/4 left-5 md:left-1/2 md:transform md:-translate-x-1/2 top-4"
+>
+	<div class="m-3 p-0.5 rounded-full bg-gradient-to-r from-primary to-secondary">
+		<label for="name" class="sr-only">Name</label>
+		<input
+			class="px-3 py-1.5 w-full rounded-full bg-background focus:outline-none text-sm md:text-lg"
+			type="text"
+			id="name"
+			placeholder="Search"
+			bind:value={$storeToSearchIn.searchString}
+			on:keyup={handleSearchKeyUp}
+		/>
 	</div>
-	<div class="hidden md:block absolute top-7 right-7 z-40">
-		<WalletMultiButton onClose={() => {}} />
-	</div>
+</div>
 
-	<div class="hidden md:block">
-		<MapWrapper>
-			<slot />
-		</MapWrapper>
-	</div>
-
-	<div class="md:hidden">
-		<MapWrapper>
-			<slot />
-		</MapWrapper>
-	</div>
-</main>
+<slot />
