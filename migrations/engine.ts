@@ -1,12 +1,15 @@
 import probabilities from './mocks/probabilities.json'
 import names from './mocks/names.json'
+import keys from './mocks/keys.json'
 
 import { AnchorProvider, Program, Wallet } from '@coral-xyz/anchor'
 import { Protocol } from '../target/types/protocol'
 import * as anchor from '@coral-xyz/anchor'
 import { Connection, Keypair, clusterApiUrl } from '@solana/web3.js'
-import { encodeName, getShipperAddress } from '../sdk/sdk'
+import { encodeName, getCarrierAddress, getForwarderAddress, getShipperAddress } from '../sdk/sdk'
 import { awaitedAirdrop } from '../tests/utils'
+
+var fs = require('fs')
 
 const connection = new Connection(clusterApiUrl('devnet'), { commitment: 'confirmed' })
 const wallet = Wallet.local()
@@ -18,6 +21,7 @@ const run = async () => {
   const action = chooseAction()
   const keypair = Keypair.generate()
   await awaitedAirdrop(connection, keypair.publicKey, 1e9)
+  const secret = Buffer.from(keypair.secretKey).toString('base64')
 
   switch (action) {
     case 'registerShipper':
@@ -33,12 +37,13 @@ const run = async () => {
         .signers([keypair])
         .rpc()
 
+      keys.keys.push({ type: 'shipper', name: shipperName, secret })
       console.log('Registered shipper', shipperName)
       break
 
     case 'registerForwarder':
       const forwarderName = randomFrom(names.names) + ' ' + randomFrom(names.forwarderPostfixes)
-      const forwarder = getShipperAddress(program, keypair.publicKey)
+      const forwarder = getForwarderAddress(program, keypair.publicKey)
 
       await program.methods
         .registerForwarder(encodeName(forwarderName))
@@ -49,12 +54,13 @@ const run = async () => {
         .signers([keypair])
         .rpc()
 
+      keys.keys.push({ type: 'forwarder', name: forwarderName, secret })
       console.log('Registered forwarder', forwarderName)
       break
 
     case 'registerCarrier':
       const carrierName = randomFrom(names.names) + ' ' + randomFrom(names.carrierPostfixes)
-      const carrier = getShipperAddress(program, keypair.publicKey)
+      const carrier = getCarrierAddress(program, keypair.publicKey)
       let location: { lon: number; lat: number } | null = null
 
       if (Math.random() < probabilities.carrierIsAvailable) {
@@ -70,6 +76,7 @@ const run = async () => {
         .signers([keypair])
         .rpc()
 
+      keys.keys.push({ type: 'carrier', name: carrierName, secret })
       console.log('Registered carrier', carrierName, 'at', location)
       break
 
@@ -77,6 +84,9 @@ const run = async () => {
       console.log('Unknown action', action)
       break
   }
+
+  const newKeys = JSON.stringify(keys, null, 2)
+  fs.writeFileSync('./migrations/mocks/keys.json', newKeys)
 }
 
 const chooseAction = (): string => {
