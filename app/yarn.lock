@@ -525,6 +525,25 @@
   dependencies:
     cross-spawn "^7.0.3"
 
+"@felte/common@1.1.8":
+  version "1.1.8"
+  resolved "https://registry.yarnpkg.com/@felte/common/-/common-1.1.8.tgz#5cabf3ad996772c7952b9879f742ba1cfbc12917"
+  integrity sha512-VbEOfNLWfDx0SpCfeE+fNWDpvcntND4MFs7Lxd18RIjrZYH82D0wWe9th2oVF9QT5XzgBEdMF5NGIttcwU4sjg==
+
+"@felte/core@1.4.3":
+  version "1.4.3"
+  resolved "https://registry.yarnpkg.com/@felte/core/-/core-1.4.3.tgz#bfe7fabd2058b2378bf202110e207c772818e775"
+  integrity sha512-DoXTuHD4atDG0SfTfI4orllcnriHRgM/ijMdRsUbLPL7O/UWGSWNXkxErx7XPbWOXMjX0J79KLfxZzm9abOCxw==
+  dependencies:
+    "@felte/common" "1.1.8"
+
+"@felte/reporter-svelte@^1.1.11":
+  version "1.1.11"
+  resolved "https://registry.yarnpkg.com/@felte/reporter-svelte/-/reporter-svelte-1.1.11.tgz#4706b890b8e8249cea9045f2d4636ca638d1712d"
+  integrity sha512-H/E9Oq7xOEiwDNxekgCOcLWtl0kCjgN9G0Q2JQPnDJUVDNGd8IsG0HljM4ephnK/hmmLUl3bmq/or442Ygqkiw==
+  dependencies:
+    "@felte/common" "1.1.8"
+
 "@fivebinaries/coin-selection@2.2.1":
   version "2.2.1"
   resolved "https://registry.yarnpkg.com/@fivebinaries/coin-selection/-/coin-selection-2.2.1.tgz#f5329909ac8cd1bf87decdcd054c88a8d69399a0"
@@ -4593,6 +4612,13 @@ fastq@^1.6.0:
   integrity sha512-sRVD3lWVIXWg6By68ZN7vho9a1pQcN/WBFaAAsDDFzlJjvoGx0P8z7V1t72grFJfJhu3YPZBuu25f7Kaw2jN1w==
   dependencies:
     reusify "^1.0.4"
+
+felte@^1.2.14:
+  version "1.2.14"
+  resolved "https://registry.yarnpkg.com/felte/-/felte-1.2.14.tgz#5a96cbe6960c8c61f128829cca98776e6e9c426b"
+  integrity sha512-eRByCSKhmvrkPOFQyCEGNx/DmP54nERvWwybyMcBSxlVXvsmDA7mDjXTJTuXFeKaemTehNvZE4tzf/xXLSE3HQ==
+  dependencies:
+    "@felte/core" "1.4.3"
 
 fflate@^0.8.0:
   version "0.8.2"

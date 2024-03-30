@@ -10,7 +10,7 @@
 	import { Transaction, type PublicKey } from '@solana/web3.js';
 	import { BN } from 'bn.js';
 	import { get } from 'svelte/store';
-	import PricePick from '$src/components/ShipmentForm/PricePick.svelte';
+	import PricePick from '$src/components/ShipmentForm/PriceForm.svelte';
 	import DatePick from '$src/components/ShipmentForm/DatePick.svelte';
 	import DimensionsPick from '$src/components/ShipmentForm/DimensionsPick.svelte';
 	import Details from '$src/components/ShipmentForm/Details.svelte';

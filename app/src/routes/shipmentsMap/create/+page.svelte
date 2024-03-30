@@ -1,21 +1,41 @@
 <script lang="ts">
-	import Button from '$src/components/Buttons/Button.svelte';
 	import Modal from '$src/components/Modals/Modal.svelte';
-	import Form from '$src/components/ShipmentForm/Form.svelte';
-	import { formStore } from '$src/stores/orderForm';
-	import { onMount } from 'svelte';
+	import DimensionsForm from '$src/components/ShipmentForm/DimensionsForm.svelte';
+	import NameForm from '$src/components/ShipmentForm/NameForm.svelte';
+	import PriceForm from '$src/components/ShipmentForm/PriceForm.svelte';
 
-	let stage = 0;
-	let showModal = true;
+	enum FormStage {
+		name,
+		price,
+		dimensions,
+		end
+	}
+
+	const forms = { 0: NameForm, 1: PriceForm, 2: DimensionsForm };
+	let form = FormStage.name;
+	let states = {};
+
+	function onSubmit(values) {
+		console.log(states);
+		if (form == FormStage.end) {
+			console.log(states);
+		} else {
+			states[form] = values;
+			states = states;
+			form += 1;
+		}
+	}
+
+	function onBack(values) {
+		if (form == FormStage.name) return;
+		states[form] = values;
+		states = states;
+		form -= 1;
+	}
 </script>
 
-<Modal {showModal}>
-	<Form />
-
-	<div class="flex justify-center mt-4 gap-x-2">
-		<Button disabled={!formStore.canPrev($formStore)} on:click={() => formStore.prevStage()}
-			>Prev</Button
-		>
-		<Button on:click={() => formStore.nextStage()}>Next</Button>
+<Modal showModal>
+	<div class="mt-10 w-full flex flex-col space-y-7">
+		<svelte:component this={forms[form]} {onSubmit} {onBack} initialValues={states[form]} />
 	</div>
 </Modal>

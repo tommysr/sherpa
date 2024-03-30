@@ -3,7 +3,7 @@ import type { LngLat } from 'maplibre-gl';
 import { get, writable } from 'svelte/store';
 import { userStore } from './user';
 import { createNotification } from '$src/components/Notification/notificationsStore';
-import type Form from '$src/components/ShipmentForm/Form.svelte';
+import type Form from '$src/components/ShipmentForm/NameForm.svelte';
 
 export enum FormStages {
 	Name,
@@ -83,10 +83,10 @@ export function createFormStore() {
 					shipper: { name }
 				} = get(userStore);
 
-				if (name && name.length > 1 && name.length < 65) {
+				if (name && name.length > 0 && name.length < 65) {
 					return;
 				} else {
-					throw 'name should be between 1 and 64 characters';
+					throw 'name should not empty and max 64 characters';
 				}
 
 			case FormStages.Price:
