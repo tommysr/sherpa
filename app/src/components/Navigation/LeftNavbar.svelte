@@ -6,6 +6,7 @@
 	import WalletMultiButton from '../Wallet/WalletMultiButton.svelte';
 	import BoxIcon from './NavbarIcons/BoxIcon.svelte';
 	import HomeIcon from './NavbarIcons/HomeIcon.svelte';
+	import PlusIcon from './NavbarIcons/PlusIcon.svelte';
 	import SendIcon from './NavbarIcons/SendIcon.svelte';
 	import TrackIcon from './NavbarIcons/TrackIcon.svelte';
 
@@ -21,7 +22,24 @@
 		{
 			name: 'Shippers',
 			link: '/shipmentsMap',
-			svg: BoxIcon
+			svg: BoxIcon,
+			routes: [
+				{
+					name: 'Buy',
+					link: '/shipmentsMap/bought',
+					svg: PlusIcon
+				},
+				{
+					name: 'Buy',
+					link: '/shipmentsMap/bought',
+					svg: PlusIcon
+				},
+				{
+					name: 'Buy',
+					link: '/shipmentsMap/bought',
+					svg: PlusIcon
+				}
+			]
 		},
 		{
 			name: 'Forwarders',
@@ -38,22 +56,47 @@
 
 <nav class="hidden md:block">
 	<div
-		class="fixed left-5 w-10 z-10 bg-white rounded-full top-1/2 transform -translate-y-1/2 py-7 px-6 shadow-lg"
+		class="fixed left-5 w-10 z-10 bg-white rounded-full top-1/2 transform -translate-y-1/2 py-3 px-7 shadow-lg"
 	>
-		<div class="flex flex-col items-center justify-center space-y-8">
-			{#each navigation as { name, link, svg }}
-				<div class="group relative">
-					<a href={link}
-						><svelte:component
-							this={svg}
-							className={clsx(currentPage === link ? 'fill-primary' : 'fill-gray-500')}
-						/></a
-					>
-					<span
-						class="opacity-0 group-hover:opacity-100 duration-300 bg-white absolute left-12 -top-2 p-2 rounded-lg shadow"
-					>
-						{name}
-					</span>
+		<div class="flex flex-col items-center justify-center space-y-4">
+			{#each navigation as { name, link, svg, routes }}
+				<div
+					class={clsx(
+						'flex flex-col justify-center items-center space-y-4 rounded-full px-2.5 py-4',
+						currentPage.includes(link) && routes ? 'bg-primary-100' : ''
+					)}
+				>
+					<div class={clsx('group relative')}>
+						<a href={link}
+							><svelte:component
+								this={svg}
+								className={clsx(currentPage === link ? 'fill-primary' : 'fill-gray-500')}
+							/></a
+						>
+						<span
+							class="opacity-0 group-hover:opacity-100 duration-300 bg-white absolute left-12 -top-2 p-2 rounded-lg shadow"
+						>
+							{name}
+						</span>
+					</div>
+
+					{#if routes && currentPage.includes(link)}
+						{#each routes as { name, link, svg }}
+							<div class="group relative">
+								<a href={link}
+									><svelte:component
+										this={svg}
+										className={clsx(currentPage === link ? 'fill-primary' : 'fill-gray-500')}
+									/></a
+								>
+								<span
+									class="opacity-0 group-hover:opacity-100 duration-300 bg-white absolute left-12 -top-3 p-2 rounded-lg shadow"
+								>
+									{name}
+								</span>
+							</div>
+						{/each}
+					{/if}
 				</div>
 			{/each}
 		</div>
