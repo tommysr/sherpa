@@ -1,24 +1,16 @@
 <script lang="ts">
-	export let price: number = 0.01;
+	import DecimalInput from '../Inputs/DecimalInput.svelte';
+
+	export let price: number;
 </script>
 
 <div class="price">
-	<label for="amount">Ship payment in SOL</label>
-	<input
-		id="amount"
-		name="amount"
-		type="number"
-		min="0.001"
-		step="0.001"
-		placeholder="0.01"
-		required
-		bind:value={price}
-	/>
+	<div class="my-10 flex justify-center">
+		<h2
+			class="bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent font-bold text-3xl"
+		>
+			Ship payment in SOL
+		</h2>
+	</div>
+	<DecimalInput bind:value={price} placeholder="amount" />
 </div>
-
-<style lang="scss">
-	.price {
-		margin-bottom: 20px;
-		margin-top: 20px;
-	}
-</style>

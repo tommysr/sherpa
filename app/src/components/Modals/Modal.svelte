@@ -11,9 +11,9 @@
 	bind:this={dialog}
 	on:close={() => (showModal = false)}
 	on:click|self={() => dialog.close()}
-	class="backdrop:backdrop-blur-sm rounded-3xl p-4 bg-white shadow-lg max-w-sm xl:max-w-md w-full z-index-1"
+	class="z-index-30 rounded-3xl p-4 bg-white shadow-lg max-w-sm xl:max-w-md w-full"
 >
-	<div class="absolute top-5 right-5 text-lg">
+	<div class="z-index-30 absolute top-5 right-5 text-lg">
 		<button on:click={() => (showModal = false)}>
 			<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="w-11 cursor-pointer">
 				<path

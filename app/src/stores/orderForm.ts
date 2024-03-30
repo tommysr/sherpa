@@ -1,18 +1,24 @@
-import type { ShipmentDetails, ShipmentDimensions } from '$src/utils/idl/shipment';
+import type { ShipmentDetails, ShipmentDimensions } from '$src/utils/account/shipment';
 import type { LngLat } from 'maplibre-gl';
-import { writable } from 'svelte/store';
+import { get, writable } from 'svelte/store';
+import { userStore } from './user';
+import { createNotification } from '$src/components/Notification/notificationsStore';
+import type Form from '$src/components/ShipmentForm/Form.svelte';
 
-export enum FormStates {
-	Main = 'main',
-	Dimensions = 'dimensions',
-	Properties = 'properties'
+export enum FormStages {
+	Name,
+	Price,
+	Dimensions,
+	Details,
+	Location,
+	Summary
 }
 // Partial could make something bad in the future if there is no proper
 // validation of object properties, so maybe provide some default values
 interface FormInterface {
 	price: number;
 	location: Partial<{ from: LngLat; to: LngLat }>;
-	currentState: FormStates;
+	currentStage: FormStages;
 	dates: {
 		when: Date;
 		deadline: Date;
@@ -47,7 +53,7 @@ export function createFormStore() {
 			weight: 0
 		},
 		location: {},
-		currentState: FormStates.Main,
+		currentStage: FormStages.Name,
 		metrics: {
 			weight: 'kg',
 			distance: 'cm'
@@ -55,37 +61,90 @@ export function createFormStore() {
 		isMetricTon: false
 	});
 
+	const canPrev = (s: FormInterface) => {
+		const {
+			shipper: { registered }
+		} = get(userStore);
+
+		if (
+			(registered && s.currentStage == FormStages.Price) ||
+			(!registered && s.currentStage == FormStages.Name)
+		) {
+			return false;
+		}
+
+		return true;
+	};
+
+	const checkStageValidity = (s: FormInterface) => {
+		switch (s.currentStage) {
+			case FormStages.Name:
+				const {
+					shipper: { name }
+				} = get(userStore);
+
+				if (name && name.length > 1 && name.length < 65) {
+					return;
+				} else {
+					throw 'name should be between 1 and 64 characters';
+				}
+
+			case FormStages.Price:
+				if (s.price > 0) {
+					return;
+				} else {
+					throw 'price should be greater than zero';
+				}
+
+			default:
+				return;
+		}
+	};
+
 	return {
 		subscribe,
 		set,
-		update,
+		checkStageValidity,
 
-		progressForm: () => {
+		refresh: () => {
+			const {
+				shipper: { registered }
+			} = get(userStore);
+
+			if (registered) {
+				update((s) => {
+					s.currentStage = FormStages.Price;
+
+					return s;
+				});
+			}
+		},
+
+		nextStage: () => {
 			update((s) => {
-				switch (s.currentState) {
-					case FormStates.Main:
-						s.currentState = FormStates.Dimensions;
-						break;
-					case FormStates.Dimensions:
-						s.currentState = FormStates.Properties;
-						break;
-					case FormStates.Properties:
-						s.currentState = FormStates.Main;
-						break;
+				try {
+					checkStageValidity(s);
+					s.currentStage += 1;
+				} catch (err) {
+					if (typeof err === 'string') {
+						createNotification({
+							text: err,
+							type: 'failed',
+							removeAfter: 3000
+						});
+					}
 				}
 
 				return s;
 			});
 		},
-		regressForm: () => {
+
+		canPrev,
+
+		prevStage: () => {
 			update((s) => {
-				switch (s.currentState) {
-					case FormStates.Dimensions:
-						s.currentState = FormStates.Main;
-						break;
-					case FormStates.Properties:
-						s.currentState = FormStates.Dimensions;
-						break;
+				if (canPrev(s)) {
+					s.currentStage -= 1;
 				}
 
 				return s;
@@ -113,7 +172,7 @@ export function createFormStore() {
 					weight: 0
 				},
 				location: {},
-				currentState: FormStates.Main,
+				currentStage: FormStages.Name,
 				metrics: {
 					weight: 'kg',
 					distance: 'cm'

@@ -1,0 +1,43 @@
+<script lang="ts">
+	export let placeholder: string = '0.00';
+	export let value: number | undefined;
+	export let required: boolean = false;
+
+	let className: string = '';
+	export { className as class };
+
+	function onInputChange(event: KeyboardEvent) {
+		const key = event.key;
+		const isNumeric = /^[0-9]$/.test(key);
+		const isDecimalSeparator = key === '.' || key === ',';
+		const isBackspace = key === 'Backspace';
+
+		if (!(isNumeric || isDecimalSeparator || isBackspace)) {
+			event.preventDefault();
+		}
+
+		// Allow only one decimal separator
+		if (
+			isDecimalSeparator &&
+			(value?.toString().includes('.') || value?.toString().includes(','))
+		) {
+			event.preventDefault();
+		}
+	}
+</script>
+
+<div class="rounded-lg border-2 border-gradient-to-r from-primary to-secondary">
+	<input
+		class="w-full rounded-3xl bg-transparent px-3 py-2 text-sm font-normal placeholder-primary placeholder:italic placeholder:text-slate-400 lg:px-4 lg:py-2 lg:text-base"
+		on:keydown={onInputChange}
+		on:change
+		on:input
+		on:keyup
+		disabled={$$props.disabled}
+		type="text"
+		bind:value
+		{placeholder}
+		pattern="^[0-9\-\.,]*[.,]?[0-9]$"
+		{required}
+	/>
+</div>

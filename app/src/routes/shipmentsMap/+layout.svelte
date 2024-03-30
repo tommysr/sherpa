@@ -139,9 +139,9 @@
 		</MapWrapper>
 	</div>
 
-	<div class="md:hidden">
+	<!-- <div class="md:hidden">
 		<MapWrapper>
 			<slot />
 		</MapWrapper>
-	</div>
+	</div> -->
 </main>

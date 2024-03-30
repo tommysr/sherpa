@@ -17,123 +17,123 @@
 	import SimpleButton from '$src/components/Buttons/SimpleButton.svelte';
 	import { encodeName } from '$sdk/sdk';
 
-	async function registerShipper(shipper: PublicKey) {
-		const { program } = get(anchorStore);
-		const { connection } = get(web3Store);
-		const wallet = get(walletStore);
+	// async function registerShipper(shipper: PublicKey) {
+	// 	const { program } = get(anchorStore);
+	// 	const { connection } = get(web3Store);
+	// 	const wallet = get(walletStore);
 
-		const registerShipperIx = await program.methods
-			.registerShipper(encodeName('shipper'))
-			.accounts({
-				shipper,
-				signer: wallet.publicKey!
-			})
-			.instruction();
-		const tx = new Transaction().add(registerShipperIx);
+	// 	const registerShipperIx = await program.methods
+	// 		.registerShipper(encodeName('shipper'))
+	// 		.accounts({
+	// 			shipper,
+	// 			signer: wallet.publicKey!
+	// 		})
+	// 		.instruction();
+	// 	const tx = new Transaction().add(registerShipperIx);
 
-		await useSignAndSendTransaction(connection, wallet, tx);
-	}
+	// 	await useSignAndSendTransaction(connection, wallet, tx);
+	// }
 
-	// something simple for now, most assertions should be moved
-	// to the component, but for now it's fine
-	function validateOrderForm() {
-		const orderStore = get(formStore);
+	// // something simple for now, most assertions should be moved
+	// // to the component, but for now it's fine
+	// function validateOrderForm() {
+	// 	const orderStore = get(formStore);
 
-		if (orderStore.price! <= 0) {
-			throw new Error('Price must be greater than 0');
-		}
-		if (orderStore.dates.when < new Date()) {
-			throw new Error('When must be in the future');
-		}
-		if (orderStore.dates.deadline < orderStore.dates.when) {
-			throw new Error('Deadline must be after when');
-		}
+	// 	if (orderStore.price! <= 0) {
+	// 		throw new Error('Price must be greater than 0');
+	// 	}
+	// 	if (orderStore.dates.when < new Date()) {
+	// 		throw new Error('When must be in the future');
+	// 	}
+	// 	if (orderStore.dates.deadline < orderStore.dates.when) {
+	// 		throw new Error('Deadline must be after when');
+	// 	}
 
-		if (orderStore.isMetricTon) {
-			$formStore.dimensions.depth = 0;
-			$formStore.dimensions.height = 0;
-			$formStore.dimensions.width = 0;
-		}
-	}
+	// 	if (orderStore.isMetricTon) {
+	// 		$formStore.dimensions.depth = 0;
+	// 		$formStore.dimensions.height = 0;
+	// 		$formStore.dimensions.width = 0;
+	// 	}
+	// }
 
-	async function addOrder() {
-		const { program } = get(anchorStore);
-		const { connection } = get(web3Store);
-		const wallet = get(walletStore);
-		const stateAddress = getStateAddress(program);
+	// async function addOrder() {
+	// 	const { program } = get(anchorStore);
+	// 	const { connection } = get(web3Store);
+	// 	const wallet = get(walletStore);
+	// 	const stateAddress = getStateAddress(program);
 
-		// DEV
-		let stateExists = (await program.account.state.fetchNullable(stateAddress)) !== null;
+	// 	// DEV
+	// 	let stateExists = (await program.account.state.fetchNullable(stateAddress)) !== null;
 
-		if (!stateExists) {
-			throw new Error('State not initialized');
-		}
-		// END DEV
+	// 	if (!stateExists) {
+	// 		throw new Error('State not initialized');
+	// 	}
+	// 	// END DEV
 
-		const shipper = getShipperAddress(program, wallet.publicKey!);
-		const shipperAccount = await program.account.shipper.fetchNullable(shipper);
+	// 	const shipper = getShipperAddress(program, wallet.publicKey!);
+	// 	const shipperAccount = await program.account.shipper.fetchNullable(shipper);
 
-		if (!shipperAccount) {
-			await registerShipper(shipper);
-		}
+	// 	if (!shipperAccount) {
+	// 		await registerShipper(shipper);
+	// 	}
 
-		const shipment = getShipmentAddress(program, wallet.publicKey!, shipperAccount?.count || 0);
-		const order = get(formStore);
+	// 	const shipment = getShipmentAddress(program, wallet.publicKey!, shipperAccount?.count || 0);
+	// 	const order = get(formStore);
 
-		const { price, dates } = order;
-		const { deadline, when } = dates;
-		const { from, to } = order.location;
+	// 	const { price, dates } = order;
+	// 	const { deadline, when } = dates;
+	// 	const { from, to } = order.location;
 
-		console.log(order);
+	// 	console.log(order);
 
-		// typing XD
-		const deadlineDate = new Date(deadline!);
-		const whenDate = new Date(when!);
+	// 	// typing XD
+	// 	const deadlineDate = new Date(deadline!);
+	// 	const whenDate = new Date(when!);
 
-		const createShipmentIx = await program.methods
-			.createShipment(new BN(price! * 10 ** 9), encodeName('TODO'), {
-				deadline: new BN(deadlineDate.valueOf()),
-				details: order.details,
-				dimensions: order.dimensions,
-				geography: {
-					from: { latitude: from?.lat!, longitude: from?.lng! },
-					fromName: encodeName('cracow TODO'),
-					to: { latitude: to?.lat!, longitude: from?.lng! },
+	// 	const createShipmentIx = await program.methods
+	// 		.createShipment(new BN(price! * 10 ** 9), encodeName('TODO'), {
+	// 			deadline: new BN(deadlineDate.valueOf()),
+	// 			details: order.details,
+	// 			dimensions: order.dimensions,
+	// 			geography: {
+	// 				from: { latitude: from?.lat!, longitude: from?.lng! },
+	// 				fromName: encodeName('cracow TODO'),
+	// 				to: { latitude: to?.lat!, longitude: from?.lng! },
 
-					toName: encodeName('warsaw TODO')
-				},
-				when: new BN(whenDate.valueOf())
-			})
-			.accounts({
-				shipper,
-				shipment,
-				signer: wallet.publicKey!
-			})
-			.instruction();
+	// 				toName: encodeName('warsaw TODO')
+	// 			},
+	// 			when: new BN(whenDate.valueOf())
+	// 		})
+	// 		.accounts({
+	// 			shipper,
+	// 			shipment,
+	// 			signer: wallet.publicKey!
+	// 		})
+	// 		.instruction();
 
-		const tx = new Transaction().add(createShipmentIx);
-		const sig = await useSignAndSendTransaction(connection, wallet, tx);
-		console.log(sig);
-	}
+	// 	const tx = new Transaction().add(createShipmentIx);
+	// 	const sig = await useSignAndSendTransaction(connection, wallet, tx);
+	// 	console.log(sig);
+	// }
 
-	// Not sure if i can use $ in typescript, but seems it works
-	async function handleButtonClick(event: Event) {
-		const { currentState } = get(formStore);
+	// // Not sure if i can use $ in typescript, but seems it works
+	// async function handleButtonClick(event: Event) {
+	// 	const { currentState } = get(formStore);
 
-		if (currentState == FormStates.Properties) {
-			// open modal?
-			validateOrderForm();
-			await addOrder();
+	// 	if (currentState == FormStates.Properties) {
+	// 		// open modal?
+	// 		validateOrderForm();
+	// 		await addOrder();
 
-			formStore.resetForm();
-		}
+	// 		formStore.resetForm();
+	// 	}
 
-		formStore.progressForm();
-	}
+	// 	formStore.progressForm();
+	// }
 
-	function handleBackButtonClick(event: Event) {
-		formStore.regressForm();
-	}
+	// function handleBackButtonClick(event: Event) {
+	// 	formStore.regressForm();
+	// }
 </script>
 
 <!-- CONSIDER: avoid binding to much -->
@@ -171,13 +171,3 @@
 		</form>
 	</div>
 </main>
-
-<style lang="scss">
-	.form-box {
-		margin-top: 20px;
-	}
-
-	.s-button {
-		margin-top: 20px;
-	}
-</style>

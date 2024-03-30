@@ -23,6 +23,7 @@ export function createUserStore() {
 	});
 
 	return {
+		set,
 		subscribe,
 		registerForwarder: (name: string) => {
 			update((store) => {
