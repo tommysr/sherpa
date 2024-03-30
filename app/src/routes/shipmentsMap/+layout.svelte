@@ -121,7 +121,7 @@
 </script>
 
 <div
-	class="hidden md:block absolute z-10 w-3/4 md:w-1/3 xl:w-1/4 left-1/2 transform -translate-x-1/2 top-4"
+	class="absolute z-10 w-3/4 md:w-1/3 xl:w-1/4 left-5 md:left-1/2 md:transform md:-translate-x-1/2 top-4"
 >
 	<div class="m-3 p-0.5 rounded-full bg-gradient-to-r from-primary to-secondary">
 		<label for="name" class="sr-only">Name</label>
