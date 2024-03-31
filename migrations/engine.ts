@@ -2,11 +2,17 @@ import probabilities from './mocks/probabilities.json'
 import names from './mocks/names.json'
 import keys from './mocks/keys.json'
 
-import { AnchorProvider, Program, Wallet } from '@coral-xyz/anchor'
+import { AnchorProvider, BN, Program, Wallet } from '@coral-xyz/anchor'
 import { Protocol } from '../target/types/protocol'
 import * as anchor from '@coral-xyz/anchor'
 import { Connection, Keypair, clusterApiUrl } from '@solana/web3.js'
-import { encodeName, getCarrierAddress, getForwarderAddress, getShipperAddress } from '../sdk/sdk'
+import {
+  encodeName,
+  getCarrierAddress,
+  getForwarderAddress,
+  getShipmentAddress,
+  getShipperAddress
+} from '../sdk/sdk'
 import { awaitedAirdrop } from '../tests/utils'
 
 var fs = require('fs')
@@ -63,7 +69,7 @@ const run = async () => {
       let location: { lon: number; lat: number } | null = null
 
       if (Math.random() < probabilities.carrierIsAvailable) {
-        const location = await chooseLocation()
+        const gotLocation = await chooseLocation()
       }
 
       await program.methods
@@ -77,6 +83,79 @@ const run = async () => {
 
       keys.keys.push({ type: 'carrier', name: carrierName, secret })
       console.log('Registered carrier', carrierName, 'at', location)
+      break
+
+    case 'createShipment':
+      const shipperKey = randomFrom(keys.keys.filter(({ type }) => type === 'shipper'))
+      const shipperSigner = keypairFromSecret(shipperKey.secret)
+      const shipperAddress = getShipperAddress(program, shipperSigner.publicKey)
+      const shipperAccount = await program.account.shipper.fetch(shipperAddress)
+      const shipmentAddress = getShipmentAddress(
+        program,
+        shipperSigner.publicKey,
+        shipperAccount.count
+      )
+
+      const shipmentPrice = new BN((0.2 + Math.random() * 0.4) * 1e9) // 0.2 - 0.6 SOL
+      const from = await chooseLocation()
+      const to = await chooseLocation()
+
+      const density = 0.2 + Math.random() * 3
+      let dimensions = {
+        weight: 1,
+        width: 100 * Math.random() * 200 + 400,
+        depth: 100 * Math.random() * 100 + 400,
+        height: 100 * Math.random() * 100 + 700
+      }
+      dimensions.weight = dimensions.width * dimensions.depth * dimensions.height * density
+
+      if (Math.random() < probabilities.nonSolid) {
+        dimensions = {
+          weight: dimensions.weight,
+          width: dimensions.weight / density,
+          depth: 0,
+          height: 0
+        }
+      }
+
+      const when = new BN(new Date().getTime() + 60 * 60 * 24 * (Math.random() * 12 - 2))
+
+      const shipmentData = {
+        geography: {
+          from: {
+            ...from
+          },
+          fromName: encodeName(from.parsedName),
+          to: {
+            ...to
+          },
+          toName: encodeName(to.parsedName)
+        },
+        dimensions,
+        details: {
+          count:
+            Math.random() < probabilities.shipmentMoreThanOne
+              ? Math.floor(Math.random() * 3 + 2)
+              : 1,
+          priority: Math.random() < probabilities.shipmentPriority ? 2 : 1,
+          fragility: Math.random() < probabilities.shipmentFragile ? 2 : 1,
+          access: Math.random() < probabilities.shipmentAccess ? 2 : 1,
+          reserved: [1, 1, 1]
+        },
+        when,
+        deadline: when.addn(60 * 60 * 24 * (Math.random() * 6 + 1))
+      }
+
+      await program.methods
+        .createShipment(shipmentPrice, encodeName('Just a pair of socks'), shipmentData)
+        .accounts({
+          shipment: shipmentAddress,
+          shipper: shipperAddress,
+          signer: shipperSigner.publicKey
+        })
+        .signers([shipperSigner])
+        .rpc()
+      console.log('Creating shipment', shipmentData)
       break
 
     default:
@@ -111,7 +190,7 @@ const chooseAction = (): string => {
 }
 
 const chooseLocation = async (): Promise<any> => {
-  let counter = 4
+  let counter = 1000
   while (counter--) {
     try {
       const left = 2
@@ -122,20 +201,49 @@ const chooseLocation = async (): Promise<any> => {
       const lat = left + Math.random() * (right - left)
       const lon = top + Math.random() * (bottom - top)
 
+      // this will throw if location is in a weird place like a sea
       const res = await fetch(
         `https://nominatim.openstreetmap.org/reverse?lat=${lon}&lon=${lat}&format=jsonv2`
       )
-      const parsed = (await res.json()) as { lat: string; lon: string }
+      const parsed = (await res.json()) as {
+        lat: string
+        lon: string
+        category?: string
+        address: {
+          village?: string
+          city?: string
+          road?: string
+          house_number?: string
+          country?: string
+        }
+      }
 
-      if (!parsed || !parsed?.lon || !parsed?.lat) {
-        console.error('Failed to get location', parsed)
+      if (parsed.category === 'highway') {
+        console.error('Not interested in roads')
         continue
       }
 
+      if (!parsed || !parsed?.lon || !parsed?.lat) {
+        console.error('Failed to get location')
+        continue
+      }
+
+      if (!parsed.address.road) {
+        console.error('Not an expected address format')
+        continue
+      }
+
+      const parsedName = `${parsed.address.road} ${parsed.address.house_number ?? ''}, ${
+        parsed.address.village ?? parsed.address.city ?? ''
+      }, ${parsed.address.country}`
+
       return {
         ...parsed,
+        parsedName,
         lon: Number(parsed?.lon),
-        lat: Number(parsed?.lat)
+        lat: Number(parsed?.lat),
+        longitude: Number(parsed?.lon),
+        latitude: Number(parsed?.lat)
       }
     } catch (error) {}
   }
@@ -145,4 +253,16 @@ const chooseLocation = async (): Promise<any> => {
 
 const randomFrom = <T>(arr: T[]): T => arr[Math.floor(Math.random() * arr.length)]
 
-run()
+const keypairFromSecret = (secret: string): Keypair => {
+  return Keypair.fromSecretKey(Uint8Array.from(Buffer.from(secret, 'base64')))
+}
+
+setInterval(async () => {
+  try {
+    await run()
+  } catch (error) {
+    console.error('Failed to run', error)
+  }
+}, 3000)
+
+// run()

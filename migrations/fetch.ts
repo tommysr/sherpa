@@ -63,6 +63,10 @@ const run = async () => {
   const forwarderAddress = getCarrierAddress(program, JACOB.publicKey)
   const forwarderAccount = await program.account.forwarder.fetchNullable(forwarderAddress)
   console.log('Jacob forwarder', forwarderAddress.toBase58(), forwarderAccount)
+
+  // Shipments
+  const shipments = await program.account.shipment.all()
+  console.log('Shipments', shipments)
 }
 
 run()
