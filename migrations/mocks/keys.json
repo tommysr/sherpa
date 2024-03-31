@@ -4,6 +4,51 @@
       "type": "shipper",
       "name": "Andrew",
       "secret": "RdCJqispZna8RhCb4LD2Vo8LthejTPhwu/M34+xO8qm1Afv8Mo1mhGYJj8d5sEyuqzA+WCn0PkvPrixQ9KB+1w=="
+    },
+    {
+      "type": "carrier",
+      "name": "Katarzyna Delivery",
+      "secret": "Z3tMVvUDkP6RwUIZt0y8UIXrz60ApmQ/l6HYu128e9Vzh8uJjrll2Jcmo4BYaIa+eDwhBV+RxMHbTNd2g3REPQ=="
+    },
+    {
+      "type": "shipper",
+      "name": "Krystyna Market",
+      "secret": "FdjSmW5X8fqd8pKEcTM2MRO/tU+jW0ciXmdAYGCkwzHfdvlHo/nYOfe9GrYKoIPACcXYMywnVae4fuvgsWfXQw=="
+    },
+    {
+      "type": "carrier",
+      "name": "Daniela Dispatch",
+      "secret": "sAd5pRbaVoYTleGK4joWW4Q6HbPVi219MrVSuw7pXwpb2tA7fqaw8DzjUkmUJmbIt/2DOOgNfspzevEIYK+pFA=="
+    },
+    {
+      "type": "shipper",
+      "name": "Maria Shop",
+      "secret": "1NI98lk+66/fSg4nwwm5Gs1djta9n5rDFl9TkxfH3OU0qw/1nG8rR3bwDmBVtanoikRQyMMm3WC3h45u9AmRrw=="
+    },
+    {
+      "type": "carrier",
+      "name": "Adam Supply",
+      "secret": "jXI6yqYUdZvE8MkRqm1ePiipZ4YZUick8XpOCdF3d8BOWbh7wOMUaZkWwjQFsZM/qyemXDP3x1d25EVWdqHVPQ=="
+    },
+    {
+      "type": "shipper",
+      "name": "Patrycja Online",
+      "secret": "mDKHv65h7lL16KmcqCS369paS8Gs8To7Rs596YIiCZ3aG638X5tPt59eHo2EQSYLSIAcLL1OcQXxSi2/fy5+WQ=="
+    },
+    {
+      "type": "shipper",
+      "name": "Aleksander Worldwide",
+      "secret": "p3OrnK78cTrGQ9MeaUerj6tSXg/RelQPyNquTXVqXrQcHt7/iZgc0cwMoaVLeMFHx2HNRFimGqicz/+JLxQGfQ=="
+    },
+    {
+      "type": "carrier",
+      "name": "Monika Dispatch",
+      "secret": "yZ2zBINShnnJUwPtaEk8pcoF0/eZ5gcRfzSlltVoxvF3kTVVAFYjSlgme6JurOzw0jpbDToAr/IB89tWLU8dOg=="
+    },
+    {
+      "type": "shipper",
+      "name": "Dorota Direct",
+      "secret": "vlaBdKX0Eeip/nQq77BxyAEYeJRO2i8rWRRtVJqxCiWVvu4ndE/tEKvroO0Z/Oh/Stjhqw0cM2PXQXGeczpwCQ=="
     }
   ]
 }

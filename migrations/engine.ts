@@ -20,7 +20,6 @@ const program = anchor.workspace.Protocol as Program<Protocol>
 const run = async () => {
   const action = chooseAction()
   const keypair = Keypair.generate()
-  await awaitedAirdrop(connection, keypair.publicKey, 1e9)
   const secret = Buffer.from(keypair.secretKey).toString('base64')
 
   switch (action) {
