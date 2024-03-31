@@ -6,7 +6,7 @@ use crate::{Channel, Error, Name, Shipment, ShipmentCreated, ShipmentData, Shipp
 pub struct CreateShipment<'info> {
     #[account(init,
         seeds = [b"shipment", signer.key.as_ref(), &shipper.load().unwrap().count.to_le_bytes()], bump,
-        payer = signer, 
+        payer = payer, 
         space = 8 + std::mem::size_of::<Shipment>()
     )]
     pub shipment: AccountLoader<'info, Shipment>,
@@ -15,8 +15,9 @@ pub struct CreateShipment<'info> {
         constraint = shipper.load().unwrap().authority == *signer.key @ Error::SignerNotAnAuthority
     )]
     pub shipper: AccountLoader<'info, Shipper>,
-    #[account(mut)]
     pub signer: Signer<'info>,
+    #[account(mut)]
+    pub payer: Signer<'info>,
     pub system_program: Program<'info, System>,
 }
 

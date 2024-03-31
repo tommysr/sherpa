@@ -68,6 +68,7 @@ describe('protocol', () => {
       .accounts({
         shipper: shipperAddress,
         signer: shipper.publicKey,
+        payer: shipper.publicKey,
         systemProgram: SystemProgram.programId
       })
       .signers([shipper])
@@ -124,6 +125,7 @@ describe('protocol', () => {
         shipment: shipmentAddress,
         shipper: shipperAddress,
         signer: shipper.publicKey,
+        payer: shipper.publicKey,
         systemProgram: SystemProgram.programId
       })
       .signers([shipper])
@@ -198,6 +200,7 @@ describe('protocol', () => {
         shipment: shipmentAddress,
         shipper: shipperAddress,
         signer: shipper.publicKey,
+        payer: shipper.publicKey,
         systemProgram: SystemProgram.programId
       })
       .signers([shipper])
@@ -233,6 +236,7 @@ describe('protocol', () => {
       .accounts({
         forwarder: forwarderAddress,
         signer: forwarder.publicKey,
+        payer: forwarder.publicKey,
         systemProgram: SystemProgram.programId
       })
       .signers([forwarder])
@@ -266,6 +270,7 @@ describe('protocol', () => {
         shipper: shipperAddress,
         forwarder: forwarderAddress,
         signer: forwarder.publicKey,
+        payer: forwarder.publicKey,
         shipmentOwner: shipper.publicKey
       })
       .signers([forwarder])
@@ -307,6 +312,7 @@ describe('protocol', () => {
       .accounts({
         carrier: carrierAddress,
         signer: carrier.publicKey,
+        payer: carrier.publicKey,
         systemProgram: SystemProgram.programId
       })
       .signers([carrier])
@@ -339,7 +345,8 @@ describe('protocol', () => {
         shipment: shipmentAddress,
         forwarder: forwarderAddress,
         carrier: carrierAddress,
-        signer: forwarder.publicKey
+        signer: forwarder.publicKey,
+        payer: forwarder.publicKey
       })
       .signers([forwarder])
       .rpc()
@@ -384,6 +391,7 @@ describe('protocol', () => {
         forwarder: forwarderAddress,
         carrier: carrierAddress,
         signer: carrier.publicKey,
+        payer: carrier.publicKey,
         offerOwner: forwarder.publicKey
       })
       .signers([carrier])
@@ -419,7 +427,8 @@ describe('protocol', () => {
       .openChannel(encodeKey(shared))
       .accounts({
         shipment: shipmentAddress,
-        signer: shipper.publicKey
+        signer: shipper.publicKey,
+        payer: shipper.publicKey
       })
       .signers([shipper])
       .rpc()
@@ -446,7 +455,8 @@ describe('protocol', () => {
       .sendMessage(encodeKey(shared), encodeName('Hello!'))
       .accounts({
         shipment: shipmentAddress,
-        signer: carrier.publicKey
+        signer: carrier.publicKey,
+        payer: carrier.publicKey
       })
       .signers([carrier])
       .rpc()
@@ -455,5 +465,4 @@ describe('protocol', () => {
 
     expect(decodeKey(shipmentAccount.channel.carrier).eq(shared)).true
   })
-
 })
