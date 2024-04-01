@@ -9,6 +9,14 @@
 		weight: 'kg'
 	};
 
+	export let weight: number | undefined = undefined;
+	export let height: number | undefined = undefined;
+	export let width: number | undefined = undefined;
+	export let depth: number | undefined = undefined;
+	export let volume: number | undefined = undefined;
+
+	$: console.log(weight, width);
+
 	export let isMetricTon: boolean = false;
 </script>
 
@@ -16,16 +24,16 @@
 	<div>
 		<label>
 			Metric tons
-			<input name="metric-ton" type="checkbox" bind:checked={isMetricTon} />
+			<input name="isMetricTon" type="checkbox" bind:checked={isMetricTon} />
 		</label>
 	</div>
 
 	<div>
 		<h4>Weight metrics</h4>
-		<input type="radio" name="weight-metrics" bind:group={metrics.weight} value="kg" />
+		<input type="radio" name="weightMetrics" bind:group={metrics.weight} value="kg" />
 		<label for="kg">kg</label>
 
-		<input type="radio" name="weight-metrics" bind:group={metrics.weight} value="lb" />
+		<input type="radio" name="weightMetrics" bind:group={metrics.weight} value="lb" />
 		<label for="lb">lb</label>
 	</div>
 
@@ -34,13 +42,13 @@
 		<input
 			type="radio"
 			id="m"
-			name="distance-metrics"
+			name="distanceMetrics"
 			bind:group={metrics.distance}
 			value="m"
 			required
 		/>
 		<label for="m">m</label>
-		<input type="radio" name="distance-metrics" bind:group={metrics.distance} value="ft" required />
+		<input type="radio" name="distanceMetrics" bind:group={metrics.distance} value="ft" required />
 		<label for="ft">ft</label>
 	</div>
 </div>
@@ -56,11 +64,11 @@
 	>
 		<div>
 			<span>
-				<DecimalInput name="weight" placeholder="weight" required />
+				<DecimalInput bind:value={weight} name="weight" placeholder="weight" required />
 			</span>
 		</div>
 		<div>
-			<span> <DecimalInput name="width" placeholder="volume" required /></span>
+			<span> <DecimalInput bind:value={volume} name="volume" placeholder="volume" required /></span>
 		</div>
 	</div>
 {/if}
@@ -78,16 +86,48 @@
 		class="col-span-4 grid grid-cols-4 opacity-100 items-center justify-items-center w-full text-primary py-2"
 	>
 		<div>
-			<span> <DecimalInput name="width" placeholder="width" required /></span>
+			<span>
+				<DecimalInput
+					data-felte-keep-on-remove
+					bind:value={width}
+					name="width"
+					placeholder="width"
+					required
+				/></span
+			>
 		</div>
 		<div>
-			<span> <DecimalInput name="height" placeholder="height" required /></span>
+			<span>
+				<DecimalInput
+					data-felte-keep-on-remove
+					bind:value={height}
+					name="height"
+					placeholder="height"
+					required
+				/></span
+			>
 		</div>
 		<div>
-			<span><DecimalInput name="depth" placeholder="depth" required /></span>
+			<span
+				><DecimalInput
+					data-felte-keep-on-remove
+					bind:value={depth}
+					name="depth"
+					placeholder="depth"
+					required
+				/></span
+			>
 		</div>
 		<div>
-			<span> <DecimalInput name="weight" placeholder="weight" required /></span>
+			<span>
+				<DecimalInput
+					data-felte-keep-on-remove
+					bind:value={weight}
+					name="weight"
+					placeholder="weight"
+					required
+				/></span
+			>
 		</div>
 	</div>
 {/if}

@@ -3,28 +3,31 @@
 	import { createForm } from 'felte';
 	import { reporter, ValidationMessage } from '@felte/reporter-svelte';
 	import Button from '../Buttons/Button.svelte';
+	import { validator } from '@felte/validator-yup';
+	import * as yup from 'yup';
 
 	export let initialValues;
 	export let onSubmit;
 	export let onBack;
+
 	export let showModal = true;
 
-	const isPriceInvalid = (price: number) => {
-		return price <= 0;
-	};
+	const schema = yup.object({
+		price: yup.number().required()
+	});
 
-	const { form, data } = createForm({
-		extend: reporter,
+	const { form, data } = createForm<yup.InferType<typeof schema>>({
+		extend: [reporter, validator({ schema })],
 		onSubmit,
 		initialValues,
-		validate: (values: { price: number }) => {
+		validate: (values) => {
 			const errors = {
 				price: ''
 			};
 
 			const { price } = values;
 
-			if (isPriceInvalid(price)) {
+			if (price <= 0) {
 				errors.price = 'Price must be greater than zero';
 			}
 

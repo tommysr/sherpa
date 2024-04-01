@@ -3,39 +3,42 @@
 	import { reporter, ValidationMessage } from '@felte/reporter-svelte';
 	import Button from '../Buttons/Button.svelte';
 	import Details from './Details.svelte';
+	import { validator } from '@felte/validator-yup';
+	import * as yup from 'yup';
 
 	export let initialValues;
 	export let onSubmit;
 	export let onBack;
+
 	export let showModal = true;
 
-	const { form, data } = createForm({
-		extend: reporter,
+	const schema = yup.object({
+		count: yup.number().required(),
+		access: yup.number().required(),
+		priority: yup.number().required(),
+		fragility: yup.number().required()
+	});
+
+	const { form, data } = createForm<yup.InferType<typeof schema>>({
+		extend: [reporter, validator({ schema })],
 		onSubmit,
 		initialValues,
 		validate: (values) => {
 			const errors = {
-				details: ''
+				count: '',
+				access: '',
+				priority: '',
+				fragility: ''
 			};
 
 			const { count, access } = values;
 
-			if (typeof count == 'number') {
-				if (count < 1) {
-					errors.details = 'count must be higher than zero';
-				}
-			} else {
-				errors.details = 'invalid form fields';
+			if (count < 1) {
+				errors.count = 'count must be higher than zero';
 			}
 
-			if (typeof access == 'string') {
-				const parsed = parseInt(access);
-
-				if (parsed < 1) {
-					errors.details = 'select one of access options';
-				}
-			} else {
-				errors.details = 'invalid form fields';
+			if (access < 1) {
+				errors.access = 'select one of access options';
 			}
 
 			return errors;
@@ -59,14 +62,16 @@
 
 	<Details />
 
-	<ValidationMessage for="details" let:messages={message}>
-		{#if message}
-			<div class="bg-red-200 border-l-4 mt-3 border-red-400 text-orange-700 p-2" role="alert">
-				<p class="font-bold">Invalid details</p>
-				<p>{message || ''}</p>
-			</div>
-		{/if}
-	</ValidationMessage>
+	{#each ['count', 'access', 'priority', 'fragility'] as name}
+		<ValidationMessage for={name} let:messages={message}>
+			{#if message}
+				<div class="bg-red-200 border-l-4 mt-3 border-red-400 text-orange-700 p-2" role="alert">
+					<p class="font-bold">Invalid {name}</p>
+					<p>{message || ''}</p>
+				</div>
+			{/if}
+		</ValidationMessage>
+	{/each}
 
 	<div class="flex justify-center mt-4 gap-x-2">
 		<Button on:click={() => onBack($data)}>Prev</Button>

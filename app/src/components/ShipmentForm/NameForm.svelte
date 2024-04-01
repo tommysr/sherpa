@@ -4,6 +4,8 @@
 	import { createForm } from 'felte';
 	import { reporter, ValidationMessage } from '@felte/reporter-svelte';
 	import Button from '../Buttons/Button.svelte';
+	import { validator } from '@felte/validator-yup';
+	import * as yup from 'yup';
 
 	export let initialValues;
 	export let onSubmit;
@@ -11,22 +13,22 @@
 	export let accountName: string = 'shipper';
 	export let showModal = true;
 
-	const isNameInvalid = (name: string) => {
-		return !name || name.length == 0 || name.length > 64;
-	};
+	const schema = yup.object({
+		name: yup.string().required()
+	});
 
-	const { form, data } = createForm({
-		extend: reporter,
+	const { form, data } = createForm<yup.InferType<typeof schema>>({
+		extend: [reporter, validator({ schema })],
 		onSubmit,
 		initialValues,
-		validate: (values: { name: string }) => {
+		validate: (values) => {
 			const errors = {
 				name: ''
 			};
 
 			const { name } = values;
 
-			if (isNameInvalid(name)) {
+			if (!name || name.length == 0 || name.length > 64) {
 				errors.name = 'Name must be non empty and less than 64 characters';
 			}
 
@@ -50,6 +52,7 @@
 			You are not registered as a {accountName}, to do so enter your desired name
 		</p>
 	</div>
+
 	<Input
 		name="name"
 		bind:value={$userStore.shipper.name}

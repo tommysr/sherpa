@@ -18,7 +18,7 @@
 		END
 	}
 
-	const forms = [NameForm, DatesForm, PriceForm, DimensionsForm, DetailsForm, LocationsForm];
+	const forms = [DimensionsForm, NameForm, DatesForm, PriceForm, DetailsForm, LocationsForm];
 	let form = FormStage.Name;
 	let states = {};
 	let showModal = true;

@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { createForm, createField } from 'felte';
+	import { createForm } from 'felte';
 	import { reporter, ValidationMessage } from '@felte/reporter-svelte';
 	import Button from '../Buttons/Button.svelte';
 	import { DateInput } from 'date-picker-svelte';
@@ -9,6 +9,7 @@
 	export let initialValues;
 	export let onSubmit;
 	export let onBack;
+
 	export let showModal = true;
 
 	const schema = yup.object({
@@ -65,12 +66,12 @@
 <form use:form>
 	<div class="border-primary border-t text-primary-800 px-4 py-3 mb-5" role="alert">
 		<p class="font-bold">Action needed</p>
-		<p class="text-sm">Enter the dates and deadlines of your shipment</p>
+		<p class="text-sm">Enter the desired date and deadline date of your shipment</p>
 	</div>
 
 	<div class="flex flex-col items-center gap-y-2">
 		<span>
-			Deadline:
+			Deadline of the shipment:
 			<DateInput
 				format="yyyy/MM/dd HH:mm"
 				placeholder="2000/31/12 23:59"
@@ -81,7 +82,7 @@
 		</span>
 
 		<span>
-			When:
+			Desired date of the shipment:
 			<DateInput
 				format="yyyy/MM/dd HH:mm"
 				placeholder="2000/31/12 23:59"
@@ -95,7 +96,7 @@
 	<ValidationMessage for="deadline" let:messages={message}>
 		{#if message}
 			<div class="bg-red-200 border-l-4 mt-3 border-red-400 text-orange-700 p-2" role="alert">
-				<p class="font-bold">Invalid deadline date</p>
+				<p class="font-bold">Invalid deadline</p>
 				<p>{message || ''}</p>
 			</div>
 		{/if}
@@ -104,7 +105,7 @@
 	<ValidationMessage for="when" let:messages={message}>
 		{#if message}
 			<div class="bg-red-200 border-l-4 mt-3 border-red-400 text-orange-700 p-2" role="alert">
-				<p class="font-bold">Invalid when date</p>
+				<p class="font-bold">Invalid date</p>
 				<p>{message || ''}</p>
 			</div>
 		{/if}
