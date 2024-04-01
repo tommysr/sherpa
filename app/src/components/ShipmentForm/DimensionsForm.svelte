@@ -5,20 +5,13 @@
 	import DimensionsPick from './DimensionsPick.svelte';
 	import { validator } from '@felte/validator-yup';
 	import * as yup from 'yup';
+	import { isSeparator } from '$src/utils/utils';
 
 	export let initialValues;
 	export let onSubmit;
 	export let onBack;
 
 	export let showModal = true;
-
-	const isSeparator = (s: string) => {
-		if (s == ',' || s == '.') {
-			return true;
-		} else {
-			return false;
-		}
-	};
 
 	const schema = yup.object({
 		isMetricTon: yup.boolean().required(),

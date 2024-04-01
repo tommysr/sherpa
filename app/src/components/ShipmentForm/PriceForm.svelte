@@ -5,6 +5,7 @@
 	import Button from '../Buttons/Button.svelte';
 	import { validator } from '@felte/validator-yup';
 	import * as yup from 'yup';
+	import { isSeparator } from '$src/utils/utils';
 
 	export let initialValues;
 	export let onSubmit;
@@ -13,7 +14,7 @@
 	export let showModal = true;
 
 	const schema = yup.object({
-		price: yup.number().required()
+		price: yup.string().transform(parseInt).required()
 	});
 
 	const { form, data } = createForm<yup.InferType<typeof schema>>({
@@ -27,7 +28,7 @@
 
 			const { price } = values;
 
-			if (price <= 0) {
+			if (isSeparator(price) || price == '0') {
 				errors.price = 'Price must be greater than zero';
 			}
 

@@ -10,21 +10,19 @@
 	} from 'svelte-maplibre';
 
 	import { pickedLocations } from '$src/stores/locationsPick';
-	import { LngLat } from 'maplibre-gl';
 
-	let srcLocation = new LngLat(50, 20);
-	let dstLocation = new LngLat(50.2, 20.2);
+	let srcLocation = $pickedLocations.src;
+	let dstLocation = $pickedLocations.dst;
 
 	export let showModal = false;
 
-	const onSourceDragEnd = (e: CustomEvent<MarkerClickInfo>) => {
-		const newLocation = LngLat.convert(e.detail.lngLat);
-		$pickedLocations.src = newLocation;
-	};
+	const onDragEnd = (e: CustomEvent<MarkerClickInfo>) => {
+		pickedLocations.update((store) => {
+			store.dst = dstLocation;
+			store.src = srcLocation;
 
-	const onDestDragEnd = (e: CustomEvent<MarkerClickInfo>) => {
-		const newLocation = LngLat.convert(e.detail.lngLat);
-		$pickedLocations.dst = newLocation;
+			return store;
+		});
 	};
 </script>
 
@@ -45,13 +43,13 @@
 	>
 </Control>
 
-<DefaultMarker on:dragend={onSourceDragEnd} bind:lngLat={srcLocation} draggable>
+<DefaultMarker on:dragend={onDragEnd} bind:lngLat={srcLocation} draggable>
 	<Popup offset={[0, -10]}>
 		<div class="text-lg font-bold">Package source</div>
 	</Popup>
 </DefaultMarker>
 
-<DefaultMarker on:dragend={onDestDragEnd} bind:lngLat={dstLocation} draggable>
+<DefaultMarker on:dragend={onDragEnd} bind:lngLat={dstLocation} draggable>
 	<Popup offset={[0, -10]}>
 		<div class="text-lg font-bold">Package destination</div>
 	</Popup>

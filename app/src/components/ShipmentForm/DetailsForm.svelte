@@ -14,7 +14,7 @@
 
 	const schema = yup.object({
 		count: yup.number().required(),
-		access: yup.number().required(),
+		access: yup.string().transform(parseInt).required(),
 		priority: yup.number().required(),
 		fragility: yup.number().required()
 	});
@@ -37,7 +37,7 @@
 				errors.count = 'count must be higher than zero';
 			}
 
-			if (access < 1) {
+			if (access == '0') {
 				errors.access = 'select one of access options';
 			}
 
