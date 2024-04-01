@@ -8,7 +8,7 @@
 	export let initialValues;
 	export let onSubmit;
 	export let onBack;
-	export let accountName: string = '';
+	export let accountName: string = 'shipper';
 	export let showModal = true;
 
 	const isNameInvalid = (name: string) => {

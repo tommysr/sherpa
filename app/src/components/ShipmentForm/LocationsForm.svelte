@@ -5,11 +5,47 @@
 	import Button from '../Buttons/Button.svelte';
 	import { pickedLocations } from '$stores/locationsPick';
 	import DecimalInput from '$components/Inputs/DecimalInput.svelte';
+	import { sleep } from '$src/utils/utils';
+	import type { LngLat } from 'maplibre-gl';
 
 	export let initialValues;
 	export let onSubmit;
 	export let onBack;
 	export let showModal = true;
+
+	// safe is 1 request per sec.
+	let lastRequestTime = Date.now();
+
+	$: src = $pickedLocations.src;
+	$: dst = $pickedLocations.dst;
+
+	const fetchLocation = async (lngLat: LngLat): Promise<string> => {
+		await sleep(2 + Math.floor(Math.random() * 7));
+
+		const currentTime = Date.now();
+		const timeSinceLastRequest = currentTime - lastRequestTime;
+
+		if (timeSinceLastRequest < 1000) {
+			await sleep(1000 - timeSinceLastRequest);
+		}
+
+		lastRequestTime = Date.now();
+
+		try {
+			const response = await fetch(
+				`https://nominatim.openstreetmap.org/reverse?lat=${lngLat.lat}&lon=${lngLat.lng}&format=geocodejson`
+			);
+			const parsed = await response.json();
+
+			console.log(parsed);
+
+			const geo = parsed.features[0].properties.geocoding;
+
+			return geo.city + geo.country;
+		} catch (e) {
+			return 'invalid fetch';
+		}
+	};
 
 	const { form, data } = createForm({
 		extend: reporter,
@@ -61,7 +97,13 @@
 		/>
 		<DecimalInput name="sourceLocationLat" required bind:value={$pickedLocations.src.lat} />
 
-		<div>TODO:</div>
+		<div>
+			{#await fetchLocation(src)}
+				loading ...
+			{:then location}
+				{location}
+			{/await}
+		</div>
 	</div>
 	<div
 		class="mb-3 row-span-2 grid grid-cols-4 opacity-70 items-center justify-items-center w-full text-white py-2 bg-gradient-to-b from-primary to-secondary"
@@ -81,7 +123,13 @@
 			bind:value={$pickedLocations.dst.lat}
 		/>
 
-		<div>TODO:</div>
+		<div>
+			{#await fetchLocation(dst)}
+				loading ...
+			{:then location}
+				{location}
+			{/await}
+		</div>
 	</div>
 
 	<div class="flex justify-center">

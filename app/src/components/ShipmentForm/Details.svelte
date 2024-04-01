@@ -1,5 +1,4 @@
 <script lang="ts">
-	import type { ShipmentDetails } from '$src/utils/account/shipment';
 </script>
 
 <label for="count">Count</label>

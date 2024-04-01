@@ -1,5 +1,6 @@
 <script lang="ts">
 	import Modal from '$src/components/Modals/Modal.svelte';
+	import DatesForm from '$src/components/ShipmentForm/DatesForm.svelte';
 	import DetailsForm from '$src/components/ShipmentForm/DetailsForm.svelte';
 	import DimensionsForm from '$src/components/ShipmentForm/DimensionsForm.svelte';
 	import LocationPick from '$src/components/ShipmentForm/LocationPick.svelte';
@@ -9,6 +10,7 @@
 
 	enum FormStage {
 		Name,
+		Dates,
 		Price,
 		Dimensions,
 		Details,
@@ -16,7 +18,7 @@
 		END
 	}
 
-	const forms = [NameForm, PriceForm, DimensionsForm, DetailsForm, LocationsForm];
+	const forms = [NameForm, DatesForm, PriceForm, DimensionsForm, DetailsForm, LocationsForm];
 	let form = FormStage.Name;
 	let states = {};
 	let showModal = true;
