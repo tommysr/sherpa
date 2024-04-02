@@ -3,7 +3,7 @@
 // configured from the workspace's Anchor.toml.
 
 import { AnchorProvider, Program, Wallet } from '@coral-xyz/anchor'
-import { Protocol } from '../target/types/protocol'
+import { Protocol } from '../app/src/utils/idl/types/protocol'
 import * as anchor from '@coral-xyz/anchor'
 import { Connection, Keypair } from '@solana/web3.js'
 import {
@@ -11,8 +11,8 @@ import {
   getShipmentAddresses,
   getShipperAddress,
   getStateAddress
-} from '../sdk/sdk'
-import { ANDREW, JACOB, ROBERT, ZDZICH } from './mocks/shippers'
+} from '../app/src/sdk/sdk'
+import { ANDREW, JACOB, ZDZICH, IGOR } from './mocks/shippers'
 
 const connection = new Connection('https://api.devnet.solana.com', { commitment: 'confirmed' })
 const wallet = Wallet.local()
@@ -48,9 +48,9 @@ const run = async () => {
   )
 
   // Available Carrier
-  const carrierAddress = getCarrierAddress(program, ROBERT.publicKey)
+  const carrierAddress = getCarrierAddress(program, IGOR.publicKey)
   const carrierAccount = await program.account.carrier.fetchNullable(carrierAddress)
-  console.log('Robert carrier', carrierAddress.toBase58())
+  console.log('Igor carrier', carrierAddress.toBase58(), carrierAccount)
 
   // Unavailable Carrier
   const unavailableCarrierAddress = getCarrierAddress(program, ZDZICH.publicKey)
