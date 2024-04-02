@@ -12,11 +12,9 @@ export const notForwardedShipments = derived<SearchStore<SearchableShipment>, Ap
 	($searchableShipments, set) => {
 		const mapped = $searchableShipments.filtered.filter(
 			(a) => a.account.forwarder === PublicKey.default.toString()
-		) as ApiShipmentAccount[];
+		);
 
-		if (mapped) {
-			set(mapped);
-		}
+		set(mapped);
 	},
 	[]
 );

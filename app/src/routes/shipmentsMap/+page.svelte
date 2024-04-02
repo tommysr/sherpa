@@ -27,18 +27,20 @@
 
 <LayoutListWrapper bind:isMobileOpen>
 	{#if $notForwardedShipments.length != 0}
-		<ul>
-			{#each $notForwardedShipments as account, i (account.publicKey)}
-				<OrderListElement
-					on:click={() => onElementSelect(i)}
-					shipmentAccount={account}
-					{selectedLocation}
-					shipmentId={i}
-				/>
-			{/each}
-		</ul>
+		<div class="h-full flex items-start">
+			<ul>
+				{#each $notForwardedShipments as account, i (account.publicKey)}
+					<OrderListElement
+						on:click={() => onElementSelect(i)}
+						shipmentAccount={account}
+						{selectedLocation}
+						shipmentId={i}
+					/>
+				{/each}
+			</ul>
+		</div>
 	{:else}
-		<p>Nothing found</p>
+		<p class="text-xl text-gray-500">Nothing found</p>
 	{/if}
 </LayoutListWrapper>
 

@@ -31,15 +31,15 @@ export const forwardedShipments = derived<
 					(a) => a.account.forwarder === searchAddress
 				);
 
-				if (shipment) {
+				if (shipment !== undefined) {
 					return { meta, shipment };
+				} else {
+					return null;
 				}
 			})
-			.filter((a) => a) as ForwardedShipment[];
+			.filter((item) => item !== null) as ForwardedShipment[];
 
-		if (mapped) {
-			set(mapped);
-		}
+		set(mapped);
 	},
 	[]
 );

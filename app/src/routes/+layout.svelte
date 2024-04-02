@@ -8,20 +8,22 @@
 	//wallets adapters
 	import type { Adapter } from '@solana/wallet-adapter-base';
 	import {
+		Coin98WalletAdapter,
 		LedgerWalletAdapter,
 		PhantomWalletAdapter,
+		SolflareWalletAdapter,
 		TrezorWalletAdapter,
 		TrustWalletAdapter
 	} from '@solana/wallet-adapter-wallets';
-
 	//wallet components
 	import AnchorConnectionProvider from '$src/components/Wallet/AnchorConnectionProvider.svelte';
 	import ConnectionProvider from '$src/components/Wallet/ConnectionProvider.svelte';
 	import WalletProvider from '$src/components/Wallet/WalletProvider.svelte';
-
 	// solana
-	import { clusterApiUrl } from '@solana/web3.js';
+	import LeftNavbar from '$src/components/Navigation/LeftNavbar.svelte';
 	import Notifications from '$src/components/Notification/Notifications.svelte';
+	import MapWrapper from '$src/components/ShipmentMap/MapWrapper.svelte';
+	import { clusterApiUrl } from '@solana/web3.js';
 
 	let wallets: Adapter[];
 	// it's a solana devnet cluster, but consider changing it to more performant provider
@@ -31,7 +33,9 @@
 	onMount(async () => {
 		wallets = [
 			new PhantomWalletAdapter(),
+			new SolflareWalletAdapter(),
 			new TrustWalletAdapter(),
+			new Coin98WalletAdapter(),
 			new LedgerWalletAdapter(),
 			new TrezorWalletAdapter()
 		];
@@ -43,5 +47,9 @@
 <WalletProvider {localStorageKey} {wallets} autoConnect />
 
 <Notifications>
-	<slot />
+	<LeftNavbar />
+
+	<MapWrapper>
+		<slot />
+	</MapWrapper>
 </Notifications>
