@@ -254,8 +254,8 @@ describe('protocol', () => {
     const subscriptionId = program.addEventListener('ShipmentTransferred', event => {
       expect(event.seller.equals(shipperAddress)).true
       expect(event.buyer.equals(forwarderAddress)).true
-      expect(event.before.equals(shipmentAddress)).true
-      expect(event.after.equals(forwardedShipmentAddress)).true
+      expect(event.shipment.equals(shipmentAddress)).true
+      expect(event.forwarded.equals(forwardedShipmentAddress)).true
     })
 
     await program.methods
@@ -332,6 +332,7 @@ describe('protocol', () => {
       expect(event.from.equals(forwarder.publicKey)).true
       expect(event.to.equals(carrier.publicKey)).true
       expect(event.offer.equals(offerAddress)).true
+      expect(event.shipment.equals(shipmentAddress)).true
     })
 
     await program.methods
@@ -373,6 +374,7 @@ describe('protocol', () => {
       expect(event.from.equals(forwarder.publicKey)).true
       expect(event.to.equals(carrier.publicKey)).true
       expect(event.offer.equals(offerAddress)).true
+      expect(event.shipment.equals(shipmentAddress)).true
     })
 
     const offerAccount = await program.account.shipmentOffer.fetch(offerAddress)

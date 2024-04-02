@@ -60,6 +60,7 @@ pub fn handler(ctx: Context<MakeOffer>, payment: u64, timeout: u32) -> Result<()
         from: forwarder.creator,
         to: carrier.creator,
         offer: ctx.accounts.offer.key(),
+        shipment: ctx.accounts.shipment.key(),
     });
 
     Ok(())
