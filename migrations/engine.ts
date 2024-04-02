@@ -12,7 +12,7 @@ import {
   getForwarderAddress,
   getShipmentAddress,
   getShipperAddress
-} from '../sdk/sdk'
+} from '../tests/sdk'
 import { awaitedAirdrop } from '../tests/utils'
 
 var fs = require('fs')
@@ -66,10 +66,23 @@ const run = async () => {
     case 'registerCarrier':
       const carrierName = randomFrom(names.names) + ' ' + randomFrom(names.carrierPostfixes)
       const carrier = getCarrierAddress(program, keypair.publicKey)
-      let location: { lon: number; lat: number } | null = null
+      let location: {
+        time: BN
+        location: { longitude: number; latitude: number }
+        locationName: { value: Array<number> }
+      } | null = null
 
       if (Math.random() < probabilities.carrierIsAvailable) {
         const gotLocation = await chooseLocation()
+        const when = new BN(new Date().getTime().toString()).add(
+          new BN(Math.floor(60 * 60 * 24 * (Math.random() * 2)).toString())
+        )
+
+        location = {
+          time: when,
+          location: { latitude: gotLocation.lat, longitude: gotLocation.lon },
+          locationName: encodeName(gotLocation.parsedName)
+        }
       }
 
       await program.methods
@@ -107,11 +120,12 @@ const run = async () => {
       const density = 0.2 + Math.random() * 3
       let dimensions = {
         weight: 1,
-        width: 100 * Math.random() * 200 + 400,
-        depth: 100 * Math.random() * 100 + 400,
-        height: 100 * Math.random() * 100 + 700
+        width: 2000 * Math.random() * 2 + 400,
+        depth: 1000 * Math.random() + 400,
+        height: 1000 * Math.random() + 700
       }
-      dimensions.weight = dimensions.width * dimensions.depth * dimensions.height * density
+      dimensions.weight =
+        ((dimensions.width * dimensions.depth * dimensions.height) / 1e3) * density
 
       if (Math.random() < probabilities.nonSolid) {
         dimensions = {
@@ -155,8 +169,10 @@ const run = async () => {
         deadline: when.addn(60 * 60 * 24 * (Math.random() * 6 + 1))
       }
 
+      console.log('Creating shipment', shipmentData)
+
       await program.methods
-        .createShipment(shipmentPrice, encodeName('Just a pair of socks'), shipmentData)
+        .createShipment(shipmentPrice, encodeName(randomFrom(names.shipments)), shipmentData)
         .accounts({
           shipment: shipmentAddress,
           shipper: shipperAddress,
@@ -227,8 +243,6 @@ const chooseLocation = async (): Promise<any> => {
           country?: string
         }
       }
-
-      console.log('here')
 
       if (parsed.category === 'highway') {
         console.error('Not interested in roads')

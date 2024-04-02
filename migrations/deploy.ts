@@ -1,7 +1,7 @@
 import { AnchorProvider, BN, Program, Wallet } from '@coral-xyz/anchor'
-import { Protocol } from '../app/src/utils/idl/types/protocol'
+import { Protocol } from '../target/types/protocol'
 import * as anchor from '@coral-xyz/anchor'
-import { Connection, clusterApiUrl } from '@solana/web3.js'
+import { Connection, Keypair, clusterApiUrl } from '@solana/web3.js'
 import {
   encodeName,
   getCarrierAddress,
@@ -9,11 +9,10 @@ import {
   getShipmentAddress,
   getShipperAddress,
   getStateAddress
-} from '../app/src/sdk/sdk'
+} from '../tests/sdk'
 import { ONE_SOL } from '../tests/utils'
 import { crateFromSchoolToAirport } from './mocks/shipments'
 import { ANDREW, JACOB, IGOR, ZDZICH } from './mocks/shippers'
-import { encode } from 'punycode'
 
 const connection = new Connection(clusterApiUrl('devnet'), { commitment: 'confirmed' })
 const wallet = Wallet.local()
