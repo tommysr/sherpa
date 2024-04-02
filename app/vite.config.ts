@@ -13,6 +13,9 @@ export default defineConfig({
 			$utils: path.resolve(path.dirname(fileURLToPath(import.meta.url)), 'src', 'utils')
 		}
 	},
+	ssr: {
+		noExternal: ['@coral-xyz/anchor']
+	},
 	define: {
 		'process.env.ANCHOR_BROWSER': true
 	},

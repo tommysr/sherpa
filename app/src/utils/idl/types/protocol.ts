@@ -630,6 +630,12 @@ export type Protocol = {
             "type": {
               "defined": "GeoLocation"
             }
+          },
+          {
+            "name": "locationName",
+            "type": {
+              "defined": "Name"
+            }
           }
         ]
       }
@@ -869,12 +875,12 @@ export type Protocol = {
           "index": false
         },
         {
-          "name": "before",
+          "name": "shipment",
           "type": "publicKey",
           "index": false
         },
         {
-          "name": "after",
+          "name": "forwarded",
           "type": "publicKey",
           "index": false
         }
@@ -912,6 +918,11 @@ export type Protocol = {
           "name": "offer",
           "type": "publicKey",
           "index": false
+        },
+        {
+          "name": "shipment",
+          "type": "publicKey",
+          "index": false
         }
       ]
     },
@@ -930,6 +941,11 @@ export type Protocol = {
         },
         {
           "name": "offer",
+          "type": "publicKey",
+          "index": false
+        },
+        {
+          "name": "shipment",
           "type": "publicKey",
           "index": false
         }
@@ -1622,6 +1638,12 @@ export const IDL: Protocol = {
             "type": {
               "defined": "GeoLocation"
             }
+          },
+          {
+            "name": "locationName",
+            "type": {
+              "defined": "Name"
+            }
           }
         ]
       }
@@ -1861,12 +1883,12 @@ export const IDL: Protocol = {
           "index": false
         },
         {
-          "name": "before",
+          "name": "shipment",
           "type": "publicKey",
           "index": false
         },
         {
-          "name": "after",
+          "name": "forwarded",
           "type": "publicKey",
           "index": false
         }
@@ -1904,6 +1926,11 @@ export const IDL: Protocol = {
           "name": "offer",
           "type": "publicKey",
           "index": false
+        },
+        {
+          "name": "shipment",
+          "type": "publicKey",
+          "index": false
         }
       ]
     },
@@ -1922,6 +1949,11 @@ export const IDL: Protocol = {
         },
         {
           "name": "offer",
+          "type": "publicKey",
+          "index": false
+        },
+        {
+          "name": "shipment",
           "type": "publicKey",
           "index": false
         }

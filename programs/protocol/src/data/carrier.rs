@@ -10,6 +10,7 @@ use crate::{GeoLocation, Name};
 pub struct Availability {
     pub time: u64, // when 0, carrier is not available
     pub location: GeoLocation,
+    pub location_name: Name,
 }
 
 #[account(zero_copy)]
