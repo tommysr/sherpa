@@ -64,8 +64,8 @@ pub fn handler(ctx: Context<BuyShipment>) -> Result<()> {
     emit!(ShipmentTransferred {
         seller: ctx.accounts.shipper.key(),
         buyer: ctx.accounts.forwarder.key(),
-        before: ctx.accounts.shipment.key(),
-        after: ctx.accounts.bought.key(),
+        shipment: ctx.accounts.shipment.key(),
+        forwarded: ctx.accounts.bought.key(),
     });
 
 

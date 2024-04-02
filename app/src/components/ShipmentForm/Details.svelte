@@ -1,5 +1,5 @@
 <script lang="ts">
-	import type { ShipmentDetails } from '$src/utils/idl/shipment';
+	import type { ShipmentDetails } from '$src/utils/account/shipment';
 
 	export let details: ShipmentDetails;
 </script>

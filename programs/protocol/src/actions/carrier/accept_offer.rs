@@ -71,6 +71,7 @@ pub fn handler(ctx: Context<AcceptOffer>) -> Result<()> {
         from: shipment.forwarder,
         to: shipment.shipper,
         offer: ctx.accounts.offer.key(),
+        shipment: ctx.accounts.shipment.key(),
     });
 
     ctx.accounts

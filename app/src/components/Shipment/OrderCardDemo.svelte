@@ -4,15 +4,15 @@
 		Geography,
 		ShipmentDetails,
 		ShipmentDimensions
-	} from '$src/utils/idl/shipment';
+	} from '$src/utils/account/shipment';
 	import type { Entries } from '$src/utils/types/object';
 
 	export let shipmentAccount: ApiShipmentAccount;
 
 	$: shipmentData = shipmentAccount.account;
 	$: dimensions = Object.entries(shipmentData.shipment.dimensions) as Entries<ShipmentDimensions>;
-	$: locations = Object.entries(shipmentData.shipment.geography) as Entries<Geography>;
-	$: properties = Object.entries(shipmentData.shipment.details) as Entries<ShipmentDetails>;
+	$: locations = shipmentData.shipment.geography;
+	// $: properties = Object.entries(shipmentData.shipment.details) as Entries<ShipmentDetails>;
 
 	async function getLocationFromCoords(lat: number, long: number): Promise<string> {
 		return `Kraków, Poland`;
@@ -56,26 +56,9 @@
 		</div>
 
 		<div class="col-span-3">
-			{#if locations}
-				{@const len = locations.length}
-
-				{#each locations as [location, value], index}
-					<!-- TODO: batching or keep locations on server -->
-					{#await getLocationFromCoords(value.latitude, value.longitude)}
-						<article aria-busy="true"></article>
-					{:then location}
-						{location}
-					{:catch error}
-						{value.latitude.toFixed(4)} {value.longitude.toFixed(4)}
-					{/await}
-
-					{#if index != len - 1}
-						{'→ '}
-					{/if}
-				{/each}
-			{:else}
-				<p>No location</p>
-			{/if}
+			<p class="text-xs xl:sm font-medium text-gray-500 mr-6 xl:mr-12">
+				{locations.fromName + ' → ' + locations.toName}
+			</p>
 		</div>
 	</div>
 

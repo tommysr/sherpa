@@ -1,5 +1,5 @@
 import { sveltekit } from '@sveltejs/kit/vite';
-import path from 'path'
+import path from 'path';
 import { fileURLToPath } from 'url';
 import { defineConfig } from 'vitest/config';
 
@@ -12,6 +12,9 @@ export default defineConfig({
 			$components: path.resolve(path.dirname(fileURLToPath(import.meta.url)), 'src', 'components'),
 			$utils: path.resolve(path.dirname(fileURLToPath(import.meta.url)), 'src', 'utils')
 		}
+	},
+	ssr: {
+		noExternal: ['@coral-xyz/anchor']
 	},
 	define: {
 		'process.env.ANCHOR_BROWSER': true

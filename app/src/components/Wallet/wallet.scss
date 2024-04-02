@@ -215,9 +215,10 @@
 	align-items: center;
 	flex-direction: column;
 	z-index: 1050;
-	max-width: 350px;
-	border-radius: 10px;
+	max-width: 400px;
+	border-radius: 20px;
 	background: var(--background);
+	padding: 0 10px;
 
 	flex: 1;
 }

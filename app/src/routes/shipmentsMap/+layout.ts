@@ -1,39 +1,29 @@
-import {
-	searchableBoughtShipments,
-	type SearchableBoughtOrder
-} from '$src/stores/forwarderShipments';
-import type { SearchableOrder } from '$src/stores/searchableShipments';
+import { forwardedShipmentsMeta } from '$src/stores/forwarderShipments.js';
+import type { SearchableShipment } from '$src/stores/searchableShipments';
 import { searchableShipments } from '$src/stores/searchableShipments';
-import type { ApiBoughtShipmentAccount } from '$src/utils/idl/boughtShipment';
-import type { ApiShipmentAccount } from '$src/utils/idl/shipment';
+import type { ApiForwardedShipmentAccount } from '$src/utils/account/forwardedShipment';
+import type { ApiShipmentAccount } from '$src/utils/account/shipment';
 
 import { error } from '@sveltejs/kit';
-import { getContext } from 'svelte';
-import type { MapContext } from 'svelte-maplibre/context.svelte';
 import { get } from 'svelte/store';
 
 function loadFromStores(): {
-	orders: ApiShipmentAccount[];
-	boughtOrders: ApiBoughtShipmentAccount[];
+	shipments: ApiShipmentAccount[];
+	forwardedShipments: ApiForwardedShipmentAccount[];
 } | null {
 	const { data: shipments } = get(searchableShipments);
-	const { data: boughtShipments } = get(searchableBoughtShipments);
+	const forwardedShipments = get(forwardedShipmentsMeta);
 	const len = shipments.length;
 
 	if (len > 0) {
 		return {
-			orders: shipments.map(({ account, publicKey }) => {
+			shipments: shipments.map(({ account, publicKey }) => {
 				return {
 					account,
 					publicKey
 				};
 			}),
-			boughtOrders: boughtShipments.map(({ account, publicKey }) => {
-				return {
-					account,
-					publicKey
-				};
-			})
+			forwardedShipments
 		};
 	} else {
 		return null;
@@ -41,9 +31,10 @@ function loadFromStores(): {
 }
 
 /** @type {import('./$types').PageLoad } */
-export async function load({
-	fetch
-}): Promise<{ orders: ApiShipmentAccount[]; boughtOrders: ApiBoughtShipmentAccount[] }> {
+export async function load({ fetch }): Promise<{
+	shipments: ApiShipmentAccount[];
+	forwardedShipments: ApiForwardedShipmentAccount[];
+}> {
 	console.log('loading shipments');
 	const fromStores = loadFromStores();
 
@@ -52,14 +43,14 @@ export async function load({
 	}
 
 	try {
-		const [fetchedOrders, fetchedBoughtOrders] = await Promise.all([
+		const [fetchedShipments, fetchedForwardedShipments] = await Promise.all([
 			fetch('/api/shipments', {
 				method: 'GET',
 				headers: {
 					'content-type': 'application/json'
 				}
 			}),
-			fetch('/api/boughtShipments', {
+			fetch('/api/forwardedShipments', {
 				method: 'GET',
 				headers: {
 					'content-type': 'application/json'
@@ -67,32 +58,24 @@ export async function load({
 			})
 		]);
 
-		const [orders, boughtOrders] = await Promise.all<
-			[Promise<ApiShipmentAccount[]>, Promise<ApiBoughtShipmentAccount[]>]
-		>([fetchedOrders.json(), fetchedBoughtOrders.json()]);
+		const [shipments, forwardedShipments] = await Promise.all<
+			[Promise<ApiShipmentAccount[]>, Promise<ApiForwardedShipmentAccount[]>]
+		>([fetchedShipments.json(), fetchedForwardedShipments.json()]);
 
 		// TODO: make it more specific
-		const searchableOrders: SearchableOrder[] = orders.map((order: ApiShipmentAccount) => {
-			return {
-				...order,
-				searchParams: `${order.account.shipment.details.priority} ${order.account.shipment.details.access}`
-			};
-		});
-
-		// TODO: make it more specific
-		const searchableBoughtOrders: SearchableBoughtOrder[] = boughtOrders.map(
-			(order: ApiBoughtShipmentAccount) => {
+		const searchableShipmentsArr: SearchableShipment[] = shipments.map(
+			(shipment: ApiShipmentAccount) => {
 				return {
-					...order,
-					searchParams: `${order.account.shipment.details.priority} ${order.account.shipment.details.access}`
+					...shipment,
+					searchParams: `${shipment.account.shipment.details.priority} ${shipment.account.shipment.details.access}`
 				};
 			}
 		);
 
-		searchableShipments.default(searchableOrders);
-		searchableBoughtShipments.default(searchableBoughtOrders);
+		forwardedShipmentsMeta.set(forwardedShipments);
+		searchableShipments.default(searchableShipmentsArr);
 
-		return { orders, boughtOrders };
+		return { shipments, forwardedShipments };
 	} catch {
 		throw error(404, 'Not found');
 	}

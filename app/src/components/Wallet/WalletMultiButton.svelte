@@ -4,7 +4,7 @@
 	import WalletConnectButton from './WalletConnectButton.svelte';
 	import WalletModal from './WalletModal.svelte';
 
-	export let maxNumberOfWallets = 4;
+	export let maxNumberOfWallets = 6;
 	export let onClose: CallbackType;
 
 	$: ({ publicKey, wallet, disconnect, connect, select } = $walletStore);
