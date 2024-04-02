@@ -3,8 +3,12 @@
 
 	let dialog; // HTMLDialogElement
 
-	$: if (dialog && showModal) dialog.showModal();
+	export let closeHandler = () => {
+		console.log('closing');
+		showModal = false;
+	};
 
+	$: if (dialog && showModal) dialog.showModal();
 	$: if (dialog && !showModal) dialog.close();
 </script>
 
@@ -12,11 +16,10 @@
 <dialog
 	bind:this={dialog}
 	on:close={() => (showModal = false)}
-	on:click|self={() => dialog.close()}
 	class="z-index-30 rounded-3xl p-4 bg-white shadow-lg max-w-sm xl:max-w-md w-full"
 >
 	<div class="z-index-30 absolute top-5 right-5 text-lg">
-		<button on:click={() => (showModal = false)}>
+		<button on:click|stopPropagation={closeHandler}>
 			<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="w-11 cursor-pointer">
 				<path
 					stroke="var(--secondary)"

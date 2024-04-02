@@ -39,8 +39,8 @@
 			}}
 		>
 			M</ControlButton
-		></ControlGroup
-	>
+		>
+	</ControlGroup>
 </Control>
 
 <DefaultMarker on:dragend={onDragEnd} bind:lngLat={srcLocation} draggable>

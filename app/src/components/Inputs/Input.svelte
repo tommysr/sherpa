@@ -2,7 +2,7 @@
 	import clsx from 'clsx';
 
 	export let placeholder: string = 'input';
-	export let value: string | undefined;
+	export let value: string | undefined = undefined;
 	export let name: string;
 	export let required: boolean = false;
 

@@ -5,8 +5,9 @@
 	import Details from './Details.svelte';
 	import { validator } from '@felte/validator-yup';
 	import * as yup from 'yup';
+	import type { DetailsFormInterface } from './interfaces';
 
-	export let initialValues;
+	export let initialValues: DetailsFormInterface;
 	export let onSubmit;
 	export let onBack;
 

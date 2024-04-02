@@ -6,15 +6,16 @@
 	import { validator } from '@felte/validator-yup';
 	import * as yup from 'yup';
 	import { isSeparator } from '$src/utils/utils';
+	import type { PriceFormInterface } from './interfaces';
 
-	export let initialValues;
+	export let initialValues: PriceFormInterface;
 	export let onSubmit;
 	export let onBack;
 
 	export let showModal = true;
 
 	const schema = yup.object({
-		price: yup.string().transform(parseInt).required()
+		price: yup.string().transform(parseInt).required('price is required')
 	});
 
 	const { form, data } = createForm<yup.InferType<typeof schema>>({

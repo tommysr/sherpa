@@ -9,15 +9,9 @@
 	import * as yup from 'yup';
 	import NumberInput from '../Inputs/NumberInput.svelte';
 	import clsx from 'clsx';
+	import type { LocationsFormInterface } from './interfaces';
 
-	export let initialValues: {
-		destinationLocationLng: number;
-		destinationLocationLat: number;
-		sourceLocationLat: number;
-		sourceLocationLng: number;
-		sourceName: string;
-		destinationName: string;
-	} = {
+	export let initialValues: LocationsFormInterface = {
 		destinationLocationLat: defaultLocation.lat,
 		destinationLocationLng: defaultLocation.lng,
 		sourceLocationLat: defaultLocation.lat,

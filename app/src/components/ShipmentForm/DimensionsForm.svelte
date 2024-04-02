@@ -6,12 +6,15 @@
 	import { validator } from '@felte/validator-yup';
 	import * as yup from 'yup';
 	import { isSeparator } from '$src/utils/utils';
+	import type { DimensionsFormInterface } from './interfaces';
 
-	export let initialValues;
+	export let initialValues: DimensionsFormInterface;
 	export let onSubmit;
 	export let onBack;
 
 	export let showModal = true;
+
+	let isMetricTon = initialValues.isMetricTon ?? false;
 
 	const schema = yup.object({
 		isMetricTon: yup.boolean().required(),
@@ -20,7 +23,6 @@
 			return isMetricTon ? schema.transform(parseInt).required() : schema;
 		}),
 		width: yup.string().when('isMetricTon', ([isMetricTon], schema) => {
-			console.log(isMetricTon);
 			return isMetricTon ? schema : schema.transform(parseInt).required();
 		}),
 		depth: yup.string().when('isMetricTon', ([isMetricTon], schema) => {
@@ -85,7 +87,7 @@
 		<p class="text-sm">Enter the dimensions of your shipment</p>
 	</div>
 
-	<DimensionsPick />
+	<DimensionsPick bind:isMetricTon />
 
 	{#each ['weight', 'width', 'height', 'depth', 'volume'] as name}
 		<ValidationMessage for={name} let:messages={message}>
