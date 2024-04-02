@@ -96,9 +96,13 @@ const run = async () => {
         shipperAccount.count
       )
 
+      console.log('Creating shipment', shipperKey, shipperSigner.publicKey.toString())
+
       const shipmentPrice = new BN((0.2 + Math.random() * 0.4) * 1e9) // 0.2 - 0.6 SOL
       const from = await chooseLocation()
       const to = await chooseLocation()
+
+      console.log('Ready to create shipment', from, to)
 
       const density = 0.2 + Math.random() * 3
       let dimensions = {
@@ -118,7 +122,12 @@ const run = async () => {
         }
       }
 
-      const when = new BN(new Date().getTime() + 60 * 60 * 24 * (Math.random() * 12 - 2))
+      const when = new BN(new Date().getTime().toString()).add(
+        new BN(60)
+          .muln(60)
+          .muln(24)
+          .mul(new BN(Math.floor(60 * 60 * 24 * (Math.random() * 12 - 2)).toString()))
+      )
 
       const shipmentData = {
         geography: {
@@ -155,6 +164,7 @@ const run = async () => {
         })
         .signers([shipperSigner])
         .rpc()
+
       console.log('Creating shipment', shipmentData)
       break
 
@@ -217,6 +227,8 @@ const chooseLocation = async (): Promise<any> => {
           country?: string
         }
       }
+
+      console.log('here')
 
       if (parsed.category === 'highway') {
         console.error('Not interested in roads')

@@ -779,6 +779,16 @@
       "type": "shipper",
       "name": "Sophie Store",
       "secret": "xTYNMEA3jUNvQipfE79lndmCJrCyIitu8St6HZjkUG4sN3tkV98/7iWGggjJ/J4o2tPeI3OC0HRvoyZPCJDExQ=="
+    },
+    {
+      "type": "shipper",
+      "name": "Melanie Online",
+      "secret": "j2xTvKdXIYjGUFEASQOSRSQf0/QWsZOzx6WzYvA1Zpt03TolyJ37PRZRAYAYsaCaqsfxcdomy22wPrr6UyqlNA=="
+    },
+    {
+      "type": "shipper",
+      "name": "Fabian Link",
+      "secret": "8V9y3MAQniBmuit13W0F0s9l9UjWq4Hf00FP7MlPrqr5FJjLMXWQrIuKteq+JagGHyQ46PZjnPfFh/Q51KRHdA=="
     }
   ]
 }
