@@ -1,6 +1,6 @@
 import * as anchor from '@coral-xyz/anchor'
 import { BN, Program } from '@coral-xyz/anchor'
-import { Protocol } from '../target/types/protocol'
+import { Protocol } from '../app/src/utils/idl/types/protocol'
 import { Keypair, PublicKey, SystemProgram } from '@solana/web3.js'
 import { ONE_HOUR, ONE_SOL, U64_MAX, awaitedAirdrops } from './utils'
 import {
@@ -18,7 +18,7 @@ import {
   getShipmentAddress,
   getShipperAddress,
   getStateAddress
-} from '../sdk/sdk'
+} from '../app/src/sdk/sdk'
 import { expect } from 'chai'
 
 describe('protocol', () => {
@@ -299,7 +299,8 @@ describe('protocol', () => {
       location: {
         latitude: 43,
         longitude: 44
-      }
+      },
+      locationName: encodeName('Krakow')
     }
 
     await program.methods
@@ -318,6 +319,7 @@ describe('protocol', () => {
     expect(decodeName(carrierAccount.name)).eq('Carol')
     expect(carrierAccount.availability.time.eq(availability.time)).true
     expect(carrierAccount.availability.location).to.deep.equal(availability.location)
+    expect(decodeName(carrierAccount.availability.locationName)).eq('Krakow')
     expect(carrierAccount.offersCount).eq(0)
     expect(carrierAccount.tasksCount).eq(0)
   })
@@ -455,5 +457,4 @@ describe('protocol', () => {
 
     expect(decodeKey(shipmentAccount.channel.carrier).eq(shared)).true
   })
-
 })

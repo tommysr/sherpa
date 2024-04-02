@@ -630,6 +630,12 @@ export type Protocol = {
             "type": {
               "defined": "GeoLocation"
             }
+          },
+          {
+            "name": "locationName",
+            "type": {
+              "defined": "Name"
+            }
           }
         ]
       }
@@ -1621,6 +1627,12 @@ export const IDL: Protocol = {
             "name": "location",
             "type": {
               "defined": "GeoLocation"
+            }
+          },
+          {
+            "name": "locationName",
+            "type": {
+              "defined": "Name"
             }
           }
         ]
