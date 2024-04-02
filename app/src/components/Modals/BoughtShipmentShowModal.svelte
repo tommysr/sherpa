@@ -11,12 +11,10 @@
 	import Empty from '../Statuses/Empty.svelte';
 	import Error from '../Statuses/Error.svelte';
 	import TransactionSent from '../Statuses/TransactionSent.svelte';
-	import type { ApiCarrierAccount } from '$src/utils/idl/carrier';
-	import {
-		searchableBoughtShipments,
-		type SearchableBoughtOrder
-	} from '$src/stores/forwarderShipments';
+	import type { ApiCarrierAccount } from '$src/utils/account/carrier';
+
 	import { BN } from 'bn.js';
+	import { forwardedShipments, type ForwardedShipment } from '$src/stores/forwarderShipments';
 
 	export let showModal: boolean;
 	export let carrierAccount: ApiCarrierAccount;
@@ -25,10 +23,10 @@
 	let time: number;
 	let price: number;
 
-	let shipment: SearchableBoughtOrder | undefined;
+	let shipment: ForwardedShipment | undefined;
 
 	$: if (selectedLocation) {
-		shipment = $searchableBoughtShipments.filtered.at(selectedLocation);
+		shipment = $forwardedShipments.at(selectedLocation);
 	}
 
 	$: timeInSecs = time * 60;
@@ -76,7 +74,7 @@
 			new BN(price * 10 ** 9),
 			timeInSecs,
 			$walletStore.publicKey!,
-			new PublicKey(shipment?.publicKey as string), // TODO: handle it
+			new PublicKey(shipment?.shipment.publicKey as string), // TODO: handle it
 			new PublicKey(carrierAccount.account.authority)
 		);
 

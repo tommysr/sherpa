@@ -6,11 +6,11 @@
 
 <div
 	class={clsx(
-		'absolute md:hidden w-full bottom-0 left-0 md:top-2/3 my-auto z-10 rounded-3xl xl:max-w-md p-4 shadow-xl overflow-y-scroll bg-background ease-in-out transition-all duration-300',
-		isMobileOpen ? 'h-3/4' : 'h-1/4'
+		'fixed md:hidden w-full bottom-0 left-0 md:top-2/3 flex-col flex z-10 rounded-3xl xl:max-w-md p-4 shadow-xl overflow-y-scroll bg-background ease-in-out transition-all duration-300',
+		isMobileOpen ? 'h-3/4' : 'h-1/5'
 	)}
 >
-	<div class="cursor-pointer flex justify-center mt-2">
+	<div class="cursor-pointer flex justify-center mt-2 flex-none">
 		{#if !isMobileOpen}
 			<button on:click={() => (isMobileOpen = !isMobileOpen)}>
 				<svg
@@ -54,11 +54,13 @@
 		{/if}
 	</div>
 
-	<slot />
+	<div class="flex justify-center items-center flex-1">
+		<slot />
+	</div>
 </div>
 
 <div
-	class="absolute hidden md:block right-7 top-32 my-auto z-10 rounded-3xl h-3/4 xl:max-w-md p-4 shadow-xl overflow-y-auto bg-background"
+	class="fixed hidden md:flex justify-center items-center md:w-1/3 xl:w-1/4 2xl:w-1/5 right-7 top-32 my-auto z-10 rounded-3xl h-3/4 p-4 shadow-xl overflow-y-auto bg-background"
 >
 	<slot />
 </div>

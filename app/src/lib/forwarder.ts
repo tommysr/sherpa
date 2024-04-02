@@ -40,7 +40,7 @@ export const getBuyShipmentTx = async (
 	program: Program<Protocol>,
 	signer: PublicKey,
 	shipment: PublicKey,
-	shipperAuthority: PublicKey,
+	shipmentOwner: PublicKey,
 	forwarderName: string
 ): Promise<Transaction> => {
 	const tx = new Transaction();
@@ -55,7 +55,7 @@ export const getBuyShipmentTx = async (
 		tx.add(ix);
 	}
 
-	const shipper = getShipperAddress(program, shipperAuthority);
+	const shipper = getShipperAddress(program, shipmentOwner);
 	const bought = getBoughtShipmentAddress(program, signer, forwarderAccount?.count ?? 0);
 
 	const ix = await program.methods
@@ -65,6 +65,7 @@ export const getBuyShipmentTx = async (
 			shipment,
 			forwarder,
 			bought,
+			shipmentOwner,
 			signer
 		})
 		.instruction();

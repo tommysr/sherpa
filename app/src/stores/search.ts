@@ -11,7 +11,6 @@ interface StoreInt<T> {
 
 export interface SearchStore<T extends SearchItem> {
 	subscribe: (value: (value: StoreInt<T>) => void) => () => void;
-	set: (value: StoreInt<T>) => void;
 	update: (updater: (value: StoreInt<T>) => StoreInt<T>) => void;
 	default: (defData: T[]) => void;
 	performSearch: () => void;
@@ -67,7 +66,6 @@ export function createSearchStore<T extends SearchItem>(initialData: T[]): Searc
 
 	return {
 		subscribe,
-		set,
 		update,
 		default: (defData: T[]) =>
 			set({ data: defData, filtered: defData, searchString: '', searchState: 'none' }),

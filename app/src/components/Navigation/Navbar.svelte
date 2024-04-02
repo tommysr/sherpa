@@ -1,7 +1,8 @@
 <script lang="ts">
+	import clsx from 'clsx';
+
 	import Logo from '$lib/images/logo.png';
 	import WalletMultiButton from '$src/components/Wallet/WalletMultiButton.svelte';
-	import clsx from 'clsx';
 
 	import { page } from '$app/stores';
 
