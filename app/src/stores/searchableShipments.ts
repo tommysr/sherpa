@@ -1,6 +1,20 @@
-import type { ApiShipmentAccount } from '$src/utils/idl/shipment';
-import { createSearchStore, type SearchItem } from './search';
+import type { ApiShipmentAccount } from '$src/utils/account/shipment';
+import { derived, readable } from 'svelte/store';
+import { createSearchStore, type SearchItem, type SearchStore } from './search';
+import { PublicKey } from '@solana/web3.js';
 
-export type SearchableOrder = ApiShipmentAccount & SearchItem;
+export type SearchableShipment = ApiShipmentAccount & SearchItem;
 
-export const searchableShipments = createSearchStore<SearchableOrder>([]);
+export const searchableShipments = createSearchStore<SearchableShipment>([]);
+
+export const notForwardedShipments = derived<SearchStore<SearchableShipment>, ApiShipmentAccount[]>(
+	searchableShipments,
+	($searchableShipments, set) => {
+		const mapped = $searchableShipments.filtered.filter(
+			(a) => a.account.forwarder === PublicKey.default.toString()
+		);
+
+		set(mapped);
+	},
+	[]
+);

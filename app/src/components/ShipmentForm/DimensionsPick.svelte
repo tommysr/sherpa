@@ -1,5 +1,5 @@
 <script lang="ts">
-	import type { ShipmentDimensions } from '$src/utils/idl/shipment';
+	import type { ShipmentDimensions } from '$src/utils/account/shipment';
 
 	export let metrics: {
 		weight: string;

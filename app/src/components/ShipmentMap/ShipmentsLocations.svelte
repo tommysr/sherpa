@@ -1,13 +1,11 @@
 <script lang="ts">
-	import { Map as Map$1 } from 'maplibre-gl';
-	import { GeoJSON as GeoJson, LineLayer, MapLibre, Marker } from 'svelte-maplibre';
-
-	import type { Geography } from '$src/utils/idl/shipment';
+	import { GeoJSON as GeoJson, LineLayer, Marker } from 'svelte-maplibre';
+	import type { Geography } from '$src/utils/account/shipment';
 	import clsx from 'clsx';
 	import { getContext } from 'svelte';
 	import type { MapContext } from 'svelte-maplibre/context.svelte';
 
-	export let locations: Geography[];
+	export let locations: Geography<string>[];
 	export let selectedLocation: number | undefined;
 	export let onMarkerClick: (location: number) => void;
 	export let isMobile: boolean;

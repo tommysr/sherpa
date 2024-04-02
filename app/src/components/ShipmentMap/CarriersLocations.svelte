@@ -3,8 +3,7 @@
 	import clsx from 'clsx';
 	import { getContext } from 'svelte';
 	import type { MapContext } from 'svelte-maplibre/context.svelte';
-	import type { ApiCarrierAccount } from '$src/utils/idl/carrier';
-	import type { LngLatBounds } from 'maplibre-gl';
+	import type { ApiCarrierAccount } from '$src/utils/account/carrier';
 
 	export let carriers: ApiCarrierAccount[];
 	export let selectedCarrier: number | undefined;

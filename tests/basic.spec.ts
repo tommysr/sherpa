@@ -1,14 +1,14 @@
 import * as anchor from '@coral-xyz/anchor'
 import { BN, Program } from '@coral-xyz/anchor'
-import { Protocol } from '../target/types/protocol'
+import { Protocol } from '../app/src/utils/idl/types/protocol'
 import { Keypair, PublicKey, SystemProgram } from '@solana/web3.js'
 import { ONE_HOUR, ONE_SOL, U64_MAX, awaitedAirdrops } from './utils'
 import {
-  // DF_BASE,
-  // DF_MODULUS,
-  // decodeKey,
+  DF_BASE,
+  DF_MODULUS,
+  decodeKey,
   decodeName,
-  // encodeKey,
+  encodeKey,
   encodeName,
   getAcceptedOfferAddress,
   getBoughtShipmentAddress,
@@ -18,7 +18,7 @@ import {
   getShipmentAddress,
   getShipperAddress,
   getStateAddress
-} from '../sdk/sdk'
+} from '../app/src/sdk/sdk'
 import { expect } from 'chai'
 
 describe('protocol', () => {
@@ -299,7 +299,8 @@ describe('protocol', () => {
       location: {
         latitude: 43,
         longitude: 44
-      }
+      },
+      locationName: encodeName('Krakow')
     }
 
     await program.methods
@@ -318,6 +319,7 @@ describe('protocol', () => {
     expect(decodeName(carrierAccount.name)).eq('Carol')
     expect(carrierAccount.availability.time.eq(availability.time)).true
     expect(carrierAccount.availability.location).to.deep.equal(availability.location)
+    expect(decodeName(carrierAccount.availability.locationName)).eq('Krakow')
     expect(carrierAccount.offersCount).eq(0)
     expect(carrierAccount.tasksCount).eq(0)
   })
@@ -411,50 +413,50 @@ describe('protocol', () => {
     program.removeEventListener(subscriptionId)
   })
 
-  // it('open channel', async () => {
-  //   const shipmentAddress = getShipmentAddress(program, shipper.publicKey, 0)
+  it('open channel', async () => {
+    const shipmentAddress = getShipmentAddress(program, shipper.publicKey, 0)
 
-  //   const secret = new BN(4)
-  //   const shared = DF_BASE.pow(secret).mod(DF_MODULUS)
+    const secret = new BN(4)
+    const shared = DF_BASE.pow(secret).mod(DF_MODULUS)
 
-  //   await program.methods
-  //     .openChannel(encodeKey(shared))
-  //     .accounts({
-  //       shipment: shipmentAddress,
-  //       signer: shipper.publicKey
-  //     })
-  //     .signers([shipper])
-  //     .rpc()
+    await program.methods
+      .openChannel(encodeKey(shared))
+      .accounts({
+        shipment: shipmentAddress,
+        signer: shipper.publicKey
+      })
+      .signers([shipper])
+      .rpc()
 
-  //   const shipmentAccount = await program.account.shipment.fetch(shipmentAddress)
+    const shipmentAccount = await program.account.shipment.fetch(shipmentAddress)
 
-  //   expect(decodeKey(shipmentAccount.channel.shipper).eq(shared)).true
-  // })
+    expect(decodeKey(shipmentAccount.channel.shipper).eq(shared)).true
+  })
 
-  // it('accept channel', async () => {
-  //   const shipmentAddress = getShipmentAddress(program, shipper.publicKey, 0)
+  it('accept channel', async () => {
+    const shipmentAddress = getShipmentAddress(program, shipper.publicKey, 0)
 
-  //   const secret = new BN(3)
-  //   const shared = DF_BASE.pow(secret).mod(DF_MODULUS)
+    const secret = new BN(3)
+    const shared = DF_BASE.pow(secret).mod(DF_MODULUS)
 
-  //   const shipmentAccountBefore = await program.account.shipment.fetch(shipmentAddress)
-  //   const other = decodeKey(shipmentAccountBefore.channel.shipper)
-  //   const key = other.pow(secret).mod(DF_MODULUS)
+    const shipmentAccountBefore = await program.account.shipment.fetch(shipmentAddress)
+    const other = decodeKey(shipmentAccountBefore.channel.shipper)
+    const key = other.pow(secret).mod(DF_MODULUS)
 
-  //   expect(key.eqn(18)).true
+    expect(key.eqn(18)).true
 
-  //   // TODO: Actually encrypt here
-  //   await program.methods
-  //     .sendMessage(encodeKey(shared), encodeName('Hello!'))
-  //     .accounts({
-  //       shipment: shipmentAddress,
-  //       signer: carrier.publicKey
-  //     })
-  //     .signers([carrier])
-  //     .rpc()
+    // TODO: Actually encrypt here
+    await program.methods
+      .sendMessage(encodeKey(shared), encodeName('Hello!'))
+      .accounts({
+        shipment: shipmentAddress,
+        signer: carrier.publicKey
+      })
+      .signers([carrier])
+      .rpc()
 
-  //   const shipmentAccount = await program.account.shipment.fetch(shipmentAddress)
+    const shipmentAccount = await program.account.shipment.fetch(shipmentAddress)
 
-  //   expect(decodeKey(shipmentAccount.channel.carrier).eq(shared)).true
-  // })
+    expect(decodeKey(shipmentAccount.channel.carrier).eq(shared)).true
+  })
 })
