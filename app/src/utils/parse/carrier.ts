@@ -14,6 +14,7 @@ export function parseCarrierToApiCarrier(
 		name: decodeName(carrierAccount.name),
 		availability: {
 			...carrierAccount.availability,
+			locationName: decodeName(carrierAccount.availability.locationName),
 			time: new Date(carrierAccount.availability.time.toNumber()).toISOString()
 		}
 	};
