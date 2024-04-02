@@ -5,7 +5,7 @@
 	import CarriersLocations from '$src/components/ShipmentMap/CarriersLocations.svelte';
 	import ShipmentsLocations from '$src/components/ShipmentMap/ShipmentsLocations.svelte';
 	import ViewListSwitch from '$src/components/Switches/ViewListSwitch.svelte';
-	import { searchableBoughtShipments } from '$src/stores/forwarderShipments';
+	import { forwardedShipments, forwardedShipmentsMeta } from '$src/stores/forwarderShipments';
 	import { walletStore } from '$stores/wallet';
 	import type { PageData } from './$types';
 
@@ -15,17 +15,16 @@
 	}
 
 	$: if ($walletStore.publicKey) {
-		searchableBoughtShipments.update((s) => {
-			s.filtered = s.data.filter((s) => s.account.buyer === $walletStore.publicKey?.toString());
-
-			s.data = s.filtered;
+		// TODO: make it custom
+		forwardedShipmentsMeta.update((s) => {
+			s.filter((s) => s.account.forwarder === $walletStore.publicKey?.toString());
 
 			return s;
 		});
 	}
 
 	$: carriers = data.carriers;
-	$: locationsOnMap = $searchableBoughtShipments.data.map((s) => s.account.shipment.geography);
+	$: locationsOnMap = $forwardedShipments.map((s) => s.shipment.account.shipment.geography);
 	$: isWalletConnected = $walletStore.publicKey != null;
 	$: operationMode = operationModeSwitch ? OperationMode.SELL : OperationMode.VIEW;
 	$: isExclusiveMode = operationMode == OperationMode.SELL && selectedLocation != undefined;
@@ -74,7 +73,7 @@
 			>
 				Please connect your wallet to view bought shipments
 			</p>
-		{:else if $searchableBoughtShipments.filtered.length != 0}
+		{:else if $forwardedShipments.length != 0}
 			{#if operationMode == OperationMode.SELL}
 				{#each carriers as carrier, i}
 					<CarrierListElement
@@ -86,10 +85,10 @@
 					/>
 				{/each}
 			{:else}
-				{#each $searchableBoughtShipments.filtered as account, i}
+				{#each $forwardedShipments as { meta }, i}
 					<BoughtOrderListElement
 						on:click={() => onShipmentElementSelect(i)}
-						shipmentAccount={account}
+						shipmentAccount={meta}
 						{selectedLocation}
 						shipmentId={i}
 					/>

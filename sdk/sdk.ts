@@ -2,6 +2,7 @@ import * as anchor from '@coral-xyz/anchor'
 import { Program } from '@coral-xyz/anchor'
 import { PublicKey } from '@solana/web3.js'
 import type { Protocol } from '../target/types/protocol'
+import { BN } from 'bn.js'
 
 export const STATE_SEED = 'state'
 export const SHIPPER_SEED = 'shipper'

@@ -1,5 +1,9 @@
 <script lang="ts">
-	import type { ApiShipmentAccount, Geography, ShipmentDimensions } from '$src/utils/idl/shipment';
+	import type {
+		ApiShipmentAccount,
+		Geography,
+		ShipmentDimensions
+	} from '$src/utils/account/shipment';
 	import type { Entries } from '$src/utils/types/object';
 	import { get } from 'svelte/store';
 	import Modal from './Modal.svelte';
@@ -8,7 +12,7 @@
 	import { walletStore } from '$src/stores/wallet';
 	import { web3Store } from '$src/stores/web3';
 	import { useSignAndSendTransaction } from '$src/utils/wallet/singAndSendTx';
-	import { getBuyShipmentTx } from '$lib/forwarder';
+	import { fetchForwarderAccount, getBuyShipmentTx } from '$lib/forwarder';
 	import { userStore } from '$src/stores/user';
 	import { searchableShipments } from '$src/stores/searchableShipments';
 	import Pending from '../Statuses/Pending.svelte';
@@ -21,8 +25,8 @@
 
 	$: shipmentData = shipmentAccount.account;
 	$: dimensions = Object.entries(shipmentData.shipment.dimensions) as Entries<ShipmentDimensions>;
-	$: locations = Object.entries(shipmentData.shipment.geography) as Entries<Geography>;
-	// $: properties = Object.entries(shipmentData.shipment.details) as Entries<ShipmentDetails>;
+	$: locations = shipmentData.shipment.geography;
+	// // $: properties = Object.entries(shipmentData.shipment.details) as Entries<ShipmentDetails>;
 
 	let status = {
 		component: Empty,
@@ -75,10 +79,11 @@
 		try {
 			const sig = await useSignAndSendTransaction(connection, wallet, tx);
 
-			const indexToRemove = $searchableShipments.data.findIndex(
-				(s) => s.publicKey === shipmentAccount.publicKey
-			);
-			searchableShipments.shrink(indexToRemove);
+			// TODO: manipulate store to move it forward
+			// const indexToUpdate = $searchableShipments.data.findIndex(
+			// 	(s) => s.publicKey === shipmentAccount.publicKey
+			// );
+			// searchableShipments.shrink(indexToRemove);
 
 			status.component = TransactionSent;
 			status.statusString = sig;
@@ -131,26 +136,7 @@
 			</div>
 
 			<div class="col-span-3">
-				{#if locations}
-					{@const len = locations.length}
-
-					{#each locations as [location, value], index}
-						<!-- TODO: batching or keep locations on server -->
-						{#await getLocationFromCoords(value.latitude, value.longitude)}
-							<article aria-busy="true"></article>
-						{:then location}
-							{location}
-						{:catch error}
-							{value.latitude.toFixed(4)} {value.longitude.toFixed(4)}
-						{/await}
-
-						{#if index != len - 1}
-							{'→ '}
-						{/if}
-					{/each}
-				{:else}
-					<p>No location</p>
-				{/if}
+				{locations.fromName + ' → ' + locations.toName}
 			</div>
 		</div>
 
