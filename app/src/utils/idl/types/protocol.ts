@@ -12,6 +12,11 @@ export type Protocol = {
         },
         {
           "name": "admin",
+          "isMut": false,
+          "isSigner": true
+        },
+        {
+          "name": "payer",
           "isMut": true,
           "isSigner": true
         },
@@ -33,6 +38,11 @@ export type Protocol = {
         },
         {
           "name": "signer",
+          "isMut": false,
+          "isSigner": true
+        },
+        {
+          "name": "payer",
           "isMut": true,
           "isSigner": true
         },
@@ -61,6 +71,11 @@ export type Protocol = {
         },
         {
           "name": "signer",
+          "isMut": false,
+          "isSigner": true
+        },
+        {
+          "name": "payer",
           "isMut": true,
           "isSigner": true
         },
@@ -89,6 +104,11 @@ export type Protocol = {
         },
         {
           "name": "signer",
+          "isMut": false,
+          "isSigner": true
+        },
+        {
+          "name": "payer",
           "isMut": true,
           "isSigner": true
         },
@@ -130,6 +150,11 @@ export type Protocol = {
         },
         {
           "name": "signer",
+          "isMut": false,
+          "isSigner": true
+        },
+        {
+          "name": "payer",
           "isMut": true,
           "isSigner": true
         },
@@ -183,6 +208,11 @@ export type Protocol = {
         },
         {
           "name": "signer",
+          "isMut": false,
+          "isSigner": true
+        },
+        {
+          "name": "payer",
           "isMut": true,
           "isSigner": true
         },
@@ -224,6 +254,11 @@ export type Protocol = {
         },
         {
           "name": "signer",
+          "isMut": false,
+          "isSigner": true
+        },
+        {
+          "name": "payer",
           "isMut": true,
           "isSigner": true
         },
@@ -274,6 +309,11 @@ export type Protocol = {
         },
         {
           "name": "signer",
+          "isMut": false,
+          "isSigner": true
+        },
+        {
+          "name": "payer",
           "isMut": true,
           "isSigner": true
         },
@@ -300,6 +340,11 @@ export type Protocol = {
         },
         {
           "name": "signer",
+          "isMut": false,
+          "isSigner": true
+        },
+        {
+          "name": "payer",
           "isMut": true,
           "isSigner": true
         }
@@ -323,6 +368,11 @@ export type Protocol = {
         },
         {
           "name": "signer",
+          "isMut": false,
+          "isSigner": true
+        },
+        {
+          "name": "payer",
           "isMut": true,
           "isSigner": true
         }
@@ -532,11 +582,15 @@ export type Protocol = {
             "type": "u32"
           },
           {
+            "name": "status",
+            "type": "u8"
+          },
+          {
             "name": "reserved",
             "type": {
               "array": [
                 "u8",
-                4
+                3
               ]
             }
           }
@@ -1020,6 +1074,11 @@ export const IDL: Protocol = {
         },
         {
           "name": "admin",
+          "isMut": false,
+          "isSigner": true
+        },
+        {
+          "name": "payer",
           "isMut": true,
           "isSigner": true
         },
@@ -1041,6 +1100,11 @@ export const IDL: Protocol = {
         },
         {
           "name": "signer",
+          "isMut": false,
+          "isSigner": true
+        },
+        {
+          "name": "payer",
           "isMut": true,
           "isSigner": true
         },
@@ -1069,6 +1133,11 @@ export const IDL: Protocol = {
         },
         {
           "name": "signer",
+          "isMut": false,
+          "isSigner": true
+        },
+        {
+          "name": "payer",
           "isMut": true,
           "isSigner": true
         },
@@ -1097,6 +1166,11 @@ export const IDL: Protocol = {
         },
         {
           "name": "signer",
+          "isMut": false,
+          "isSigner": true
+        },
+        {
+          "name": "payer",
           "isMut": true,
           "isSigner": true
         },
@@ -1138,6 +1212,11 @@ export const IDL: Protocol = {
         },
         {
           "name": "signer",
+          "isMut": false,
+          "isSigner": true
+        },
+        {
+          "name": "payer",
           "isMut": true,
           "isSigner": true
         },
@@ -1191,6 +1270,11 @@ export const IDL: Protocol = {
         },
         {
           "name": "signer",
+          "isMut": false,
+          "isSigner": true
+        },
+        {
+          "name": "payer",
           "isMut": true,
           "isSigner": true
         },
@@ -1232,6 +1316,11 @@ export const IDL: Protocol = {
         },
         {
           "name": "signer",
+          "isMut": false,
+          "isSigner": true
+        },
+        {
+          "name": "payer",
           "isMut": true,
           "isSigner": true
         },
@@ -1282,6 +1371,11 @@ export const IDL: Protocol = {
         },
         {
           "name": "signer",
+          "isMut": false,
+          "isSigner": true
+        },
+        {
+          "name": "payer",
           "isMut": true,
           "isSigner": true
         },
@@ -1308,6 +1402,11 @@ export const IDL: Protocol = {
         },
         {
           "name": "signer",
+          "isMut": false,
+          "isSigner": true
+        },
+        {
+          "name": "payer",
           "isMut": true,
           "isSigner": true
         }
@@ -1331,6 +1430,11 @@ export const IDL: Protocol = {
         },
         {
           "name": "signer",
+          "isMut": false,
+          "isSigner": true
+        },
+        {
+          "name": "payer",
           "isMut": true,
           "isSigner": true
         }
@@ -1540,11 +1644,15 @@ export const IDL: Protocol = {
             "type": "u32"
           },
           {
+            "name": "status",
+            "type": "u8"
+          },
+          {
             "name": "reserved",
             "type": {
               "array": [
                 "u8",
-                4
+                3
               ]
             }
           }
