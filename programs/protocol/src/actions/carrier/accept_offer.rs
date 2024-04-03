@@ -6,7 +6,7 @@ use crate::{AcceptedOffer, Carrier, Error, Forwarder, OfferAccepted, Shipment, S
 pub struct AcceptOffer<'info> {
     #[account(init,
         seeds = [b"task", carrier.load().unwrap().creator.as_ref(), &carrier.load().unwrap().tasks_count.to_le_bytes()], bump,
-        payer = signer,
+        payer = payer,
         space = 8 + std::mem::size_of::<AcceptedOffer>()
     )]
     pub task: AccountLoader<'info, AcceptedOffer>,
@@ -28,8 +28,9 @@ pub struct AcceptOffer<'info> {
         constraint = carrier.load().unwrap().authority == *signer.key @ Error::SignerNotAnAuthority
     )]
     pub carrier: AccountLoader<'info, Carrier>,
-    #[account(mut)]
     pub signer: Signer<'info>,
+    #[account(mut)]
+    pub payer: Signer<'info>,
     #[account(mut,
         constraint = offer_owner.key() == offer.load().unwrap().offeror @ Error::InvalidShipperAccount,
     )]
@@ -70,6 +71,7 @@ pub fn handler(ctx: Context<AcceptOffer>) -> Result<()> {
         from: shipment.forwarder,
         to: shipment.shipper,
         offer: ctx.accounts.offer.key(),
+        shipment: ctx.accounts.shipment.key(),
     });
 
     ctx.accounts

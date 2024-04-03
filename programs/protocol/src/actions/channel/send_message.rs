@@ -8,8 +8,9 @@ pub struct SendMessage<'info> {
         seeds = [b"shipment", shipment.load().unwrap().shipper.as_ref(), &shipment.load().unwrap().no.to_le_bytes()], bump,
     )]
     pub shipment: AccountLoader<'info, Shipment>,
-    #[account(mut)]
     pub signer: Signer<'info>,
+    #[account(mut)]
+    pub payer: Signer<'info>,
 }
 
 pub fn handler(ctx: Context<SendMessage>, key: Public, message: Name) -> Result<()> {

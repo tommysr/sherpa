@@ -1,8 +1,7 @@
 import * as anchor from '@coral-xyz/anchor'
-import { Program } from '@coral-xyz/anchor'
+import { Program, utils, BN } from '@coral-xyz/anchor'
 import { PublicKey } from '@solana/web3.js'
-import type { Protocol } from '../target/types/protocol'
-import { BN } from 'bn.js'
+import { Protocol } from '../target/types/protocol'
 
 export const STATE_SEED = 'state'
 export const SHIPPER_SEED = 'shipper'
@@ -12,13 +11,12 @@ export const SHIPMENT_SEED = 'shipment'
 export const BOUGHT_SHIPMENT_SEED = 'forwarded'
 export const OFFER_SEED = 'offer'
 export const ACCEPTED_OFFER_SEED = 'task'
-
-// export const DF_BASE = new BN(5)
-// export const DF_MODULUS = new BN(23)
+export const DF_BASE = new BN(5)
+export const DF_MODULUS = new BN(23)
 
 export const getStateAddress = (program: Program<Protocol>) => {
   const [stateAddress, stateBump] = PublicKey.findProgramAddressSync(
-    [Buffer.from(anchor.utils.bytes.utf8.encode(STATE_SEED))],
+    [Buffer.from(utils.bytes.utf8.encode(STATE_SEED))],
     program.programId
   )
   return stateAddress
@@ -26,7 +24,7 @@ export const getStateAddress = (program: Program<Protocol>) => {
 
 export const getShipperAddress = (program: Program<Protocol>, shipper: PublicKey) => {
   const [shipperAddress, shipperBump] = PublicKey.findProgramAddressSync(
-    [Buffer.from(anchor.utils.bytes.utf8.encode(SHIPPER_SEED)), shipper.toBuffer()],
+    [Buffer.from(utils.bytes.utf8.encode(SHIPPER_SEED)), shipper.toBuffer()],
     program.programId
   )
   return shipperAddress
@@ -34,7 +32,7 @@ export const getShipperAddress = (program: Program<Protocol>, shipper: PublicKey
 
 export const getForwarderAddress = (program: Program<Protocol>, forwarder: PublicKey) => {
   const [forwarderAddress, shipperBump] = PublicKey.findProgramAddressSync(
-    [Buffer.from(anchor.utils.bytes.utf8.encode(FORWARDER_SEED)), forwarder.toBuffer()],
+    [Buffer.from(utils.bytes.utf8.encode(FORWARDER_SEED)), forwarder.toBuffer()],
     program.programId
   )
   return forwarderAddress
@@ -42,7 +40,7 @@ export const getForwarderAddress = (program: Program<Protocol>, forwarder: Publi
 
 export const getCarrierAddress = (program: Program<Protocol>, carrier: PublicKey) => {
   const [carrierAddress, shipperBump] = PublicKey.findProgramAddressSync(
-    [Buffer.from(anchor.utils.bytes.utf8.encode(CARRIER_SEED)), carrier.toBuffer()],
+    [Buffer.from(utils.bytes.utf8.encode(CARRIER_SEED)), carrier.toBuffer()],
     program.programId
   )
   return carrierAddress
@@ -57,7 +55,7 @@ export const getShipmentAddress = (
   indexBuffer.writeInt32LE(index)
 
   const [shipmentAddress, shipmentBump] = PublicKey.findProgramAddressSync(
-    [Buffer.from(anchor.utils.bytes.utf8.encode(SHIPMENT_SEED)), shipper.toBuffer(), indexBuffer],
+    [Buffer.from(utils.bytes.utf8.encode(SHIPMENT_SEED)), shipper.toBuffer(), indexBuffer],
     program.programId
   )
 
@@ -81,11 +79,7 @@ export const getBoughtShipmentAddress = (
   indexBuffer.writeInt32LE(index)
 
   const [shipmentAddress, shipmentBump] = PublicKey.findProgramAddressSync(
-    [
-      Buffer.from(anchor.utils.bytes.utf8.encode(BOUGHT_SHIPMENT_SEED)),
-      forwarder.toBuffer(),
-      indexBuffer
-    ],
+    [Buffer.from(utils.bytes.utf8.encode(BOUGHT_SHIPMENT_SEED)), forwarder.toBuffer(), indexBuffer],
     program.programId
   )
 
@@ -105,7 +99,7 @@ export const getOfferAddress = (program, carrier: PublicKey, index: number) => {
   indexBuffer.writeInt32LE(index)
 
   const [offerAddress, offerBump] = PublicKey.findProgramAddressSync(
-    [Buffer.from(anchor.utils.bytes.utf8.encode(OFFER_SEED)), carrier.toBuffer(), indexBuffer],
+    [Buffer.from(utils.bytes.utf8.encode(OFFER_SEED)), carrier.toBuffer(), indexBuffer],
     program.programId
   )
 
@@ -117,11 +111,7 @@ export const getAcceptedOfferAddress = (program, carrier: PublicKey, index: numb
   indexBuffer.writeInt32LE(index)
 
   const [offerAddress, offerBump] = PublicKey.findProgramAddressSync(
-    [
-      Buffer.from(anchor.utils.bytes.utf8.encode(ACCEPTED_OFFER_SEED)),
-      carrier.toBuffer(),
-      indexBuffer
-    ],
+    [Buffer.from(utils.bytes.utf8.encode(ACCEPTED_OFFER_SEED)), carrier.toBuffer(), indexBuffer],
     program.programId
   )
 
@@ -129,7 +119,7 @@ export const getAcceptedOfferAddress = (program, carrier: PublicKey, index: numb
 }
 
 export const encodeName = (utf8Name: string) => {
-  const encoded = anchor.utils.bytes.utf8.encode(utf8Name)
+  const encoded = utils.bytes.utf8.encode(utf8Name)
 
   if (encoded.length > 64) {
     throw new Error('name too long')
@@ -176,61 +166,62 @@ export const decodeName = (encoded: { value: number[] }): string => {
     result.pop()
   }
 
-  return anchor.utils.bytes.utf8.decode(Buffer.from(result))
+  return utils.bytes.utf8.decode(Buffer.from(result))
 }
 
-// export const encodeKey = (key: BN) => {
-//   const single = new BN(2).pow(new BN(64))
-//   let value = [key.mod(single)]
+type BNN = InstanceType<typeof BN>
+export const encodeKey = (key: BNN) => {
+  const single = new BN(2).pow(new BN(64))
+  let value = [key.mod(single)]
 
-//   let remaining = key
+  let remaining = key
 
-//   while (key.gte(single)) {
-//     remaining = remaining.div(single)
-//     value.push(remaining.mod(single))
-//   }
+  while (key.gte(single)) {
+    remaining = remaining.div(single)
+    value.push(remaining.mod(single))
+  }
 
-//   if (value.length > 4) {
-//     throw new Error('key too long')
-//   }
+  if (value.length > 4) {
+    throw new Error('key too long')
+  }
 
-//   while (value.length < 4) {
-//     value.push(new BN(0))
-//   }
+  while (value.length < 4) {
+    value.push(new BN(0))
+  }
 
-//   return { value }
-// }
+  return { value }
+}
 
-// export const decodeKey = (encoded: { value: BN[] }) => {
-//   const single = new BN(2).pow(new BN(64))
-//   let result = new BN(0)
+export const decodeKey = (encoded: { value: BNN[] }) => {
+  const single = new BN(2).pow(new BN(64))
+  let result = new BN(0)
 
-//   let remaining = new BN(1)
+  let remaining = new BN(1)
 
-//   for (let i = 0; i < encoded.value.length; i++) {
-//     result = result.add(encoded.value[i].mul(remaining))
-//     remaining = remaining.mul(single)
-//   }
+  for (let i = 0; i < encoded.value.length; i++) {
+    result = result.add(encoded.value[i].mul(remaining))
+    remaining = remaining.mul(single)
+  }
 
-//   return result
-// }
+  return result
+}
 
-// export const encrypt = (plain: string, key: BN) => {
-//   const encoded = encodeName(plain)
-//   let multiplier = new BN(1)
+export const encrypt = (plain: string, key: BNN) => {
+  const encoded = encodeName(plain)
+  let multiplier = new BN(1)
 
-//   const r = new BN(0)
+  const r = new BN(0)
 
-//   while (encoded.value.length > 0) {
-//     r.add(new BN(encoded.value.pop()!).mul(multiplier))
-//     multiplier = multiplier.muln(256)
-//   }
+  while (encoded.value.length > 0) {
+    r.add(new BN(encoded.value.pop()!).mul(multiplier))
+    multiplier = multiplier.muln(256)
+  }
 
-//   if (r.gte(DF_MODULUS)) {
-//     throw new Error('message too large')
-//   }
+  if (r.gte(DF_MODULUS)) {
+    throw new Error('message too large')
+  }
 
-//   return encodeKey(r.add(DF_MODULUS).add(key).mod(DF_MODULUS))
-// }
+  return encodeKey(r.add(DF_MODULUS).add(key).mod(DF_MODULUS))
+}
 
-// export const decrypt = (encrypted: BN, key: BN) => {}
+export const decrypt = (encrypted: BNN, key: BNN) => {}

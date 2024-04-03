@@ -4,10 +4,11 @@ use crate::State;
 
 #[derive(Accounts)]
 pub struct InitializeState<'info> {
-    #[account(init, seeds = [b"state".as_ref()], bump, payer = admin, space = 8 + std::mem::size_of::<State>())]
+    #[account(init, seeds = [b"state".as_ref()], bump, payer = payer, space = 8 + std::mem::size_of::<State>())]
     pub state: AccountLoader<'info, State>,
-    #[account(mut)]
     pub admin: Signer<'info>,
+    #[account(mut)]
+    pub payer: Signer<'info>,
     pub system_program: Program<'info, System>,
 }
 

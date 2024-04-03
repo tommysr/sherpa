@@ -1,6 +1,6 @@
 import * as anchor from '@coral-xyz/anchor'
 import { BN, Program } from '@coral-xyz/anchor'
-import { Protocol } from '../target/types/protocol'
+import { Protocol } from '../app/src/utils/idl/types/protocol'
 import { Keypair, PublicKey, SystemProgram } from '@solana/web3.js'
 import { ONE_HOUR, ONE_SOL, U64_MAX, awaitedAirdrops } from './utils'
 import {
@@ -18,7 +18,7 @@ import {
   getShipmentAddress,
   getShipperAddress,
   getStateAddress
-} from '../sdk/sdk'
+} from '../app/src/sdk/sdk'
 import { expect } from 'chai'
 
 describe('protocol', () => {
@@ -68,6 +68,7 @@ describe('protocol', () => {
       .accounts({
         shipper: shipperAddress,
         signer: shipper.publicKey,
+        payer: shipper.publicKey,
         systemProgram: SystemProgram.programId
       })
       .signers([shipper])
@@ -124,6 +125,7 @@ describe('protocol', () => {
         shipment: shipmentAddress,
         shipper: shipperAddress,
         signer: shipper.publicKey,
+        payer: shipper.publicKey,
         systemProgram: SystemProgram.programId
       })
       .signers([shipper])
@@ -198,6 +200,7 @@ describe('protocol', () => {
         shipment: shipmentAddress,
         shipper: shipperAddress,
         signer: shipper.publicKey,
+        payer: shipper.publicKey,
         systemProgram: SystemProgram.programId
       })
       .signers([shipper])
@@ -233,6 +236,7 @@ describe('protocol', () => {
       .accounts({
         forwarder: forwarderAddress,
         signer: forwarder.publicKey,
+        payer: forwarder.publicKey,
         systemProgram: SystemProgram.programId
       })
       .signers([forwarder])
@@ -254,8 +258,8 @@ describe('protocol', () => {
     const subscriptionId = program.addEventListener('ShipmentTransferred', event => {
       expect(event.seller.equals(shipperAddress)).true
       expect(event.buyer.equals(forwarderAddress)).true
-      expect(event.before.equals(shipmentAddress)).true
-      expect(event.after.equals(forwardedShipmentAddress)).true
+      expect(event.shipment.equals(shipmentAddress)).true
+      expect(event.forwarded.equals(forwardedShipmentAddress)).true
     })
 
     await program.methods
@@ -266,6 +270,7 @@ describe('protocol', () => {
         shipper: shipperAddress,
         forwarder: forwarderAddress,
         signer: forwarder.publicKey,
+        payer: forwarder.publicKey,
         shipmentOwner: shipper.publicKey
       })
       .signers([forwarder])
@@ -299,7 +304,8 @@ describe('protocol', () => {
       location: {
         latitude: 43,
         longitude: 44
-      }
+      },
+      locationName: encodeName('Krakow')
     }
 
     await program.methods
@@ -307,6 +313,7 @@ describe('protocol', () => {
       .accounts({
         carrier: carrierAddress,
         signer: carrier.publicKey,
+        payer: carrier.publicKey,
         systemProgram: SystemProgram.programId
       })
       .signers([carrier])
@@ -318,6 +325,7 @@ describe('protocol', () => {
     expect(decodeName(carrierAccount.name)).eq('Carol')
     expect(carrierAccount.availability.time.eq(availability.time)).true
     expect(carrierAccount.availability.location).to.deep.equal(availability.location)
+    expect(decodeName(carrierAccount.availability.locationName)).eq('Krakow')
     expect(carrierAccount.offersCount).eq(0)
     expect(carrierAccount.tasksCount).eq(0)
   })
@@ -330,6 +338,7 @@ describe('protocol', () => {
       expect(event.from.equals(forwarder.publicKey)).true
       expect(event.to.equals(carrier.publicKey)).true
       expect(event.offer.equals(offerAddress)).true
+      expect(event.shipment.equals(shipmentAddress)).true
     })
 
     await program.methods
@@ -339,7 +348,8 @@ describe('protocol', () => {
         shipment: shipmentAddress,
         forwarder: forwarderAddress,
         carrier: carrierAddress,
-        signer: forwarder.publicKey
+        signer: forwarder.publicKey,
+        payer: forwarder.publicKey
       })
       .signers([forwarder])
       .rpc()
@@ -371,6 +381,7 @@ describe('protocol', () => {
       expect(event.from.equals(forwarder.publicKey)).true
       expect(event.to.equals(carrier.publicKey)).true
       expect(event.offer.equals(offerAddress)).true
+      expect(event.shipment.equals(shipmentAddress)).true
     })
 
     const offerAccount = await program.account.shipmentOffer.fetch(offerAddress)
@@ -384,6 +395,7 @@ describe('protocol', () => {
         forwarder: forwarderAddress,
         carrier: carrierAddress,
         signer: carrier.publicKey,
+        payer: carrier.publicKey,
         offerOwner: forwarder.publicKey
       })
       .signers([carrier])
@@ -419,7 +431,8 @@ describe('protocol', () => {
       .openChannel(encodeKey(shared))
       .accounts({
         shipment: shipmentAddress,
-        signer: shipper.publicKey
+        signer: shipper.publicKey,
+        payer: shipper.publicKey
       })
       .signers([shipper])
       .rpc()
@@ -446,7 +459,8 @@ describe('protocol', () => {
       .sendMessage(encodeKey(shared), encodeName('Hello!'))
       .accounts({
         shipment: shipmentAddress,
-        signer: carrier.publicKey
+        signer: carrier.publicKey,
+        payer: carrier.publicKey
       })
       .signers([carrier])
       .rpc()
@@ -455,5 +469,4 @@ describe('protocol', () => {
 
     expect(decodeKey(shipmentAccount.channel.carrier).eq(shared)).true
   })
-
 })

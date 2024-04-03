@@ -6,7 +6,7 @@ use crate::{ForwardedShipment, Error, Forwarder, Shipment, ShipmentTransferred, 
 pub struct BuyShipment<'info> {
     #[account(init,
         seeds = [b"forwarded", forwarder.load().unwrap().creator.as_ref(), &forwarder.load().unwrap().count.to_le_bytes()], bump,
-        payer = signer,
+        payer = payer,
         space = 8 + std::mem::size_of::<ForwardedShipment>()
     )]
     pub bought: AccountLoader<'info, ForwardedShipment>,
@@ -23,8 +23,9 @@ pub struct BuyShipment<'info> {
         constraint = forwarder.load().unwrap().authority == *signer.key @ Error::SignerNotAnAuthority
     )]
     pub forwarder: AccountLoader<'info, Forwarder>,
-    #[account(mut)]
     pub signer: Signer<'info>,
+    #[account(mut)]
+    pub payer: Signer<'info>,
     #[account(mut,
         constraint = shipment_owner.key() == shipment.load().unwrap().shipper @ Error::InvalidShipperAccount,
     )]
@@ -63,18 +64,18 @@ pub fn handler(ctx: Context<BuyShipment>) -> Result<()> {
     emit!(ShipmentTransferred {
         seller: ctx.accounts.shipper.key(),
         buyer: ctx.accounts.forwarder.key(),
-        before: ctx.accounts.shipment.key(),
-        after: ctx.accounts.bought.key(),
+        shipment: ctx.accounts.shipment.key(),
+        forwarded: ctx.accounts.bought.key(),
     });
 
 
     // Invoke the transfer instruction
-    let transfer_instruction = system_instruction::transfer(ctx.accounts.signer.key, ctx.accounts.shipment_owner.key, shipment.price);
+    let transfer_instruction = system_instruction::transfer(ctx.accounts.payer.key, ctx.accounts.shipment_owner.key, shipment.price);
 
     anchor_lang::solana_program::program::invoke_signed(
         &transfer_instruction,
         &[
-            ctx.accounts.signer.to_account_info(),
+            ctx.accounts.payer.to_account_info(),
             ctx.accounts.shipment_owner.clone(),
             ctx.accounts.system_program.to_account_info(),
         ],

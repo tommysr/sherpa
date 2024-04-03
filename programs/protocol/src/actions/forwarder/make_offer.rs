@@ -7,7 +7,7 @@ pub struct MakeOffer<'info> {
     #[account(init,
         // Potentially DoSable
         seeds = [b"offer", carrier.load().unwrap().creator.as_ref(), &carrier.load().unwrap().offers_count.to_le_bytes()], bump,
-        payer = signer,
+        payer = payer,
         space = 8 + std::mem::size_of::<ShipmentOffer>()
     )]
     pub offer: AccountLoader<'info, ShipmentOffer>,
@@ -25,8 +25,9 @@ pub struct MakeOffer<'info> {
         seeds = [b"carrier", carrier.load().unwrap().creator.as_ref()], bump,
     )]
     pub carrier: AccountLoader<'info, Carrier>,
-    #[account(mut)]
     pub signer: Signer<'info>,
+    #[account(mut)]
+    pub payer: Signer<'info>,
     pub system_program: Program<'info, System>,
 }
 
@@ -60,6 +61,7 @@ pub fn handler(ctx: Context<MakeOffer>, payment: u64, timeout: u32) -> Result<()
         from: forwarder.creator,
         to: carrier.creator,
         offer: ctx.accounts.offer.key(),
+        shipment: ctx.accounts.shipment.key(),
     });
 
     Ok(())

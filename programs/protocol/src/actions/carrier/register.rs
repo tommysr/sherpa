@@ -7,12 +7,13 @@ use crate::{Availability, Carrier, Name};
 pub struct RegisterCarrier<'info> {
     #[account(init,
         seeds = [b"carrier", signer.key.as_ref()], bump,
-        payer = signer, 
+        payer = payer, 
         space = 8 + std::mem::size_of::<Carrier>()
     )]
     pub carrier: AccountLoader<'info, Carrier>,
-    #[account(mut)]
     pub signer: Signer<'info>,
+    #[account(mut)]
+    pub payer: Signer<'info>,
     pub system_program: Program<'info, System>,
 }
 

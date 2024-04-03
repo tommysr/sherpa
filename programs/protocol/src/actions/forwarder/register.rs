@@ -6,12 +6,13 @@ use crate::{Forwarder, Name};
 pub struct RegisterForwarder<'info> {
     #[account(init,
         seeds = [b"forwarder", signer.key.as_ref()], bump,
-        payer = signer, 
+        payer = payer, 
         space = 8 + std::mem::size_of::<Forwarder>()
     )]
     pub forwarder: AccountLoader<'info, Forwarder>,
-    #[account(mut)]
     pub signer: Signer<'info>,
+    #[account(mut)]
+    pub payer: Signer<'info>,
     pub system_program: Program<'info, System>,
 }
 
