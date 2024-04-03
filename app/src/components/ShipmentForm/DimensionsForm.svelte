@@ -18,40 +18,9 @@
 	let isMetricTon = initialValues.isMetricTon ?? false;
 
 	const { form, data } = createForm<yup.InferType<typeof schema>>({
-		extend: [reporter, validator({ schema })],
+		extend: [reporter, validator({ schema, castValues: true })],
 		onSubmit,
-		initialValues,
-
-		validate: (values) => {
-			const errors = {
-				weight: '',
-				depth: '',
-				width: '',
-				height: '',
-				volume: ''
-			};
-
-			const { depth, weight, width, height, volume, isMetricTon } = values;
-
-			console.log(isMetricTon);
-			if (isSeparator(weight)) {
-				errors.weight = 'enter correct weight';
-			}
-			if (width && isSeparator(width)) {
-				errors.width = 'enter correct width';
-			}
-			if (depth && isSeparator(depth)) {
-				errors.depth = 'enter correct depth';
-			}
-			if (height && isSeparator(height)) {
-				errors.height = 'enter correct height';
-			}
-			if (volume && isSeparator(volume)) {
-				errors.volume = 'enter correct volume';
-			}
-
-			return errors;
-		}
+		initialValues
 	});
 </script>
 

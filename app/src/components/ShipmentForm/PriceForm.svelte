@@ -16,22 +16,9 @@
 	export let showModal = true;
 
 	const { form, data } = createForm<yup.InferType<typeof schema>>({
-		extend: [reporter, validator({ schema })],
+		extend: [reporter, validator({ schema, castValues: true })],
 		onSubmit,
-		initialValues,
-		validate: (values) => {
-			const errors = {
-				price: ''
-			};
-
-			const { price } = values;
-
-			if (isSeparator(price) || price == '0') {
-				errors.price = 'Price must be greater than zero';
-			}
-
-			return errors;
-		}
+		initialValues
 	});
 </script>
 

@@ -15,29 +15,9 @@
 	export let showModal = true;
 
 	const { form, data } = createForm<yup.InferType<typeof schema>>({
-		extend: [reporter, validator({ schema })],
+		extend: [reporter, validator({ schema, castValues: true })],
 		onSubmit,
-		initialValues,
-		validate: (values) => {
-			const errors = {
-				count: '',
-				access: '',
-				priority: '',
-				fragility: ''
-			};
-
-			const { count, access } = values;
-
-			if (count < 1) {
-				errors.count = 'count must be higher than zero';
-			}
-
-			if (access == '0') {
-				errors.access = 'select one of access options';
-			}
-
-			return errors;
-		}
+		initialValues
 	});
 </script>
 

@@ -8,6 +8,7 @@
 	import { validator } from '@felte/validator-yup';
 	import * as yup from 'yup';
 	import NumberInput from '../Inputs/NumberInput.svelte';
+
 	import type { LocationsFormInterface } from './interfaces';
 	import { locationsFormSchema as schema } from './schemas';
 
@@ -85,67 +86,7 @@
 	const { form, data, setData, touched, setFields } = createForm<yup.InferType<typeof schema>>({
 		extend: [reporter, validator({ schema })],
 		onSubmit,
-		initialValues,
-		validate: (values) => {
-			const errors = {
-				destination: '',
-				source: '',
-				sourceLocationLat: '',
-				sourceLocationLng: '',
-				destinationLocationLat: '',
-				destinationLocationLng: '',
-				sourceName: '',
-				destinationName: ''
-			};
-
-			const {
-				sourceLocationLat,
-				destinationLocationLat,
-				destinationLocationLng,
-				sourceLocationLng,
-				destinationName,
-				sourceName
-			} = values;
-
-			if (sourceName == 'default') {
-				errors.source = 'change location or enter name manually';
-			}
-
-			if (destinationName == 'default') {
-				errors.destination = 'change location or enter name manually';
-			}
-
-			const sourceLngLat = LngLat.convert([sourceLocationLng, sourceLocationLat]);
-			const destinationLngLat = LngLat.convert([destinationLocationLng, destinationLocationLat]);
-
-			console.log(sourceLngLat, destinationLngLat);
-
-			if (sourceLngLat.toString() === defaultLocation.toString()) {
-				errors.source = 'you need to change source location';
-			}
-
-			if (destinationLngLat.toString() === defaultLocation.toString()) {
-				errors.destination = 'you need to change destination location';
-			}
-
-			if (sourceLocationLat < -90 || sourceLocationLat > 90) {
-				errors.source = 'Invalid latitude value';
-			}
-
-			if (destinationLocationLat < -90 || destinationLocationLat > 90) {
-				errors.destination = 'Invalid latitude value';
-			}
-
-			if (sourceLocationLng < -180 || sourceLocationLng > 180) {
-				errors.source = 'Invalid longitude value';
-			}
-
-			if (destinationLocationLng < -180 || destinationLocationLng > 180) {
-				errors.destination = 'Invalid longitude value';
-			}
-
-			return errors;
-		}
+		initialValues
 	});
 
 	const sourceNameInitial = $data.sourceName;
@@ -223,11 +164,12 @@
 	<div class="flex justify-center">
 		<Button type="button" on:click={() => (showModal = false)}>Change locations</Button>
 	</div>
-	{#each ['source', 'destination'] as name}
+	{#each ['sourceLocationLat', 'sourceLocationLng', 'destinationLocationLat', 'destinationLocationLng', 'sourceName', 'destinationName'] as name}
+		{@const realName = name[0] == 's' ? 'source' : 'destination'}
 		<ValidationMessage for={name} let:messages={message}>
 			{#if message}
 				<div class="bg-red-200 border-l-4 mt-3 border-red-400 text-orange-700 p-2" role="alert">
-					<p class="font-bold">Invalid {name} location</p>
+					<p class="font-bold">Invalid {realName} location</p>
 					<p>{message || ''}</p>
 				</div>
 			{/if}

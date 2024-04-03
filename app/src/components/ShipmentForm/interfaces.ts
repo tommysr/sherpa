@@ -8,23 +8,23 @@ export interface NameFormInterface {
 }
 
 export interface PriceFormInterface {
-	price: string;
+	price?: number;
 }
 
 export interface DimensionsFormInterface {
 	isMetricTon: boolean;
-	weight: string;
-	volume?: string;
-	width?: string;
-	depth?: string;
-	height?: string;
+	weight: number;
+	volume?: number;
+	width?: number;
+	depth?: number;
+	height?: number;
 	distanceMetrics: 'm' | 'ft';
 	weightMetrics: 'kg' | 'lb';
 }
 
 export interface DetailsFormInterface {
 	count: number;
-	access: string;
+	access: number;
 	priority: number;
 	fragility: number;
 }

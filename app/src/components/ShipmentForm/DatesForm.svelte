@@ -17,25 +17,7 @@
 	const { form, data, touched } = createForm<yup.InferType<typeof schema>>({
 		extend: [reporter, validator({ schema })],
 		onSubmit,
-		initialValues,
-		validate: (values) => {
-			const errors = {
-				when: '',
-				deadline: ''
-			};
-
-			const { deadline, when } = values;
-
-			if (deadline < new Date()) {
-				errors.deadline = 'deadline should be in the future';
-			}
-
-			if (when < new Date()) {
-				errors.when = 'date should be in the future';
-			}
-
-			return errors;
-		}
+		initialValues
 	});
 
 	const deadlineInitial = $data.deadline;

@@ -74,7 +74,7 @@
 			when: new Date()
 		},
 		details: {
-			access: '0',
+			access: 0,
 			count: 1,
 			fragility: 1,
 			priority: 1
@@ -83,13 +83,13 @@
 			distanceMetrics: 'm',
 			isMetricTon: false,
 			weightMetrics: 'kg',
-			weight: '',
-			depth: '',
-			height: '',
-			volume: '',
-			width: ''
+			weight: 0,
+			depth: undefined,
+			height: undefined,
+			volume: undefined,
+			width: undefined
 		},
-		price: { price: '' },
+		price: { price: undefined },
 		locations: {
 			destinationLocationLat: defaultLocation.lat,
 			destinationLocationLng: defaultLocation.lng,
@@ -141,16 +141,13 @@
 			name: { name }
 		} = values;
 
-		let depth = 0;
-		let height = 0;
-		let width = 0;
-		let weight = parseFloat(dimensions.weight!);
+		let depth = dimensions.depth ?? 0;
+		let height = dimensions.height ?? 0;
+		let width = dimensions.width ?? 0;
+		let weight = dimensions.weight ?? 0;
 
 		if (dimensions.isMetricTon) {
-			width = parseFloat(dimensions.volume!);
-		} else {
-			height = parseFloat(dimensions.height!);
-			depth = parseFloat(dimensions.depth!);
+			width = dimensions.volume ?? 0;
 		}
 
 		const tx = await getCreateShipmentTx(
@@ -161,7 +158,7 @@
 				deadline: dates.deadline,
 				when: dates.when,
 				details: {
-					access: parseInt(access),
+					access,
 					count,
 					fragility,
 					priority,
@@ -183,7 +180,7 @@
 					toName: destinationName
 				},
 
-				price: parseFloat(price)
+				price: price ?? 0
 			},
 			shipper.name != '' ? shipper.name : name
 		);

@@ -17,20 +17,7 @@
 	const { form, data } = createForm<yup.InferType<typeof schema>>({
 		extend: [reporter, validator({ schema })],
 		onSubmit,
-		initialValues: { name: initialValues.name },
-		validate: (values) => {
-			const errors = {
-				name: ''
-			};
-
-			const { name } = values;
-
-			if (name.length > 64) {
-				errors.name = 'Name must be less than 64 characters';
-			}
-
-			return errors;
-		}
+		initialValues: { name: initialValues.name }
 	});
 </script>
 
