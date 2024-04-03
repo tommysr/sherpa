@@ -64,42 +64,46 @@
 </script>
 
 <LayoutListWrapper bind:isMobileOpen>
-	<ul>
-		{#if !isWalletConnected}
+	{#if !isWalletConnected}
+		<p
+			class="mt-1 text-center text-xl bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent w-2/3"
+		>
+			Connect your wallet to view shipments
+		</p>
+	{:else if $forwardedShipments.length != 0}
+		<div class="h-full flex w-full flex-col items-center">
+			<ul class="w-full flex-1">
+				{#if operationMode == OperationMode.SELL}
+					{#each carriers as carrier, i}
+						<CarrierListElement
+							on:click={() => onCarrierElementSelect(i)}
+							{selectedCarrier}
+							{selectedLocation}
+							carrierAccount={carrier}
+							carrierId={i}
+						/>
+					{/each}
+				{:else}
+					{#each $forwardedShipments as { meta }, i}
+						<BoughtOrderListElement
+							on:click={() => onShipmentElementSelect(i)}
+							shipmentAccount={meta}
+							{selectedLocation}
+							shipmentId={i}
+						/>
+					{/each}
+				{/if}
+			</ul>
+		</div>
+	{:else}
+		<div class="flex-1 flex items-center">
 			<p
-				class="mt-1 text-center text-xl bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent w-2/3"
-			>
-				Connect your wallet to view shipments
-			</p>
-		{:else if $forwardedShipments.length != 0}
-			{#if operationMode == OperationMode.SELL}
-				{#each carriers as carrier, i}
-					<CarrierListElement
-						on:click={() => onCarrierElementSelect(i)}
-						{selectedCarrier}
-						{selectedLocation}
-						carrierAccount={carrier}
-						carrierId={i}
-					/>
-				{/each}
-			{:else}
-				{#each $forwardedShipments as { meta }, i}
-					<BoughtOrderListElement
-						on:click={() => onShipmentElementSelect(i)}
-						shipmentAccount={meta}
-						{selectedLocation}
-						shipmentId={i}
-					/>
-				{/each}
-			{/if}
-		{:else}
-			<p
-				class="mt-1 text-center text-lg bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent"
+				class="mb-5 text-center text-xl bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent"
 			>
 				Nothing found
 			</p>
-		{/if}
-	</ul>
+		</div>
+	{/if}
 </LayoutListWrapper>
 
 {#if isWalletConnected}

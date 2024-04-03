@@ -27,7 +27,7 @@
 
 <LayoutListWrapper bind:isMobileOpen>
 	{#if $notForwardedShipments.length != 0}
-		<div class="h-full flex w-full flex-col items-center">
+		<div class="flex-1 flex w-full flex-col items-center">
 			<ul class="w-full flex-1">
 				{#each $notForwardedShipments as account, i (account.publicKey)}
 					<OrderListElement
