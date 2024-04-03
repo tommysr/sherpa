@@ -141,11 +141,7 @@
 			name: { name }
 		} = values;
 
-		let depth = dimensions.depth ?? 0;
-		let height = dimensions.height ?? 0;
 		let width = dimensions.width ?? 0;
-		let weight = dimensions.weight ?? 0;
-
 		if (dimensions.isMetricTon) {
 			width = dimensions.volume ?? 0;
 		}
@@ -165,9 +161,9 @@
 					reserved: [0, 0, 0]
 				},
 				dimensions: {
-					depth,
-					height,
-					weight,
+					depth: dimensions.depth ?? 0,
+					height: dimensions.height ?? 0,
+					weight: dimensions.weight ?? 0,
 					width
 				},
 				geography: {
