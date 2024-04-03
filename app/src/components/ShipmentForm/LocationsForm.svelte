@@ -10,6 +10,7 @@
 	import NumberInput from '../Inputs/NumberInput.svelte';
 	import clsx from 'clsx';
 	import type { LocationsFormInterface } from './interfaces';
+	import { locationsFormSchema as schema } from './schemas';
 
 	export let initialValues: LocationsFormInterface = {
 		destinationLocationLat: defaultLocation.lat,
@@ -30,15 +31,6 @@
 
 	let srcLocationDisabled = true;
 	let dstLocationDisabled = true;
-
-	const schema = yup.object({
-		destinationLocationLng: yup.number().required(),
-		destinationLocationLat: yup.number().required(),
-		sourceLocationLat: yup.number().required(),
-		sourceLocationLng: yup.number().required(),
-		sourceName: yup.string().required(),
-		destinationName: yup.string().required()
-	});
 
 	// maybe store there some default location or cache some.
 	$: src = $pickedLocations.src;

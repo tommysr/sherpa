@@ -11,7 +11,7 @@
 	import PriceForm from '$src/components/ShipmentForm/PriceForm.svelte';
 	import SummaryForm from '$src/components/ShipmentForm/SummaryForm.svelte';
 	import type { CreateShipmentFormInterface } from '$src/components/ShipmentForm/interfaces';
-	import { FormStage } from '$src/components/ShipmentForm/interfaces';
+	import { FormStage, nextStage } from '$src/components/ShipmentForm/formStage';
 	import { getCreateShipmentTx } from '$src/lib/shipper';
 	import { anchorStore } from '$src/stores/anchor';
 	import { walletStore } from '$src/stores/wallet';
@@ -19,41 +19,48 @@
 	import { userStore } from '$stores/user';
 	import { get } from 'svelte/store';
 	import { useSignAndSendTransaction } from '$utils/wallet/singAndSendTx';
-	import ShipmentNameForm from '$src/components/ShipmentForm/ShipmentNameForm.svelte';
-
-	function nextStage(f: FormStage): FormStage {
-		switch (f) {
-			case FormStage.Name:
-				return FormStage.ShipmentName;
-			case FormStage.ShipmentName:
-				return FormStage.Price;
-			case FormStage.Price:
-				return FormStage.Dates;
-			case FormStage.Dates:
-				return FormStage.Dimensions;
-			case FormStage.Dimensions:
-				return FormStage.Details;
-			case FormStage.Details:
-				return FormStage.Locations;
-			case FormStage.Locations:
-				return FormStage.Summary;
-			default:
-				return FormStage.Summary;
-		}
-	}
 
 	const forms = {
-		name: NameForm,
-		shipmentName: ShipmentNameForm,
-		price: PriceForm,
-		dates: DatesForm,
-		dimensions: DimensionsForm,
-		details: DetailsForm,
-		locations: LocationsForm,
-		summary: SummaryForm
+		name: {
+			component: NameForm,
+			props: {
+				header: 'Shipper name',
+				text: "You're not registered as a shipper, enter desired shipper name"
+			}
+		},
+		shipmentName: {
+			component: NameForm,
+			props: { header: 'Shipment Name', text: 'enter short name describing your shipment' }
+		},
+		price: {
+			component: PriceForm,
+			props: {}
+		},
+		dates: {
+			component: DatesForm,
+			props: {}
+		},
+		dimensions: {
+			component: DimensionsForm,
+			props: {}
+		},
+		details: {
+			component: DetailsForm,
+			props: {}
+		},
+		locations: {
+			component: LocationsForm,
+			props: {}
+		},
+
+		summary: {
+			component: SummaryForm,
+			props: {}
+		}
 	};
 
 	let startForm = $userStore.shipper.registered ? FormStage.Price : FormStage.Name;
+
 	let states: CreateShipmentFormInterface = {
 		name: {
 			name: ''
@@ -189,6 +196,7 @@
 				.then((sig) => console.log(sig))
 				.catch((err) => console.error(err));
 		} else {
+			console.log(form, values);
 			states[form] = values;
 
 			if (form == FormStage.Locations) {
@@ -210,11 +218,12 @@
 <Modal {showModal} closeHandler={() => history.back()}>
 	<div class="mt-10 w-full flex flex-col space-y-7">
 		<svelte:component
-			this={forms[form]}
+			this={forms[form].component}
 			{onSubmit}
 			{onBack}
 			initialValues={states[form]}
 			bind:showModal
+			{...forms[form].props}
 		/>
 	</div>
 </Modal>

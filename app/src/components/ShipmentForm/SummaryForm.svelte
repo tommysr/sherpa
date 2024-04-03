@@ -5,22 +5,13 @@
 	import Details from './Details.svelte';
 	import { validator } from '@felte/validator-yup';
 	import * as yup from 'yup';
+	import type { CreateShipmentFormInterface } from './interfaces';
 
-	interface NestedObject {
-		[key: string]: number | string | boolean;
-	}
-
-	interface SummaryInitial {
-		[key: string]: NestedObject;
-	}
-
-	export let initialValues: SummaryInitial;
+	export let initialValues: CreateShipmentFormInterface;
 	export let onSubmit;
 	export let onBack;
 
 	export let showModal = true;
-
-	$: console.log(initialValues);
 
 	$: flatStates = Object.entries(initialValues).flatMap(([key, value]) => {
 		return Object.entries(value).map(([nestedKey, nestedValue]) => {

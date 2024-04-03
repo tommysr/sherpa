@@ -47,14 +47,3 @@ export interface CreateShipmentFormInterface {
 	details: DetailsFormInterface;
 	locations: LocationsFormInterface;
 }
-
-export enum FormStage {
-	Name = 'name',
-	ShipmentName = 'shipmentName',
-	Price = 'price',
-	Dates = 'dates',
-	Dimensions = 'dimensions',
-	Details = 'details',
-	Locations = 'locations',
-	Summary = 'summary'
-}

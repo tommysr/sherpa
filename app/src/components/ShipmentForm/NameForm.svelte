@@ -7,15 +7,12 @@
 	import { validator } from '@felte/validator-yup';
 	import * as yup from 'yup';
 	import type { NameFormInterface } from './interfaces';
+	import { nameFormSchema as schema } from './schemas';
 
 	export let initialValues: NameFormInterface;
 	export let onSubmit;
 	export let onBack;
 	export let showModal = true;
-
-	const schema = yup.object({
-		name: yup.string().required('name is required to register as shipper')
-	});
 
 	const { form, data } = createForm<yup.InferType<typeof schema>>({
 		extend: [reporter, validator({ schema })],
@@ -41,14 +38,14 @@
 	<h2
 		class="bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent font-bold text-3xl"
 	>
-		Account Name
+		{$$restProps['header']}
 	</h2>
 </div>
 
 <form use:form>
 	<div class="border-primary border-t text-primary-800 px-4 py-3 mb-5" role="alert">
 		<p class="font-bold">Action needed</p>
-		<p class="text-sm">You are not registered as shipper, enter name</p>
+		<p class="text-sm">{$$restProps['text']}</p>
 	</div>
 
 	<Input name="name" placeholder="enter name to be registered" required />

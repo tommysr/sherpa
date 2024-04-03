@@ -6,19 +6,13 @@
 	import { validator } from '@felte/validator-yup';
 	import * as yup from 'yup';
 	import type { DetailsFormInterface } from './interfaces';
+	import { detailsFormSchema as schema } from './schemas';
 
 	export let initialValues: DetailsFormInterface;
 	export let onSubmit;
 	export let onBack;
 
 	export let showModal = true;
-
-	const schema = yup.object({
-		count: yup.number().required(),
-		access: yup.string().transform(parseInt).required(),
-		priority: yup.number().required(),
-		fragility: yup.number().required()
-	});
 
 	const { form, data } = createForm<yup.InferType<typeof schema>>({
 		extend: [reporter, validator({ schema })],

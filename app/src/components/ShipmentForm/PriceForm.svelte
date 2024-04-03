@@ -7,16 +7,13 @@
 	import * as yup from 'yup';
 	import { isSeparator } from '$src/utils/utils';
 	import type { PriceFormInterface } from './interfaces';
+	import { priceFormSchema as schema } from './schemas';
 
 	export let initialValues: PriceFormInterface;
 	export let onSubmit;
 	export let onBack;
 
 	export let showModal = true;
-
-	const schema = yup.object({
-		price: yup.string().transform(parseInt).required('price is required')
-	});
 
 	const { form, data } = createForm<yup.InferType<typeof schema>>({
 		extend: [reporter, validator({ schema })],

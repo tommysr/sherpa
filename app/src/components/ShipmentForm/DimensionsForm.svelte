@@ -7,6 +7,7 @@
 	import * as yup from 'yup';
 	import { isSeparator } from '$src/utils/utils';
 	import type { DimensionsFormInterface } from './interfaces';
+	import { dimensionsFormSchema as schema } from './schemas';
 
 	export let initialValues: DimensionsFormInterface;
 	export let onSubmit;
@@ -15,25 +16,6 @@
 	export let showModal = true;
 
 	let isMetricTon = initialValues.isMetricTon ?? false;
-
-	const schema = yup.object({
-		isMetricTon: yup.boolean().required(),
-		weight: yup.string().transform(parseInt).required(),
-		volume: yup.string().when('isMetricTon', ([isMetricTon], schema) => {
-			return isMetricTon ? schema.transform(parseInt).required() : schema;
-		}),
-		width: yup.string().when('isMetricTon', ([isMetricTon], schema) => {
-			return isMetricTon ? schema : schema.transform(parseInt).required();
-		}),
-		depth: yup.string().when('isMetricTon', ([isMetricTon], schema) => {
-			return isMetricTon ? schema : schema.transform(parseInt).required();
-		}),
-		height: yup.string().when('isMetricTon', ([isMetricTon], schema) => {
-			return isMetricTon ? schema : schema.transform(parseInt).required();
-		}),
-		distanceMetrics: yup.string().required(),
-		weightMetrics: yup.string().required()
-	});
 
 	const { form, data } = createForm<yup.InferType<typeof schema>>({
 		extend: [reporter, validator({ schema })],

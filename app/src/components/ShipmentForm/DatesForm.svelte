@@ -6,17 +6,13 @@
 	import { validator } from '@felte/validator-yup';
 	import * as yup from 'yup';
 	import type { DatesFormInterface } from './interfaces';
+	import { dateFormSchema as schema } from './schemas';
 
 	export let initialValues: DatesFormInterface;
 	export let onSubmit;
 	export let onBack;
 
 	export let showModal = true;
-
-	const schema = yup.object({
-		when: yup.date().required('desired shipment date is required'),
-		deadline: yup.date().required('deadline date is required')
-	});
 
 	const { form, data, touched } = createForm<yup.InferType<typeof schema>>({
 		extend: [reporter, validator({ schema })],
