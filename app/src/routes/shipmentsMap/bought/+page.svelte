@@ -4,7 +4,6 @@
 	import CarrierListElement from '$src/components/Shipment/CarrierListElement.svelte';
 	import CarriersLocations from '$src/components/ShipmentMap/CarriersLocations.svelte';
 	import ShipmentsLocations from '$src/components/ShipmentMap/ShipmentsLocations.svelte';
-	import ViewListSwitch from '$src/components/Switches/ViewListSwitch.svelte';
 	import { forwardedShipments, forwardedShipmentsMeta } from '$src/stores/forwarderShipments';
 	import { walletStore } from '$stores/wallet';
 	import type { PageData } from './$types';
@@ -65,13 +64,12 @@
 </script>
 
 <LayoutListWrapper bind:isMobileOpen>
-	<ViewListSwitch left="shipments" right="carriers" bind:isRight={operationModeSwitch} />
 	<ul>
 		{#if !isWalletConnected}
 			<p
-				class="mt-1 text-center text-lg bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent"
+				class="mt-1 text-center text-xl bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent w-2/3"
 			>
-				Please connect your wallet to view bought shipments
+				Connect your wallet to view shipments
 			</p>
 		{:else if $forwardedShipments.length != 0}
 			{#if operationMode == OperationMode.SELL}

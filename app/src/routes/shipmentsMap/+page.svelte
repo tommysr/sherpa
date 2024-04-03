@@ -27,8 +27,8 @@
 
 <LayoutListWrapper bind:isMobileOpen>
 	{#if $notForwardedShipments.length != 0}
-		<div class="h-full flex items-start">
-			<ul>
+		<div class="h-full flex w-full flex-col items-center">
+			<ul class="w-full flex-1">
 				{#each $notForwardedShipments as account, i (account.publicKey)}
 					<OrderListElement
 						on:click={() => onElementSelect(i)}
@@ -40,7 +40,13 @@
 			</ul>
 		</div>
 	{:else}
-		<p class="text-xl text-gray-500">Nothing found</p>
+		<div class="flex-1 flex items-center">
+			<p
+				class="mb-5 text-center text-xl bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent"
+			>
+				Nothing found
+			</p>
+		</div>
 	{/if}
 </LayoutListWrapper>
 
