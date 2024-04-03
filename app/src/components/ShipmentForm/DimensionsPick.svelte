@@ -15,8 +15,6 @@
 	export let depth: number | undefined = undefined;
 	export let volume: number | undefined = undefined;
 
-	$: console.log(weight, width);
-
 	export let isMetricTon: boolean = false;
 </script>
 

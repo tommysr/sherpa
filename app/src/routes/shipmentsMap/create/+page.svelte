@@ -19,6 +19,7 @@
 	import { userStore } from '$stores/user';
 	import { get } from 'svelte/store';
 	import { useSignAndSendTransaction } from '$utils/wallet/singAndSendTx';
+	import { defaultLocation } from '$src/stores/locationsPick';
 
 	const forms = {
 		name: {
@@ -90,12 +91,12 @@
 		},
 		price: { price: '' },
 		locations: {
-			destinationLocationLat: 0,
-			destinationLocationLng: 0,
-			destinationName: '',
-			sourceLocationLat: 0,
-			sourceLocationLng: 0,
-			sourceName: ''
+			destinationLocationLat: defaultLocation.lat,
+			destinationLocationLng: defaultLocation.lng,
+			sourceLocationLat: defaultLocation.lat,
+			sourceLocationLng: defaultLocation.lng,
+			destinationName: 'default',
+			sourceName: 'default'
 		}
 	};
 	let showModal = true;

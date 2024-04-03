@@ -8,18 +8,10 @@
 	import { validator } from '@felte/validator-yup';
 	import * as yup from 'yup';
 	import NumberInput from '../Inputs/NumberInput.svelte';
-	import clsx from 'clsx';
 	import type { LocationsFormInterface } from './interfaces';
 	import { locationsFormSchema as schema } from './schemas';
 
-	export let initialValues: LocationsFormInterface = {
-		destinationLocationLat: defaultLocation.lat,
-		destinationLocationLng: defaultLocation.lng,
-		sourceLocationLat: defaultLocation.lat,
-		sourceLocationLng: defaultLocation.lng,
-		destinationName: 'default',
-		sourceName: 'default'
-	};
+	export let initialValues: LocationsFormInterface;
 
 	export let onSubmit;
 	export let onBack;
