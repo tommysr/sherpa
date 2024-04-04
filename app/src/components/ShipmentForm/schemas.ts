@@ -34,56 +34,48 @@ export const detailsFormSchema: yup.ObjectSchema<DetailsFormInterface> = yup.obj
 export const dimensionsFormSchema: yup.ObjectSchema<DimensionsFormInterface> = yup.object({
 	isMetricTon: yup.boolean().required(),
 	weight: yup
-		.number()
-		.transform((value) => (value == null || value == undefined || isNaN(value) ? 0 : value))
+		.mixed<number>()
+		.test('number', 'Must be a number', (value) => !Number.isNaN(value))
+		.transform((value) => parseInt(value, 10))
 		.required('can not be empty')
 		.test('is-zero', 'weight must be greater than 0', (val) => val > 0),
-	volume: yup.number().when('isMetricTon', ([isMetricTon], schema) => {
-		console.log('v', isMetricTon, schema);
+
+	volume: yup.mixed<number>().when('isMetricTon', ([isMetricTon], schema) => {
 		return isMetricTon
 			? schema
-					.transform((value) => {
-						console.log('t', value);
-						return value == null || value == undefined || isNaN(value) ? 0 : value;
-					})
+					.test('number', 'Must be a number', (value) => !Number.isNaN(value))
+					.transform((value) => parseInt(value, 10))
 					.required('can not be empty')
 					.test('is-zero', 'volume must be greater than 0', (val) => val > 0)
-			: schema.transform((value) => {
-					console.log('f', value);
-					return value == null || value == undefined || isNaN(value) ? 0 : value;
-				});
+			: schema;
 	}),
-	width: yup.number().when('isMetricTon', ([isMetricTon], schema) => {
+	width: yup.mixed<number>().when('isMetricTon', ([isMetricTon], schema) => {
 		return !isMetricTon
 			? schema
-					.transform((value) => (value == null || value == undefined || isNaN(value) ? 0 : value))
+					.test('number', 'Must be a number', (value) => !Number.isNaN(value))
+					.transform((value) => parseInt(value, 10))
 					.required('can not be empty')
 					.test('is-zero', 'width must be greater than 0', (val) => val > 0)
-			: schema.transform((value) =>
-					value == null || value == undefined || isNaN(value) ? 0 : value
-				);
+			: schema;
 	}),
-	depth: yup.number().when('isMetricTon', ([isMetricTon], schema) => {
+	depth: yup.mixed<number>().when('isMetricTon', ([isMetricTon], schema) => {
 		return !isMetricTon
 			? schema
-					.transform((value) => (value == null || value == undefined || isNaN(value) ? 0 : value))
+
+					.test('number', 'Must be a number', (value) => !Number.isNaN(value))
+					.transform((value) => parseInt(value, 10))
 					.required('can not be empty')
 					.test('is-zero', 'depth must be greater than 0', (val) => val > 0)
-			: schema.transform((value) =>
-					value == null || value == undefined || isNaN(value) ? 0 : value
-				);
+			: schema;
 	}),
-	height: yup.number().when('isMetricTon', ([isMetricTon], schema) => {
-		console.log('h', isMetricTon);
-
+	height: yup.mixed<number>().when('isMetricTon', ([isMetricTon], schema) => {
 		return !isMetricTon
 			? schema
-					.transform((value) => (value == null || value == undefined || isNaN(value) ? 0 : value))
+					.test('number', 'Must be a number', (value) => !Number.isNaN(value))
+					.transform((value) => parseInt(value, 10))
 					.required('can not be empty')
 					.test('is-zero', 'height must be greater than 0', (val) => val > 0)
-			: schema.transform((value) =>
-					value == null || value == undefined || isNaN(value) ? 0 : value
-				);
+			: schema;
 	}),
 	distanceMetrics: yup.string<'ft' | 'm'>().required(),
 	weightMetrics: yup.string<'kg' | 'lb'>().required()

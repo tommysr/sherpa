@@ -13,7 +13,7 @@ export interface PriceFormInterface {
 
 export interface DimensionsFormInterface {
 	isMetricTon: boolean;
-	weight: number;
+	weight?: number;
 	volume?: number;
 	width?: number;
 	depth?: number;

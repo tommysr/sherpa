@@ -83,7 +83,7 @@
 			distanceMetrics: 'm',
 			isMetricTon: false,
 			weightMetrics: 'kg',
-			weight: 0,
+			weight: undefined,
 			depth: undefined,
 			height: undefined,
 			volume: undefined,

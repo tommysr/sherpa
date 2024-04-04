@@ -5,7 +5,6 @@
 	import DimensionsPick from './DimensionsPick.svelte';
 	import { validator } from '@felte/validator-yup';
 	import * as yup from 'yup';
-	import { isSeparator } from '$src/utils/utils';
 	import type { DimensionsFormInterface } from './interfaces';
 	import { dimensionsFormSchema as schema } from './schemas';
 
@@ -18,7 +17,7 @@
 	let isMetricTon = initialValues.isMetricTon ?? false;
 
 	const { form, data } = createForm<yup.InferType<typeof schema>>({
-		extend: [reporter, validator({ schema, castValues: true })],
+		extend: [reporter, validator({ schema })],
 		onSubmit,
 		initialValues
 	});
