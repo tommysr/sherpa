@@ -1,19 +1,17 @@
 <script lang="ts">
-	import DecimalInput from '../Inputs/DecimalInput.svelte';
-	import { createForm } from 'felte';
-	import { reporter, ValidationMessage } from '@felte/reporter-svelte';
-	import Button from '../Buttons/Button.svelte';
+	import { reporter } from '@felte/reporter-svelte';
 	import { validator } from '@felte/validator-yup';
+	import { createForm } from 'felte';
 	import * as yup from 'yup';
-	import { isSeparator } from '$src/utils/utils';
+	import Button from '../Buttons/Button.svelte';
+	import DecimalInput from '../Inputs/DecimalInput.svelte';
 	import type { PriceFormInterface } from './interfaces';
 	import { priceFormSchema as schema } from './schemas';
 
 	export let initialValues: PriceFormInterface;
-	export let onSubmit;
-	export let onBack;
-
-	export let showModal = true;
+	export let onSubmit: any;
+	export let onBack: any;
+	export const showModal = true;
 
 	const { form, data } = createForm<yup.InferType<typeof schema>>({
 		extend: [reporter, validator({ schema, castValues: true })],
@@ -22,32 +20,22 @@
 	});
 </script>
 
-<div class="my-10 flex justify-center">
+<div>
 	<h2
-		class="bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent font-bold text-3xl"
+		class="font-bold text-xl bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent"
 	>
-		Ship payment in SOL
+		Ship payment
 	</h2>
+	<p class="text-neutral-600 text-sm max-w-sm mt-2">
+		Enter the amount you want to offer to ship your goods.
+	</p>
+
+	<form use:form class="mt-8">
+		<DecimalInput name="price" placeholder="1 SOL" />
+
+		<div class="flex justify-center space-x-5 mt-8">
+			<Button class="uppercase tracking-widest" on:click={() => onBack($data)}>Prev</Button>
+			<Button class="uppercase tracking-widest" type="submit">Next</Button>
+		</div>
+	</form>
 </div>
-
-<form use:form>
-	<div class="border-primary border-t text-primary-800 px-4 py-3 mb-5" role="alert">
-		<p class="font-bold">Action needed</p>
-		<p class="text-sm">Enter the amount you want to offer to ship your goods</p>
-	</div>
-	<DecimalInput name="price" placeholder="amount" />
-
-	<ValidationMessage for="price" let:messages={message}>
-		{#if message}
-			<div class="bg-red-200 border-l-4 mt-3 border-red-400 text-orange-700 p-2" role="alert">
-				<p class="font-bold">Invalid price</p>
-				<p>{message || ''}</p>
-			</div>
-		{/if}
-	</ValidationMessage>
-
-	<div class="flex justify-center mt-4 gap-x-2">
-		<Button on:click={() => onBack($data)}>Prev</Button>
-		<Button type="submit">Next</Button>
-	</div>
-</form>
