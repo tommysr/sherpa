@@ -9,9 +9,14 @@
 	import PlusIcon from './NavbarIcons/PlusIcon.svelte';
 	import SendIcon from './NavbarIcons/SendIcon.svelte';
 	import TrackIcon from './NavbarIcons/TrackIcon.svelte';
+	import { userStore } from '$src/stores/user';
+	import { walletStore } from '$src/stores/wallet';
 
 	$: currentPage = $page.url.pathname;
 	$: isNavbarOpen = false;
+
+	$: isUserCarrier = $userStore.carrier.registered
+	$: walletKey = $walletStore.publicKey;
 
 	const navigation = [
 		{
@@ -49,7 +54,19 @@
 		{
 			name: 'Carriers',
 			link: '/carrier',
-			svg: TrackIcon
+			svg: TrackIcon,
+			routes: [
+				{
+					name: 'Dashboard',
+					link: `/carrier/${isUserCarrier ? walletKey : 'register'}` ,
+					svg: PlusIcon
+				},
+				{
+					name: 'Buy',
+					link: '/carrier/register',
+					svg: PlusIcon
+				},
+			]
 		}
 	];
 </script>

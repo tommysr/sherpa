@@ -15,6 +15,7 @@
 	let dstLocation = $pickedLocations.dst;
 
 	export let showModal = false;
+	export let type: 'single' | 'double' = 'single';
 
 	const onDragEnd = (e: CustomEvent<MarkerClickInfo>) => {
 		pickedLocations.update((store) => {
@@ -49,8 +50,10 @@
 	</Popup>
 </DefaultMarker>
 
-<DefaultMarker on:dragend={onDragEnd} bind:lngLat={dstLocation} draggable>
-	<Popup offset={[0, -10]}>
-		<div class="text-lg font-bold">Package destination</div>
-	</Popup>
-</DefaultMarker>
+{#if type === 'double'}
+	<DefaultMarker on:dragend={onDragEnd} bind:lngLat={dstLocation} draggable>
+		<Popup offset={[0, -10]}>
+			<div class="text-lg font-bold">Package destination</div>
+		</Popup>
+	</DefaultMarker>
+{/if}

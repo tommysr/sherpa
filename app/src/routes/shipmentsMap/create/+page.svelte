@@ -20,6 +20,7 @@
 	import { get } from 'svelte/store';
 	import { useSignAndSendTransaction } from '$utils/wallet/singAndSendTx';
 	import { defaultLocation } from '$src/stores/locationsPick';
+	import { CarrierFormStage } from '$src/components/CarrierForm/carrierFormStage';
 
 	const forms = {
 		name: {
@@ -101,7 +102,7 @@
 	};
 	let showModal = true;
 
-	$: form = $page.state.form ?? (startForm as FormStage);
+	$: form = $page.state.form ?? startForm;
 
 	function summarizeState() {
 		const endState = {};
@@ -204,7 +205,7 @@
 				summarizeState();
 			}
 			states = states;
-			pushState('', { form: nextStage(form), showModal: true });
+			pushState('', { form: nextStage(form), showModal: true, carrierForm: CarrierFormStage.Name });
 		}
 	}
 
@@ -230,5 +231,5 @@
 </Modal>
 
 {#if !showModal}
-	<LocationPick bind:showModal />
+	<LocationPick bind:showModal type='double'/>
 {/if}

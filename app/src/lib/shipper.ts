@@ -15,7 +15,7 @@ export const fetchShipperAccount = async (program: Program<Protocol>, owner: Pub
 	const shipper = getShipperAddress(program, owner);
 
 	return {
-		account: await program.account.forwarder.fetchNullable(shipper),
+		account: await program.account.shipper.fetchNullable(shipper),
 		accountKey: shipper
 	};
 };
