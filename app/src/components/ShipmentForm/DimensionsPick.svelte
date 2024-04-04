@@ -1,128 +1,131 @@
 <script lang="ts">
-	import type { ShipmentDimensions } from '$src/utils/account/shipment';
+	import DecimalInput from '../Inputs/DecimalInput.svelte';
 
 	export let metrics: {
-		weight: string;
-		distance: string;
+		weight: 'kg' | 'lb';
+		distance: 'm' | 'ft';
+	} = {
+		distance: 'm',
+		weight: 'kg'
 	};
 
+	export let weight: number | undefined = undefined;
+	export let height: number | undefined = undefined;
+	export let width: number | undefined = undefined;
+	export let depth: number | undefined = undefined;
+	export let volume: number | undefined = undefined;
+
 	export let isMetricTon: boolean = false;
-	export let dimensions: ShipmentDimensions;
 </script>
 
-<h1>Dimensions</h1>
-<div class="grid marginb">
-	<div class="flex-box">
-		<fieldset>
-			<label>
-				<input name="metricton" type="checkbox" role="switch" required bind:checked={isMetricTon} />
-				Metric tons
-			</label>
-		</fieldset>
-
-		<fieldset>
-			<!-- <legend>Weight metrics:</legend> -->
-			<h4>Weight metrics</h4>
-			<input type="radio" id="kg" name="weight-metrics" bind:group={metrics.weight} value="kg" />
-			<label for="kg">kg</label>
-			<input type="radio" id="lb" name="weight-metrics" bind:group={metrics.weight} value="lb" />
-			<label for="lb">lb</label>
-		</fieldset>
-
-		{#if !isMetricTon}
-			<fieldset>
-				<h4>Distance metrics</h4>
-				<!-- <legend>Distance metrics:</legend> -->
-				<input
-					type="radio"
-					id="cm"
-					name="distance-metrics"
-					bind:group={metrics.distance}
-					value="cm"
-				/>
-				<label for="cm">cm</label>
-				<input
-					type="radio"
-					id="ft"
-					name="distance-metrics"
-					bind:group={metrics.distance}
-					value="ft"
-				/>
-				<label for="ft">ft</label>
-			</fieldset>
-		{/if}
+<div class="flex flex-row gap-x-10">
+	<div>
+		<label>
+			Metric tons
+			<input name="isMetricTon" type="checkbox" bind:checked={isMetricTon} />
+		</label>
 	</div>
 
-	<div class="flex-box">
-		<div>
-			<label for="amount">weight</label>
+	<div>
+		<h4>Weight metrics</h4>
+		<input type="radio" name="weightMetrics" bind:group={metrics.weight} value="kg" />
+		<label for="kg">kg</label>
 
-			<input
-				type="number"
-				name="amount"
-				placeholder="weight"
-				required
-				bind:value={dimensions.weight}
-			/>
-		</div>
-		<!-- TODO: handle input validation, min, max, step and others -->
+		<input type="radio" name="weightMetrics" bind:group={metrics.weight} value="lb" />
+		<label for="lb">lb</label>
+	</div>
 
-		{#if !isMetricTon}
-			<div>
-				<label for="amount">width</label>
-
-				<input
-					type="number"
-					name="amount"
-					placeholder="width"
-					required
-					bind:value={dimensions.width}
-				/>
-			</div>
-
-			<div>
-				<label for="amount"
-					>height<label>
-						<input
-							type="number"
-							name="amount"
-							placeholder="height"
-							required
-							bind:value={dimensions.height}
-						/>
-					</label></label
-				>
-			</div>
-
-			<div>
-				<label for="amount">Depth</label>
-				<input
-					type="number"
-					name="amount"
-					placeholder="depth"
-					required
-					bind:value={dimensions.depth}
-				/>
-			</div>
-		{/if}
+	<div>
+		<h4>Distance metrics</h4>
+		<input
+			type="radio"
+			id="m"
+			name="distanceMetrics"
+			bind:group={metrics.distance}
+			value="m"
+			required
+		/>
+		<label for="m">m</label>
+		<input type="radio" name="distanceMetrics" bind:group={metrics.distance} value="ft" required />
+		<label for="ft">ft</label>
 	</div>
 </div>
+{#if isMetricTon}
+	<div
+		class="col-span-2 grid grid-cols-2 opacity-100 items-center justify-items-center w-full text-white py-2 rounded-lg bg-gradient-to-r from-primary to-secondary"
+	>
+		<div class="">weight</div>
+		<div class="">volume</div>
+	</div>
+	<div
+		class="col-span-2 grid grid-cols-2 opacity-100 items-center justify-items-center w-full text-primary py-2"
+	>
+		<div>
+			<span>
+				<DecimalInput bind:value={weight} name="weight" placeholder="weight" required />
+			</span>
+		</div>
+		<div>
+			<span> <DecimalInput bind:value={volume} name="volume" placeholder="volume" required /></span>
+		</div>
+	</div>
+{/if}
 
-<style lang="scss">
-	.flex-box {
-		display: flex;
-		flex-direction: column;
-	}
-
-	fieldset {
-		text-align: center;
-	}
-
-	h1 {
-		text-align: center;
-	}
-
-	.marginb {
-		margin-bottom: 20px;
-	}
-</style>
+{#if !isMetricTon}
+	<div
+		class="col-span-4 grid grid-cols-4 opacity-100 items-center justify-items-center w-full text-white py-2 rounded-lg bg-gradient-to-r from-primary to-secondary"
+	>
+		<div class="">Width</div>
+		<div class="">Height</div>
+		<div class="">Depth</div>
+		<div class="">Weight</div>
+	</div>
+	<div
+		class="col-span-4 grid grid-cols-4 opacity-100 items-center justify-items-center w-full text-primary py-2"
+	>
+		<div>
+			<span>
+				<DecimalInput
+					data-felte-keep-on-remove
+					bind:value={width}
+					name="width"
+					placeholder="width"
+					required
+				/></span
+			>
+		</div>
+		<div>
+			<span>
+				<DecimalInput
+					data-felte-keep-on-remove
+					bind:value={height}
+					name="height"
+					placeholder="height"
+					required
+				/></span
+			>
+		</div>
+		<div>
+			<span
+				><DecimalInput
+					data-felte-keep-on-remove
+					bind:value={depth}
+					name="depth"
+					placeholder="depth"
+					required
+				/></span
+			>
+		</div>
+		<div>
+			<span>
+				<DecimalInput
+					data-felte-keep-on-remove
+					bind:value={weight}
+					name="weight"
+					placeholder="weight"
+					required
+				/></span
+			>
+		</div>
+	</div>
+{/if}

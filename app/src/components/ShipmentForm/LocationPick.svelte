@@ -1,51 +1,56 @@
 <script lang="ts">
-	import ShipmentMap from '../ShipmentMap/ShipmentMap.svelte';
-	import { LngLat } from 'maplibre-gl';
+	import {
+		Control,
+		ControlButton,
+		ControlGroup,
+		DefaultMarker,
+		GeolocateControl,
+		Popup,
+		type MarkerClickInfo
+	} from 'svelte-maplibre';
 
-	export let shipmentSourceCoords: LngLat = new LngLat(15, 50);
-	export let shipmentDestinationCoords: LngLat = new LngLat(15, 50);
+	import { pickedLocations } from '$src/stores/locationsPick';
+
+	let srcLocation = $pickedLocations.src;
+	let dstLocation = $pickedLocations.dst;
+
+	export let showModal = false;
+
+	const onDragEnd = (e: CustomEvent<MarkerClickInfo>) => {
+		pickedLocations.update((store) => {
+			store.dst = dstLocation;
+			store.src = srcLocation;
+
+			return store;
+		});
+	};
 </script>
 
-<div class="location-box">
-	<div class="info-box">
-		<table>
-			<tbody>
-				<tr>
-					<td>Source Location Coordinates</td>
-					<td>
-						<div data-type="amount">
-							<span>Longitude: {shipmentSourceCoords.lng.toFixed(6)}</span>
-							<span>Latitude: {shipmentSourceCoords.lat.toFixed(6)}</span>
-						</div>
-					</td>
-				</tr>
+<GeolocateControl
+	position="top-left"
+	fitBoundsOptions={{ maxZoom: 12 }}
+	showAccuracyCircle={false}
+/>
+<Control position="top-left" class="flex flex-col gap-y-2">
+	<ControlGroup>
+		<ControlButton
+			on:click={() => {
+				showModal = true;
+			}}
+		>
+			M</ControlButton
+		>
+	</ControlGroup>
+</Control>
 
-				<tr>
-					<td>Destination Location Coordinates</td>
-					<td>
-						<div data-type="amount">
-							<span>Longitude: {shipmentDestinationCoords.lng.toFixed(6)}</span>
-							<span>Latitude: {shipmentDestinationCoords.lat.toFixed(6)}</span>
-						</div>
-					</td>
-				</tr>
-			</tbody>
-		</table>
-	</div>
-	<div class="map-box">
-		<ShipmentMap
-			bind:sourceLocation={shipmentSourceCoords}
-			bind:destinationLocation={shipmentDestinationCoords}
-		/>
-	</div>
-</div>
+<DefaultMarker on:dragend={onDragEnd} bind:lngLat={srcLocation} draggable>
+	<Popup offset={[0, -10]}>
+		<div class="text-lg font-bold">Package source</div>
+	</Popup>
+</DefaultMarker>
 
-<style lang="scss">
-	.location-box {
-		margin-bottom: 20px;
-	}
-
-	.map-box {
-		padding: 20px;
-	}
-</style>
+<DefaultMarker on:dragend={onDragEnd} bind:lngLat={dstLocation} draggable>
+	<Popup offset={[0, -10]}>
+		<div class="text-lg font-bold">Package destination</div>
+	</Popup>
+</DefaultMarker>

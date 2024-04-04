@@ -29,10 +29,10 @@ export function parseShipmentToApiShipment(
 				toName: decodeName(shipmentAcc.shipment.geography.toName)
 			},
 			dimensions: {
-				depth: shipmentAcc.shipment.dimensions.depth / 1000,
-				height: shipmentAcc.shipment.dimensions.height / 1000,
-				width: shipmentAcc.shipment.dimensions.width / 1000,
-				weight: shipmentAcc.shipment.dimensions.weight / 1000
+				depth: shipmentAcc.shipment.dimensions.depth / 1000, // kgs
+				height: shipmentAcc.shipment.dimensions.height / 1000, // meters
+				width: shipmentAcc.shipment.dimensions.width / 1000, // meters
+				weight: shipmentAcc.shipment.dimensions.weight / 1000 // meters
 			},
 			when: new Date(shipmentAcc.shipment.when.toNumber()).toISOString(),
 			deadline: new Date(shipmentAcc.shipment.deadline.toNumber()).toISOString()

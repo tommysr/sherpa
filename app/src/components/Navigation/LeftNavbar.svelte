@@ -25,8 +25,8 @@
 			svg: BoxIcon,
 			routes: [
 				{
-					name: 'Buy',
-					link: '/shipmentsMap/bought',
+					name: 'Create',
+					link: '/shipmentsMap/create',
 					svg: PlusIcon
 				},
 				{
