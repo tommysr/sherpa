@@ -2,7 +2,7 @@ import { anchorStore } from '$src/stores/anchor';
 import { error, json } from '@sveltejs/kit';
 import { get } from 'svelte/store';
 
-import type { ApiCarrierAccount, CarrierAccount } from '$src/utils/idl/carrier';
+import type { ApiCarrierAccount, CarrierAccount } from '$src/utils/account/carrier';
 import { parseCarrierToApiCarrier } from '$src/utils/parse/carrier';
 
 export async function GET() {
