@@ -61,7 +61,8 @@ pub struct Shipment {
     pub channel: Channel,
     pub shipment: ShipmentData,
     pub no: u32,
-    pub reserved: [u8; 4],
+    pub status: u8,
+    pub reserved: [u8; 3],
 }
 
 #[account(zero_copy)]

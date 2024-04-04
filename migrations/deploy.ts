@@ -1,7 +1,7 @@
 import { AnchorProvider, BN, Program, Wallet } from '@coral-xyz/anchor'
 import { Protocol } from '../target/types/protocol'
 import * as anchor from '@coral-xyz/anchor'
-import { Connection, clusterApiUrl } from '@solana/web3.js'
+import { Connection, Keypair, clusterApiUrl } from '@solana/web3.js'
 import {
   encodeName,
   getCarrierAddress,
@@ -9,7 +9,7 @@ import {
   getShipmentAddress,
   getShipperAddress,
   getStateAddress
-} from '../sdk/sdk'
+} from '../tests/sdk'
 import { ONE_SOL } from '../tests/utils'
 import { crateFromSchoolToAirport } from './mocks/shipments'
 import { ANDREW, JACOB, IGOR, ZDZICH } from './mocks/shippers'
@@ -89,7 +89,8 @@ const run = async () => {
       location: {
         latitude: 43,
         longitude: 44
-      }
+      },
+      locationName: encodeName('Lagiewniki, Krakow')
     }
     await program.methods
       .registerCarrier(encodeName('Igor'), availability)
