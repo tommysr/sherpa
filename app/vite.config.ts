@@ -1,10 +1,11 @@
 import { sveltekit } from '@sveltejs/kit/vite';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import { nodePolyfills } from 'vite-plugin-node-polyfills';
 import { defineConfig } from 'vitest/config';
 
 export default defineConfig({
-	plugins: [sveltekit()],
+	plugins: [sveltekit(), nodePolyfills()],
 	resolve: {
 		alias: {
 			$src: path.resolve(path.dirname(fileURLToPath(import.meta.url)), 'src'),
