@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { ValidationMessage } from '@felte/reporter-svelte';
 	import clsx from 'clsx';
 
 	export let placeholder: string = 'input';
@@ -10,10 +11,10 @@
 	export { className as class };
 </script>
 
-<div class="rounded-lg border-2 border-gradient-to-r from-primary to-secondary">
+<div class="relative">
 	<input
 		class={clsx(
-			'w-full rounded-3xl bg-transparent px-3 py-2 text-sm font-normal placeholder-primary placeholder:italic placeholder:text-slate-400 lg:px-4 lg:py-2 lg:text-base',
+			'w-full bg-transparent px-3 py-2 text-sm placeholder-primary placeholder:italic placeholder:text-slate-400 lg:px-4 lg:py-2 lg:text-base rounded-lg border-2 border-gradient-to-r from-primary to-secondary',
 			className
 		)}
 		on:keydown
@@ -26,4 +27,12 @@
 		{placeholder}
 		{required}
 	/>
+
+	<ValidationMessage for={name} let:messages>
+		{#if messages}
+			<div class="absolute ml-3 mt-1" role="alert">
+				<p class="text-md text-red-600 font-semibold">{messages[0]}</p>
+			</div>
+		{/if}
+	</ValidationMessage>
 </div>
