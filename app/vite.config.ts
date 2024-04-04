@@ -5,7 +5,14 @@ import { nodePolyfills } from 'vite-plugin-node-polyfills';
 import { defineConfig } from 'vitest/config';
 
 export default defineConfig({
-	plugins: [sveltekit(), nodePolyfills()],
+	plugins: [
+		sveltekit(),
+		nodePolyfills({
+			globals: {
+				Buffer: true
+			}
+		})
+	],
 	resolve: {
 		alias: {
 			$src: path.resolve(path.dirname(fileURLToPath(import.meta.url)), 'src'),
