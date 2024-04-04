@@ -1,14 +1,6 @@
 <script lang="ts">
-	import type {
-		ApiShipmentAccount,
-		Geography,
-		ShipmentDetails,
-		ShipmentDimensions
-	} from '$src/utils/account/shipment';
-	import type { Entries } from '$src/utils/types/object';
-	import clsx from 'clsx';
-	import BoughtShipmentShowModal from '../Modals/BoughtShipmentShowModal.svelte';
 	import type { ApiForwardedShipmentAccount } from '$src/utils/account/forwardedShipment';
+	import clsx from 'clsx';
 
 	export let shipmentAccount: ApiForwardedShipmentAccount;
 	export let selectedLocation: number | undefined;
@@ -46,7 +38,7 @@
 <li
 	on:click
 	class={clsx(
-		'mt-4 rounded-lg shadow cursor-pointer',
+		'rounded-lg shadow cursor-pointer',
 		selectedLocation == shipmentId ? 'bg-secondary-100' : 'bg-white'
 	)}
 >
