@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { ValidationMessage } from '@felte/reporter-svelte';
 	import clsx from 'clsx';
 
 	export let placeholder: string = '0.00';
@@ -48,4 +49,12 @@
 		pattern="^[0-9]*[.,]?[0-9]$"
 		{required}
 	/>
+
+	<ValidationMessage for={name} let:messages>
+		{#if messages}
+			<div class="absolute ml-3 mt-1" role="alert">
+				<p class="text-md text-red-600 font-semibold">{messages[0]}</p>
+			</div>
+		{/if}
+	</ValidationMessage>
 </div>
