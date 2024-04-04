@@ -6,12 +6,13 @@ use crate::{Name, Shipper};
 pub struct RegisterShipper<'info> {
     #[account(init,
         seeds = [b"shipper", signer.key.as_ref()], bump,
-        payer = signer, 
+        payer = payer, 
         space = 8 + std::mem::size_of::<Shipper>()
     )]
     pub shipper: AccountLoader<'info, Shipper>,
-    #[account(mut)]
     pub signer: Signer<'info>,
+    #[account(mut)]
+    pub payer: Signer<'info>,
     pub system_program: Program<'info, System>,
 }
 

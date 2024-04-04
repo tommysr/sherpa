@@ -11,8 +11,8 @@ import {
   getShipmentAddresses,
   getShipperAddress,
   getStateAddress
-} from '../sdk/sdk'
-import { ANDREW, JACOB, ROBERT, ZDZICH } from './mocks/shippers'
+} from '../tests/sdk'
+import { ANDREW, JACOB, ZDZICH, IGOR } from './mocks/shippers'
 
 const connection = new Connection('https://api.devnet.solana.com', { commitment: 'confirmed' })
 const wallet = Wallet.local()
@@ -26,43 +26,51 @@ const stateAddress = getStateAddress(program)
 const run = async () => {
   // console.log(Buffer.from(Keypair.generate().secretKey).toString('base64'))
 
-  console.log('Running for', program.programId.toBase58())
-  console.log('Running as ', provider.wallet.publicKey.toBase58())
+  // console.log('Running for', program.programId.toBase58())
+  // console.log('Running as ', provider.wallet.publicKey.toBase58())
 
-  // State
-  const stateAccount = await program.account.state.fetchNullable(stateAddress)
-  console.log('State', stateAddress.toBase58(), stateAccount)
+  // // State
+  // const stateAccount = await program.account.state.fetchNullable(stateAddress)
+  // console.log('State', stateAddress.toBase58(), stateAccount)
 
-  // Shipper
-  console.log('andrew', ANDREW.publicKey.toBase58())
-  const shipperAddress = getShipperAddress(program, ANDREW.publicKey)
-  const shipperAccount = await program.account.shipper.fetch(shipperAddress)
-  console.log('Andrew shipper', shipperAddress.toBase58(), shipperAccount)
+  // // Shipper
+  // console.log('andrew', ANDREW.publicKey.toBase58())
+  // const shipperAddress = getShipperAddress(program, ANDREW.publicKey)
+  // const shipperAccount = await program.account.shipper.fetch(shipperAddress)
+  // console.log('Andrew shipper', shipperAddress.toBase58(), shipperAccount)
 
-  // Shipment
-  const shipmentAddresses = getShipmentAddresses(program, ANDREW.publicKey, shipperAccount.count)
-  const shipmentAccounts = await program.account.shipment.fetchMultiple(shipmentAddresses)
-  console.log(
-    'Andrew shipments',
-    shipmentAddresses.map((address, i) => [address.toBase58(), shipmentAccounts[i]])
-  )
+  // // Shipment
+  // const shipmentAddresses = getShipmentAddresses(program, ANDREW.publicKey, shipperAccount.count)
+  // const shipmentAccounts = await program.account.shipment.fetchMultiple(shipmentAddresses)
+  // console.log(
+  //   'Andrew shipments',
+  //   shipmentAddresses.map((address, i) => [address.toBase58(), shipmentAccounts[i]])
+  // )
 
-  // Available Carrier
-  const carrierAddress = getCarrierAddress(program, ROBERT.publicKey)
-  const carrierAccount = await program.account.carrier.fetchNullable(carrierAddress)
-  console.log('Robert carrier', carrierAddress.toBase58())
+  // // Available Carrier
+  // const carrierAddress = getCarrierAddress(program, IGOR.publicKey)
+  // const carrierAccount = await program.account.carrier.fetchNullable(carrierAddress)
+  // console.log('Igor carrier', carrierAddress.toBase58(), carrierAccount)
 
-  // Unavailable Carrier
-  const unavailableCarrierAddress = getCarrierAddress(program, ZDZICH.publicKey)
-  const unavailableCarrierAccount = await program.account.carrier.fetchNullable(
-    unavailableCarrierAddress
-  )
-  console.log('Zdzich carrier', unavailableCarrierAddress.toBase58(), unavailableCarrierAccount)
+  // // Unavailable Carrier
+  // const unavailableCarrierAddress = getCarrierAddress(program, ZDZICH.publicKey)
+  // const unavailableCarrierAccount = await program.account.carrier.fetchNullable(
+  //   unavailableCarrierAddress
+  // )
+  // console.log('Zdzich carrier', unavailableCarrierAddress.toBase58(), unavailableCarrierAccount)
 
-  // Forwarder
-  const forwarderAddress = getCarrierAddress(program, JACOB.publicKey)
-  const forwarderAccount = await program.account.forwarder.fetchNullable(forwarderAddress)
-  console.log('Jacob forwarder', forwarderAddress.toBase58(), forwarderAccount)
+  // // Forwarder
+  // const forwarderAddress = getCarrierAddress(program, JACOB.publicKey)
+  // const forwarderAccount = await program.account.forwarder.fetchNullable(forwarderAddress)
+  // console.log('Jacob forwarder', forwarderAddress.toBase58(), forwarderAccount)
+
+  // Shipments
+  const shipments = await program.account.shipment.all()
+  console.log('Shipments', shipments.length)
+
+  console.log('Carriers', (await program.account.carrier.all()).length)
+  console.log('Forwarders', (await program.account.forwarder.all()).length)
+  console.log('Shippers', (await program.account.shipper.all()).length)
 }
 
 run()
