@@ -141,9 +141,16 @@
 			name: { name }
 		} = values;
 
-		let width = dimensions.width ?? 0;
+		// WELCOME TO CIRCUS 
+
+		const shitCheck = (n: number | undefined) => {
+			return n ? (typeof n == 'string' ? parseFloat(n) : n) : 0;
+		};
+
+		let width = shitCheck(dimensions.width);
+
 		if (dimensions.isMetricTon) {
-			width = dimensions.volume ?? 0;
+			width = shitCheck(dimensions.volume)
 		}
 
 		const tx = await getCreateShipmentTx(
@@ -161,9 +168,9 @@
 					reserved: [0, 0, 0]
 				},
 				dimensions: {
-					depth: dimensions.depth ?? 0,
-					height: dimensions.height ?? 0,
-					weight: dimensions.weight ?? 0,
+					depth: shitCheck(dimensions.depth),
+					height: shitCheck(dimensions.height),
+					weight: shitCheck(dimensions.weight),
 					width
 				},
 				geography: {

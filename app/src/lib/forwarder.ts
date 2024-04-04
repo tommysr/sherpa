@@ -29,7 +29,8 @@ export const getRegisterForwarderIx = async (
 		.registerForwarder(encodeName(name))
 		.accounts({
 			forwarder,
-			signer
+			signer,
+			payer: signer,
 		})
 		.instruction();
 
@@ -70,7 +71,8 @@ export const getBuyShipmentTx = async (
 			forwarder,
 			bought,
 			shipmentOwner,
-			signer
+			signer,
+			payer: signer
 		})
 		.instruction();
 
@@ -104,7 +106,8 @@ export const getMakeOfferTx = async (
 			shipment,
 			forwarder,
 			carrier,
-			signer
+			signer,
+			payer: signer,
 		})
 		.instruction();
 

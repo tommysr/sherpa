@@ -56,7 +56,8 @@ export interface Shipment<Public, ChannelData, Name, Date, Price, Key> {
 	channel: Channel<Public, ChannelData>;
 	shipment: ShipmentData<Date, Name>;
 	no: number;
-	reserved: number[];
+	status: number;
+	reserved: number[]; // 3
 }
 
 export type FetchedShipment = Shipment<Public<BN>, AccountName, AccountName, BN, BN, PublicKey>;

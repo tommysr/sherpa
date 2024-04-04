@@ -4,6 +4,7 @@ import type { Protocol } from '$src/utils/idl/types/protocol';
 import type { Program } from '@coral-xyz/anchor';
 import { Transaction, type PublicKey, type TransactionInstruction } from '@solana/web3.js';
 import { BN } from 'bn.js';
+import { deprecate } from 'util';
 
 export type CreateShipmentParams = ShipmentData<Date, string> & {
 	price: number; // in SOL currently
@@ -29,7 +30,8 @@ export const getRegisterShipperIx = async (
 		.registerShipper(encodeName(name))
 		.accounts({
 			shipper,
-			signer
+			signer,
+			payer: signer,
 		})
 		.instruction();
 
@@ -42,6 +44,8 @@ export const getCreateShipmentTx = async (
 	shipmentParams: CreateShipmentParams,
 	shipperName: string
 ): Promise<Transaction> => {
+	console.log(shipmentParams)
+
 	const tx = new Transaction();
 
 	const { account: shipperAccount, accountKey: shipper } = await fetchShipperAccount(
@@ -54,9 +58,12 @@ export const getCreateShipmentTx = async (
 		tx.add(ix);
 	}
 
+
 	const shipment = getShipmentAddress(program, signer, shipperAccount ? shipperAccount.count : 0);
 
 	const { deadline, when, price, name, details, dimensions, geography } = shipmentParams;
+
+
 
 	const ix = await program.methods
 		.createShipment(new BN(price * 10 ** 9), encodeName(name), {
@@ -78,7 +85,8 @@ export const getCreateShipmentTx = async (
 		.accounts({
 			shipper,
 			shipment,
-			signer
+			signer,
+			payer: signer,
 		})
 		.instruction();
 
