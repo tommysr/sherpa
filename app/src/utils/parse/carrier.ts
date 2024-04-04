@@ -1,12 +1,9 @@
-import type { PublicKey } from '@solana/web3.js';
-import type { Carrier } from '../account/carrier';
-import type BN from 'bn.js';
+import type { ApiCarrier, Carrier } from '../account/carrier';
 import { decodeName } from '$sdk/sdk';
-import type { AccountName } from '../account/common';
 
 export function parseCarrierToApiCarrier(
-	carrierAccount: Carrier<BN, PublicKey, AccountName>
-): Carrier<string, string, string> {
+	carrierAccount: Carrier
+): ApiCarrier {
 	return {
 		...carrierAccount,
 		authority: carrierAccount.authority.toString(),
