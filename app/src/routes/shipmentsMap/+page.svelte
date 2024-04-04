@@ -27,8 +27,8 @@
 
 <LayoutListWrapper bind:isMobileOpen>
 	{#if $notForwardedShipments.length != 0}
-		<div class="flex-1 flex w-full flex-col items-center">
-			<ul class="w-full flex-1">
+		<div class="flex-1 flex w-full flex-col overflow-y-auto px-4">
+			<ul class="w-full flex-1 space-y-4">
 				{#each $notForwardedShipments as account, i (account.publicKey)}
 					<OrderListElement
 						on:click={() => onElementSelect(i)}

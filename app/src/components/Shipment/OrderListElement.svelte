@@ -41,7 +41,7 @@
 <li
 	on:click
 	class={clsx(
-		'mt-4 rounded-lg shadow cursor-pointer w-full',
+		'rounded-lg shadow cursor-pointer w-full',
 		selectedLocation == shipmentId ? 'bg-secondary-100' : 'bg-white'
 	)}
 >
