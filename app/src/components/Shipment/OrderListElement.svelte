@@ -47,7 +47,7 @@
 >
 	<div class="px-4 py-5 sm:px-6">
 		<div class="flex items-center justify-between">
-			<h3 class="sm:text-md xl:text-lg leading-6 font-medium text-gray-900">Some title</h3>
+			<h3 class="sm:text-md xl:text-lg leading-6 font-medium text-gray-900">{shipmentData.name}</h3>
 			<p
 				class="mt-1 text-md bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent font-bold"
 			>

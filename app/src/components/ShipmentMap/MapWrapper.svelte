@@ -9,7 +9,12 @@
 		: 'https://basemaps.cartocdn.com/gl/positron-gl-style/style.json';
 </script>
 
-<MapLibre {style} class="relative w-full sm:aspect-video h-screen z-0" zoom={5} center={[19, 50]}>
+<MapLibre
+	{style}
+	class="maplibre relative w-full sm:aspect-video h-screen z-0"
+	zoom={5}
+	center={[19, 50]}
+>
 	<slot />
 </MapLibre>
 

@@ -29,7 +29,8 @@ export const getRegisterForwarderIx = async (
 		.registerForwarder(encodeName(name))
 		.accounts({
 			forwarder,
-			signer
+			signer,
+			payer: signer,
 		})
 		.instruction();
 
@@ -41,7 +42,7 @@ export const getBuyShipmentTx = async (
 	signer: PublicKey,
 	shipment: PublicKey,
 	shipmentOwner: PublicKey,
-	forwarderName: string
+	forwarderName: string // CONSIDER: how to handle it, also in make offer
 ): Promise<Transaction> => {
 	const tx = new Transaction();
 
@@ -56,7 +57,11 @@ export const getBuyShipmentTx = async (
 	}
 
 	const shipper = getShipperAddress(program, shipmentOwner);
-	const bought = getBoughtShipmentAddress(program, signer, forwarderAccount?.count ?? 0);
+	const bought = getBoughtShipmentAddress(
+		program,
+		signer,
+		forwarderAccount ? forwarderAccount.count : 0
+	);
 
 	const ix = await program.methods
 		.buyShipment()
@@ -66,7 +71,8 @@ export const getBuyShipmentTx = async (
 			forwarder,
 			bought,
 			shipmentOwner,
-			signer
+			signer,
+			payer: signer
 		})
 		.instruction();
 
@@ -100,7 +106,8 @@ export const getMakeOfferTx = async (
 			shipment,
 			forwarder,
 			carrier,
-			signer
+			signer,
+			payer: signer,
 		})
 		.instruction();
 
