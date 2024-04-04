@@ -71,8 +71,8 @@
 			Connect your wallet to view shipments
 		</p>
 	{:else if $forwardedShipments.length != 0}
-		<div class="h-full flex w-full flex-col items-center">
-			<ul class="w-full flex-1">
+		<div class="flex-1 flex w-full flex-col overflow-y-auto px-4">
+			<ul class="w-full flex-1 space-y-4">
 				{#if operationMode == OperationMode.SELL}
 					{#each carriers as carrier, i}
 						<CarrierListElement
