@@ -133,7 +133,6 @@
 		return [unsubscribeForwardedShipment, unsubscribeShipmentCreated];
 	}
 
-	onMount(() => {});
 
 	onMount(() => {
 		wallets = [
