@@ -1,41 +1,7 @@
 <script lang="ts">
-	import { onMount } from 'svelte';
-	import { get } from 'svelte/store';
-	import { decodeName } from '$sdk/sdk';
-	import { fetchForwarderAccount } from '$src/lib/forwarder';
-	import { fetchShipperAccount } from '$src/lib/shipper';
-	import { anchorStore } from '$src/stores/anchor';
-	import { forwardedShipmentsMeta } from '$src/stores/forwarderShipments';
 	import { searchableShipments } from '$src/stores/searchableShipments';
-	import { userStore } from '$src/stores/user';
-	import { walletStore } from '$src/stores/wallet';
-	import type {
-		ApiForwardedShipmentAccount,
-		FetchedForwardedShipment
-	} from '$src/utils/account/forwardedShipment';
-	import type { ApiShipmentAccount, FetchedShipment } from '$src/utils/account/shipment';
-	import { parseForwardedShipmentToApiForwardedShipment } from '$src/utils/parse/forwardedShipment';
-	import { parseShipmentToApiShipment } from '$src/utils/parse/shipment';
 
-	const { program } = get(anchorStore);
 	let storeToSearchIn = searchableShipments;
-
-	$: if ($walletStore.publicKey) {
-		fetchForwarderAccount(program, $walletStore.publicKey).then(({ account, accountKey }) => {
-			if (account) {
-				userStore.registerForwarder(decodeName(account.name));
-			}
-		});
-
-		fetchShipperAccount(program, $walletStore.publicKey).then(({ account, accountKey }) => {
-			if (account) {
-				userStore.registerShipper(decodeName(account.name));
-			}
-		});
-	} else {
-		userStore.unregisterForwarder();
-		userStore.unregisterShipper();
-	}
 
 	function handleSearchKeyUp(e: KeyboardEvent) {
 		if ($storeToSearchIn.searchString && e.key == 'Enter') {
@@ -45,72 +11,7 @@
 		}
 	}
 
-	function subscribeToShipmentEvents(): number[] {
-		const unsubscribeShipmentCreated = program.addEventListener(
-			'ShipmentCreated',
-			async (event) => {
-				console.log(event);
-				const shipmentPublicKey = event.shipment;
 
-				const shipment: FetchedShipment = await program.account.shipment.fetch(shipmentPublicKey);
-
-				const parsedShipment: ApiShipmentAccount = {
-					publicKey: shipmentPublicKey.toString(),
-					account: parseShipmentToApiShipment(shipment)
-				};
-
-				searchableShipments.extend({
-					...parsedShipment,
-					searchParams: parsedShipment.account.shipment.details.priority.toString()
-				});
-			}
-		);
-
-		const unsubscribeForwardedShipment = program.addEventListener(
-			'ShipmentTransferred',
-			async (event) => {
-				console.log(event);
-				const shipmentToRemove = event.before.toString();
-
-				const forwardedShipmentPublicKey = event.after;
-
-				const forwardedShipment: FetchedForwardedShipment =
-					await program.account.forwardedShipment.fetch(forwardedShipmentPublicKey);
-
-				const parsedShipment: ApiForwardedShipmentAccount = {
-					publicKey: forwardedShipmentPublicKey.toString(),
-					account: parseForwardedShipmentToApiForwardedShipment(forwardedShipment)
-				};
-
-				forwardedShipmentsMeta.update((meta) => {
-					meta.push(parsedShipment);
-					return meta;
-				});
-
-				// TODO: change in searchableOrders
-
-				// const { data } = get(searchableShipments);
-				// const shipmentToRemoveIndex = data.findIndex(
-				// 	(shipment) => shipment.publicKey === shipmentToRemove
-				// );
-
-				// if (shipmentToRemoveIndex !== -1) {
-				// 	searchableShipments.shrink(shipmentToRemoveIndex);
-				// }
-			}
-		);
-
-		return [unsubscribeForwardedShipment, unsubscribeShipmentCreated];
-	}
-
-	onMount(() => {
-		const unsubscribe = subscribeToShipmentEvents();
-		return () => {
-			for (const listener of unsubscribe) {
-				program.removeEventListener(listener);
-			}
-		};
-	});
 </script>
 
 <div

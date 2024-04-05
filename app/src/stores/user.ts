@@ -43,6 +43,15 @@ export function createUserStore() {
 			});
 		},
 
+		registerCarrier: (name: string) => {
+			update((store) => {
+				store.carrier.registered = true;
+				store.carrier.name = name;
+
+				return store;
+			});
+		},
+
 		unregisterForwarder: () => {
 			update((store) => {
 				store.forwarder.registered = false;
@@ -56,6 +65,15 @@ export function createUserStore() {
 			update((store) => {
 				store.shipper.registered = false;
 				store.shipper.name = '';
+
+				return store;
+			});
+		},
+
+		unregisterCarrier: () => {
+			update((store) => {
+				store.carrier.registered = false;
+				store.carrier.name = '';
 
 				return store;
 			});

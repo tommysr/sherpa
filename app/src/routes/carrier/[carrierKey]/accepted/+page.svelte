@@ -1,0 +1,1 @@
+<svelte:head><title>Accepted offers</title></svelte:head>
