@@ -98,7 +98,6 @@
 	}
 
 	async function onSubmit(values) {
-		console.log(values, states);
 		if (form == CarrierFormStage.Summary) {
 			await registerCarrier(states as RegisterCarrierFormInterface)
 				.then((sig) => console.log(sig))

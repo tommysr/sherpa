@@ -1,4 +1,4 @@
-import { shipmentsOffersMeta } from '$src/stores/offers.js';
+import { shipmentsOffersMeta } from '$src/stores/offers';
 import type { ApiShipmentOfferAccount } from '$src/utils/account/offer';
 
 import { error } from '@sveltejs/kit';
@@ -40,6 +40,8 @@ export async function load({ fetch, params }): Promise<{ offers: ApiShipmentOffe
 
 
     shipmentsOffersMeta.set(offers);
+
+		shipmentsOffersMeta.subscribe((val) => console.log(val))
 
 		return { offers };
 	} catch {

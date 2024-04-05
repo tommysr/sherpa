@@ -8,7 +8,7 @@
   $:console.log(carriers)
 </script>
 
-<!-- CONSIDER: Moving this into layout, handling display with route match -->
+<!-- CONSIDER: Moving this into layout, allowing carrier to view other carriers nearby  -->
 <svelte:head><title>Carriers</title></svelte:head>
 {#each carriers as { account }}
 	{@const location = account.availability.location}

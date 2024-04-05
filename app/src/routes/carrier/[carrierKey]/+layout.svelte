@@ -1,14 +1,17 @@
 <script lang="ts">
 	import { Control, ControlButton, ControlGroup } from 'svelte-maplibre';
 	import { page } from '$app/stores';
+
+
+	$: key = $page.params['carrierKey']
 </script>
 
-<Control class="flex flex-col gap-y-2">
+<Control position="top-left">
 	<ControlGroup>
-		<a href="{$page.url.pathname}/incoming">
+		<a href="/carrier/{key}/incoming">
 			<ControlButton>N</ControlButton>
 		</a>
-		<a href="{$page.url.pathname}/accepted">
+		<a href="/carrier/{key}/accepted">
 			<ControlButton>A</ControlButton>
 		</a>
 	</ControlGroup>

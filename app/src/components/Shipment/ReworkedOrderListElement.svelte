@@ -3,17 +3,23 @@
 	import type { Entries } from '$src/utils/types/object';
 	import clsx from 'clsx';
 	import ShipmentShowModal from '../Modals/ShipmentShowModal.svelte';
+	import ShipmentInformationModal from '../Modals/ShipmentInformationModal.svelte';
+	import { createEventDispatcher } from 'svelte';
 
 	export let shipmentAccount: ApiShipmentAccount;
-	export let selectedLocation: number | undefined;
+	export let selectedLocation: number | undefined = undefined;
 	export let shipmentId: number;
-
-	let showModal = false;
 
 	$: shipmentData = shipmentAccount.account;
 	$: locations = shipmentData.shipment.geography;
-	$: priority = getPriorityName(shipmentData.shipment.details.priority)
-	$: priorityColor = getPriorityColor(priority)
+	$: priority = getPriorityName(shipmentData.shipment.details.priority);
+	$: priorityColor = getPriorityColor(priority);
+
+	const dispatch = createEventDispatcher();
+
+	const handleButtonClick = (e: MouseEvent) => {
+		dispatch('buttonClick');
+	};
 
 	function getPriorityName(priority: number) {
 		switch (priority) {
@@ -68,13 +74,9 @@
 				<span class={clsx('font-semibold', priorityColor)}>{priority}</span>
 			</p>
 
-			<button class="text-sm xl:text-md text-accent font-medium" on:click={() => (showModal = true)}
+			<button class="text-sm xl:text-md text-accent font-medium" on:click={handleButtonClick}
 				>Show</button
 			>
 		</div>
 	</div>
 </li>
-
-{#if selectedLocation === shipmentId && showModal}
-	<ShipmentShowModal {shipmentAccount} bind:showModal />
-{/if}

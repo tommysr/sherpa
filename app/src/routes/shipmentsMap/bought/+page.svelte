@@ -23,6 +23,8 @@
 		});
 	}
 
+	$:console.log(carriers)
+
 	$: carriers = data.carriers;
 	$: locationsOnMap = $forwardedShipments.map((s) => s.shipment.account.shipment.geography);
 	$: isWalletConnected = $walletStore.publicKey != null;

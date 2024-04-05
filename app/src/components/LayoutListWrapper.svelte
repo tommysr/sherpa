@@ -60,7 +60,7 @@
 </div>
 
 <div
-	class="fixed hidden md:flex justify-center items-center md:w-1/3 xl:w-1/4 2xl:w-1/5 right-7 top-32 my-auto z-10 rounded-3xl h-3/4 p-4 shadow-xl overflow-y-auto bg-background"
+	class="fixed hidden md:flex justify-center md:w-1/3 xl:w-1/4 2xl:w-1/5 right-7 top-32 my-auto z-10 rounded-3xl h-3/4 p-4 shadow-xl overflow-y-auto bg-background"
 >
 	<slot />
 </div>
