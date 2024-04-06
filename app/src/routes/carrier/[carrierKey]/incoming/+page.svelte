@@ -49,7 +49,13 @@
 		if (!$walletStore.publicKey) {
 			walletStore.openModal();
 
-			throw 'wallet not connected';
+			createNotification({
+				text: 'Wallet not connected',
+				type: 'failed',
+				removeAfter: 5000
+			});
+
+			return
 		}
 
 		const tx = await getAcceptShipmentOfferTx(
@@ -64,13 +70,13 @@
 			const sig = await useSignAndSendTransaction(connection, wallet, tx);
 
 			createNotification({
-				text: 'accept offer tx sent',
+				text: 'Transaction send',
 				type: 'success',
-				removeAfter: 3000,
+				removeAfter: 5000,
 				signature: sig
 			});
 		} catch (err) {
-			createNotification({ text: 'signing failed', type: 'failed', removeAfter: 3000 });
+			createNotification({ text: 'Transaction send', type: 'failed', removeAfter: 5000 });
 		}
 	};
 </script>
