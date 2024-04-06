@@ -17,10 +17,10 @@
 	$: currentPage = $page.url.pathname;
 	$: isNavbarOpen = false;
 
-	$: isUserCarrier = $userStore.carrier.registered
-	$: walletKey = $walletStore.publicKey;
+	$: carrierRoute = $userStore.carrier.registered && $walletStore.publicKey ? $walletStore.publicKey.toString() : 'register'
+$:console.log($walletStore.publicKey?.toString(), carrierRoute)
 
-	const navigation = [
+	$: navigation = [
 		{
 			name: 'Home',
 			link: '/',
@@ -60,7 +60,7 @@
 			routes: [
 				{
 					name: 'Dashboard',
-					link: `/carrier/${isUserCarrier ? walletKey : 'register'}` ,
+					link: `/carrier/${carrierRoute}/incoming`,
 					svg: PlusIcon
 				},
 				{

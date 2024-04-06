@@ -1,4 +1,6 @@
-import { shipmentsOffersMeta } from '$src/stores/offers.js';
+import { acceptedShipmentsOffersMeta } from '$src/stores/acceptedOffers.js';
+import { shipmentsOffersMeta } from '$src/stores/offers';
+import type { ApiAcceptedShipmentOfferAccount } from '$src/utils/account/acceptedOffer.js';
 import type { ApiShipmentOfferAccount } from '$src/utils/account/offer';
 
 import { error } from '@sveltejs/kit';
@@ -29,17 +31,28 @@ export async function load({ fetch, params }): Promise<{ offers: ApiShipmentOffe
 	}
 
 	try {
-		const fetchedOffers = await fetch(`/api/offers/${params.carrierKey}/incoming`, {
-			method: 'GET',
-			headers: {
-				'content-type': 'application/json'
-			}
-		});
+		const [fetchedOffers, fetchedAcceptedOffers] = await Promise.all([
+			fetch(`/api/offers/${params.carrierKey}/incoming`, {
+				method: 'GET',
+				headers: {
+					'content-type': 'application/json'
+				}
+			}),
+			fetch(`/api/offers/${params.carrierKey}/accepted`, {
+				method: 'GET',
+				headers: {
+					'content-type': 'application/json'
+				}
+			})
+		]);
 
-		const offers: ApiShipmentOfferAccount[] = await fetchedOffers.json();
+		const [offers, acceptedOffers] = await Promise.all<
+			[Promise<ApiShipmentOfferAccount[]>, Promise<ApiAcceptedShipmentOfferAccount[]>]
+		>([fetchedOffers.json(), fetchedAcceptedOffers.json()]);
 
+		shipmentsOffersMeta.set(offers);
+		acceptedShipmentsOffersMeta.set(acceptedOffers)
 
-    shipmentsOffersMeta.set(offers);
 
 		return { offers };
 	} catch {

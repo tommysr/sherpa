@@ -19,8 +19,8 @@ export function parseShipmentDataToApiShipmentData(data: ShipmentData<BN, Accoun
 				width: data.dimensions.width / 1000, // meters
 				weight: data.dimensions.weight / 1000 // meters
 			},
-			when: new Date(data.when.toNumber()).toISOString(),
-			deadline: new Date(data.deadline.toNumber()).toISOString()
+			when: new Date(data.when.toNumber() * 1000).toISOString(),
+			deadline: new Date(data.deadline.toNumber() * 1000).toISOString()
 	};
 }
 

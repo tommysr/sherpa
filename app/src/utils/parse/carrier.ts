@@ -12,7 +12,7 @@ export function parseCarrierToApiCarrier(
 		availability: {
 			...carrierAccount.availability,
 			locationName: decodeName(carrierAccount.availability.locationName),
-			time: new Date(carrierAccount.availability.time.toNumber()).toISOString()
+			time: new Date(carrierAccount.availability.time.toNumber() * 1000).toISOString()
 		}
 	};
 }
