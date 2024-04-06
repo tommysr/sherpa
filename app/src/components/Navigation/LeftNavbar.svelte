@@ -60,7 +60,7 @@ $:console.log($walletStore.publicKey?.toString(), carrierRoute)
 			routes: [
 				{
 					name: 'Dashboard',
-					link: `/carrier/${carrierRoute}`,
+					link: `/carrier/${carrierRoute}/incoming`,
 					svg: PlusIcon
 				},
 				{

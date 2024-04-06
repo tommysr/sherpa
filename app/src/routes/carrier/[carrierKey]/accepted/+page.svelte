@@ -1,18 +1,6 @@
 <script lang="ts">
-	import LayoutListWrapper from '$src/components/LayoutListWrapper.svelte';
 	import ShipmentInformationModal from '$src/components/Modals/ShipmentInformationModal.svelte';
-	import OfferListElement from '$src/components/Offer/OfferListElement.svelte';
-	import ReworkedOrderListElement from '$src/components/Shipment/ReworkedOrderListElement.svelte';
-	import { shipmentOffers, type OfferedShipment } from '$src/stores/offers';
 	import ShipmentLocations from '$src/components/ShipmentMap/ShipmentsLocations.svelte';
-	import { getAcceptShipmentOfferTx } from '$lib/offer';
-	import { get } from 'svelte/store';
-	import { anchorStore } from '$stores/anchor';
-	import { walletStore } from '$stores/wallet';
-	import { web3Store } from '$stores/web3';
-	import { PublicKey } from '@solana/web3.js';
-	import { useSignAndSendTransaction } from '$utils/wallet/singAndSendTx';
-	import { createNotification } from '$components/Notification/notificationsStore';
 	import { acceptedShipmentOffers, type AcceptedShipment } from '$src/stores/acceptedOffers';
 	import AcceptedOfferListElement from '$src/components/AcceptedOffer/AcceptedOfferListElement.svelte';
 
@@ -42,80 +30,37 @@
 			isMobileOpen = false;
 		}
 	}
-
-	// const acceptShipmentOffer = async () => {
-	// 	const { program } = get(anchorStore);
-	// 	const wallet = get(walletStore);
-	// 	const { connection } = get(web3Store);
-
-	// 	if (!$walletStore.publicKey) {
-	// 		walletStore.openModal();
-
-	// 		throw 'wallet not connected';
-	// 	}
-
-	// 	const tx = await getAcceptShipmentOfferTx(
-	// 		program,
-	// 		$walletStore.publicKey,
-	// 		new PublicKey(selectedOffer!.meta.account.offeror),
-	// 		new PublicKey(selectedOffer!.shipment.publicKey),
-	// 		selectedOffer!.meta.account.no
-	// 	);
-
-	// 	try {
-	// 		const sig = await useSignAndSendTransaction(connection, wallet, tx);
-
-	// 		createNotification({
-	// 			text: 'accept offer tx sent',
-	// 			type: 'success',
-	// 			removeAfter: 3000,
-	// 			signature: sig
-	// 		});
-	// 	} catch (err) {
-	// 		createNotification({ text: 'signing failed', type: 'failed', removeAfter: 3000 });
-	// 	}
-	// };
 </script>
 
 <svelte:head><title>Accepted offers</title></svelte:head>
 
-<LayoutListWrapper bind:isMobileOpen>
-	{#if $acceptedShipmentOffers.length != 0}
-		<div class="h-full flex items-start">
-			<ul>
-				{#each $acceptedShipmentOffers as offer, i}
-					<div class="flex flex-col">
-						<AcceptedOfferListElement
-							acceptedOfferMeta={offer.meta}
-							on:click={() => onElementSelect(i)}
-							on:buttonClick={async () => {
-								selectedAcceptedOffer = offer;
-								// await acceptShipmentOffer();
-							}}
-						/>
-						<button
-							class="mt-1 border-2 border-secondary-600 rounded-full px-2 font-bold text-secondary-600 bg-primary-100 hover:bg-secondary-600 hover:text-white"
-							on:click={() => (isOpen = !isOpen)}
-							>{isOpen ? 'hide shipment' : 'show shipment'}</button
-						>
-						{#if isOpen}
-							<ReworkedOrderListElement
-								on:buttonClick={() => {
-									selectedAcceptedOffer = offer;
-									showShipmentDetailsModal = true;
-								}}
-								shipmentAccount={offer.shipment}
-								shipmentId={i}
-							/>
-						{/if}
-					</div>
-				{/each}
-			</ul>
-		</div>
-	{:else}
-		<p class="text-xl text-gray-500">Nothing found</p>
-	{/if}
-</LayoutListWrapper>
+{#if $acceptedShipmentOffers.length != 0}
+	<div class="flex-1 flex w-full flex-col overflow-y-auto px-4 mt-5">
+		<ul class="w-full flex-1 space-y-4">
+			{#each $acceptedShipmentOffers as offer, i}
+				<AcceptedOfferListElement
+					acceptedOfferMeta={offer.meta}
+					on:click={() => onElementSelect(i)}
+					on:buttonClick={() => {
+						selectedAcceptedOffer = offer;
+					}}
+					on:shipmentShow={() => {
+						selectedAcceptedOffer = offer;
+						showShipmentDetailsModal = !showShipmentDetailsModal;
+					}}
+				/>
+			{/each}
+		</ul>
+	</div>
+{:else}
+	<div class="flex-1 flex items-center">
+		<p
+			class="mb-5 text-center text-xl bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent"
+		>
+			Nothing found
+		</p>
+	</div>
+{/if}
 
 <!--  Modal for showing shipment details, just one, less rendering -->
 {#if selectedAcceptedOffer}

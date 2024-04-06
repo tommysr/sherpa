@@ -1,8 +1,6 @@
 <script lang="ts">
-	import LayoutListWrapper from '$src/components/LayoutListWrapper.svelte';
 	import ShipmentInformationModal from '$src/components/Modals/ShipmentInformationModal.svelte';
 	import OfferListElement from '$src/components/Offer/OfferListElement.svelte';
-	import ReworkedOrderListElement from '$src/components/Shipment/ReworkedOrderListElement.svelte';
 	import { shipmentOffers, type OfferedShipment } from '$src/stores/offers';
 	import ShipmentLocations from '$src/components/ShipmentMap/ShipmentsLocations.svelte';
 	import { getAcceptShipmentOfferTx } from '$lib/offer';
@@ -55,7 +53,7 @@
 				removeAfter: 5000
 			});
 
-			return
+			return;
 		}
 
 		const tx = await getAcceptShipmentOfferTx(
@@ -83,43 +81,31 @@
 
 <svelte:head><title>Incoming offers</title></svelte:head>
 
-<LayoutListWrapper bind:isMobileOpen>
-	{#if $shipmentOffers.length != 0}
-		<div class="h-full flex items-start">
-			<ul>
-				{#each $shipmentOffers as offer, i}
-					<div class="flex flex-col">
-						<OfferListElement
-							offerMeta={offer.meta}
-							on:click={() => onElementSelect(i)}
-							on:buttonClick={async () => {
-								selectedOffer = offer;
-								await acceptShipmentOffer();
-							}}
-						/>
-						<button
-							class="mt-1 border-2 border-secondary-600 rounded-full px-2 font-bold text-secondary-600 bg-primary-100 hover:bg-secondary-600 hover:text-white"
-							on:click={() => (isOpen = !isOpen)}
-							>{isOpen ? 'hide shipment' : 'show shipment'}</button
-						>
-						{#if isOpen}
-							<ReworkedOrderListElement
-								on:buttonClick={() => {
-									selectedOffer = offer;
-									showShipmentDetailsModal = true;
-								}}
-								shipmentAccount={offer.shipment}
-								shipmentId={i}
-							/>
-						{/if}
-					</div>
-				{/each}
-			</ul>
-		</div>
-	{:else}
-		<p class="text-xl text-gray-500">Nothing found</p>
-	{/if}
-</LayoutListWrapper>
+
+{#if $shipmentOffers.length != 0}
+	<div class="flex-1 flex w-full flex-col overflow-y-auto px-4 mt-5">
+		<ul class="w-full flex-1 space-y-4">
+			{#each $shipmentOffers as offer, i}
+					<OfferListElement
+						offerMeta={offer.meta}
+						on:click={() => onElementSelect(i)}
+						on:buttonClick={async () => {
+							selectedOffer = offer;
+							await acceptShipmentOffer();
+						}}
+					/>
+			{/each}
+		</ul>
+	</div>
+{:else}
+	<div class="flex-1 flex items-center">
+		<p
+			class="mb-5 text-center text-xl bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent"
+		>
+			Nothing found
+		</p>
+	</div>
+{/if}
 
 <!--  Modal for showing shipment details, just one, less rendering -->
 {#if selectedOffer}

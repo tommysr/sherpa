@@ -19,7 +19,25 @@
 	import { onMount } from 'svelte';
 	import { walletStore } from '$src/stores/wallet';
 	import Page from '../+page.svelte';
+	import LayoutListWrapper from '$src/components/LayoutListWrapper.svelte';
+	import clsx from 'clsx';
 	const { program } = get(anchorStore);
+
+	let selectedNav: number = 0;
+	let isMobileOpen = false;
+	$: isWalletConnected = $walletStore.publicKey != null;
+
+	const routes = [
+		{
+			name: 'incoming'
+		},
+		{
+			name: 'accepted'
+		}
+		// {
+		// 	name: 'Delivered'
+		// }
+	];
 
 	function subscribeToOffersEvents(): number[] {
 		const unsubscribeOfferMade = program.addEventListener('OfferMade', async (event) => {
@@ -27,7 +45,7 @@
 
 			// Carrier is only interested in offers made to him
 			if (!$walletStore.publicKey || event.to.toString() != $walletStore.publicKey.toString()) {
-				return;	
+				return;
 			}
 
 			const offer: ShipmentOffer = await program.account.shipmentOffer.fetch(offerPublicKey);
@@ -43,14 +61,13 @@
 			});
 		});
 
-
 		// this is also information which forwarder cares about
 		const unsubscribeOfferAccepted = program.addEventListener('OfferAccepted', async (event) => {
 			const acceptedOfferPublicKey = event.offer;
 
 			// Check not to include foreign offers just these which carrier accepted during session
 			if (!$walletStore.publicKey || event.to.toString() != $walletStore.publicKey.toString()) {
-				return;	
+				return;
 			}
 
 			const acceptedOffer: AcceptedShipmentOffer =
@@ -80,19 +97,44 @@
 	});
 
 	$: key = $page.params['carrierKey'];
+	$: absolutePath = `/carrier/${key}`;
+	$: url = $page.url.pathname;
+	$: carrierPage = url.split('/').at(-1)
+
+	$: console.log(carrierPage)
 </script>
 
+<LayoutListWrapper bind:isMobileOpen>
+	{#if !isWalletConnected}
+		<p
+			class="mt-1 text-center text-xl bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent w-2/3"
+		>
+			Connect your wallet to view shipments
+		</p>
+	{:else}
+		<div class="h-full flex w-full flex-col items-center">
+			<div class="inline-flex shadow-sm bg-white rounded-lg m-4 flex-none">
+				{#each routes as { name }, i}
+					<a href={`${absolutePath}/${name}`}>
+						<button
+							aria-current="page"
+							class={clsx(
+								'px-4 py-2 text-md font-semibold',
+								(carrierPage == name
+									? 'bg-gradient-to-r from-primary to-secondary text-white'
+									: 'bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent'),
+								i == 0 && 'rounded-l-lg',
+								i == routes.length - 1 && 'rounded-r-lg'
+							)}
+						>
+							{name}
+						</button>
+					</a>
+				{/each}
+			</div>
+			<slot />
+		</div>
+	{/if}
+</LayoutListWrapper>
 
-<!-- Consider replacing it by some better ui -->
-<Control position="top-left">
-	<ControlGroup>
-		<a href="/carrier/{key}/incoming">
-			<ControlButton>N</ControlButton>
-		</a>
-		<a href="/carrier/{key}/accepted">
-			<ControlButton>A</ControlButton>
-		</a>
-	</ControlGroup>
-</Control>
-
-<slot />
+<!-- <slot /> -->

@@ -6,9 +6,9 @@
 
 	const dispatch = createEventDispatcher();
 
-	const handleButtonClick = (e: MouseEvent) => {
-		dispatch('buttonClick');
-	};
+	const handleShowShipmentButtonClick = (e: MouseEvent) => {
+		dispatch('shipmentShow')
+	}
 
 	$: offer = acceptedOfferMeta.account;
 </script>
@@ -27,13 +27,15 @@
 		</div>
 		<div class="mt-3 xl:mt-5 flex items-center justify-between">
 			<p class="text-xs xl:sm font-medium text-gray-500 mr-6 xl:mr-12">
-				Accepted: {new Date(offer.accepted).toUTCString()}
+				&#x2022
+			 Accepted: {new Date(offer.accepted).toUTCString()}
 				<br />
-				&#x2022;
+			 Message: 
 			</p>
 
-			<button class="text-sm xl:text-md text-accent font-medium" on:click={handleButtonClick}
-				>Open channel?????</button
+
+			<button class="text-sm xl:text-md text-accent font-medium" on:click={handleShowShipmentButtonClick}
+				>Show details</button
 			>
 		</div>
 	</div>
