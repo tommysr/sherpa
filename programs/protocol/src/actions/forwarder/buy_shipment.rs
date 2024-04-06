@@ -46,6 +46,7 @@ pub fn handler(ctx: Context<BuyShipment>) -> Result<()> {
 
     // Update owner
     shipment.forwarder = forwarder.creator;
+    shipment.status = 2;
 
     // Check if the buyer has enough funds
     require_gte!(ctx.accounts.signer.get_lamports(), shipment.price, Error::NotEnoughFunds);

@@ -38,6 +38,7 @@ pub fn handler(ctx: Context<MakeOffer>, payment: u64, timeout: u32) -> Result<()
     let shipment = &mut ctx.accounts.shipment.load_mut()?;
 
     require_eq!(shipment.carrier, Pubkey::default(), Error::ShipmentSold);
+    shipment.status = 3;
 
     let now = Clock::get()?.unix_timestamp;
 

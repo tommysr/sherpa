@@ -68,7 +68,6 @@ describe('protocol', () => {
       .accounts({
         shipper: shipperAddress,
         signer: shipper.publicKey,
-        payer: shipper.publicKey,
         systemProgram: SystemProgram.programId
       })
       .signers([shipper])
@@ -125,7 +124,6 @@ describe('protocol', () => {
         shipment: shipmentAddress,
         shipper: shipperAddress,
         signer: shipper.publicKey,
-        payer: shipper.publicKey,
         systemProgram: SystemProgram.programId
       })
       .signers([shipper])
@@ -138,6 +136,7 @@ describe('protocol', () => {
     expect(shipmentAccount.shipper.equals(shipper.publicKey)).true
     expect(shipmentAccount.forwarder.equals(new PublicKey(0))).true
     expect(shipmentAccount.carrier.equals(new PublicKey(0))).true
+    expect(shipmentAccount.status).eq(1)
     expect(shipmentAccount.price.eq(shipmentPrice)).true
     expect(shipmentAccount.no).eq(0)
     expect(shipmentAccount.shipment.geography.from).to.deep.equal(shipmentData.geography.from)
@@ -200,7 +199,6 @@ describe('protocol', () => {
         shipment: shipmentAddress,
         shipper: shipperAddress,
         signer: shipper.publicKey,
-        payer: shipper.publicKey,
         systemProgram: SystemProgram.programId
       })
       .signers([shipper])
@@ -212,6 +210,7 @@ describe('protocol', () => {
     expect(shipmentAccount.shipper.equals(shipper.publicKey)).true
     expect(shipmentAccount.forwarder.equals(new PublicKey(0))).true
     expect(shipmentAccount.carrier.equals(new PublicKey(0))).true
+    expect(shipmentAccount.status).eq(1)
     expect(shipmentAccount.price.eq(shipmentPrice)).true
     expect(shipmentAccount.no).eq(1)
     expect(shipmentAccount.shipment.geography.from).to.deep.equal(shipmentData.geography.from)
@@ -236,7 +235,6 @@ describe('protocol', () => {
       .accounts({
         forwarder: forwarderAddress,
         signer: forwarder.publicKey,
-        payer: forwarder.publicKey,
         systemProgram: SystemProgram.programId
       })
       .signers([forwarder])
@@ -283,6 +281,7 @@ describe('protocol', () => {
     expect(shipmentAccount.shipper.equals(shipper.publicKey)).true
     expect(shipmentAccount.forwarder.equals(forwarder.publicKey)).true
     expect(shipmentAccount.carrier.equals(new PublicKey(0))).true
+    expect(shipmentAccount.status).eq(2)
 
     const forwarderAccount = await program.account.forwarder.fetch(forwarderAddress)
     expect(forwarderAccount.count).eq(1)
@@ -313,7 +312,6 @@ describe('protocol', () => {
       .accounts({
         carrier: carrierAddress,
         signer: carrier.publicKey,
-        payer: carrier.publicKey,
         systemProgram: SystemProgram.programId
       })
       .signers([carrier])
@@ -348,8 +346,7 @@ describe('protocol', () => {
         shipment: shipmentAddress,
         forwarder: forwarderAddress,
         carrier: carrierAddress,
-        signer: forwarder.publicKey,
-        payer: forwarder.publicKey
+        signer: forwarder.publicKey
       })
       .signers([forwarder])
       .rpc()
@@ -358,6 +355,7 @@ describe('protocol', () => {
     expect(shipmentAccount.shipper.equals(shipper.publicKey)).true
     expect(shipmentAccount.forwarder.equals(forwarder.publicKey)).true
     expect(shipmentAccount.carrier.equals(new PublicKey(0))).true
+    expect(shipmentAccount.status).eq(3)
 
     const offerAccount = await program.account.shipmentOffer.fetch(offerAddress)
     expect(offerAccount.offeror.equals(forwarder.publicKey)).true
@@ -405,6 +403,7 @@ describe('protocol', () => {
     expect(shipmentAccount.shipper.equals(shipper.publicKey)).true
     expect(shipmentAccount.forwarder.equals(forwarder.publicKey)).true
     expect(shipmentAccount.carrier.equals(carrier.publicKey)).true
+    expect(shipmentAccount.status).eq(4)
 
     const offerAccountAfter = await program.account.shipmentOffer.fetchNullable(offerAddress)
     expect(offerAccountAfter).null
@@ -431,8 +430,7 @@ describe('protocol', () => {
       .openChannel(encodeKey(shared))
       .accounts({
         shipment: shipmentAddress,
-        signer: shipper.publicKey,
-        payer: shipper.publicKey
+        signer: shipper.publicKey
       })
       .signers([shipper])
       .rpc()
@@ -459,8 +457,7 @@ describe('protocol', () => {
       .sendMessage(encodeKey(shared), encodeName('Hello!'))
       .accounts({
         shipment: shipmentAddress,
-        signer: carrier.publicKey,
-        payer: carrier.publicKey
+        signer: carrier.publicKey
       })
       .signers([carrier])
       .rpc()

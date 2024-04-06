@@ -48,6 +48,7 @@ pub fn handler(ctx: Context<AcceptOffer>) -> Result<()> {
     // check if the shipment is for sale
     require_eq!(shipment.carrier, Pubkey::default(), Error::ShipmentSold);
     shipment.carrier = carrier.creator;
+    shipment.status = 4;
 
     // lock the funds as a collateral
     require_gte!(

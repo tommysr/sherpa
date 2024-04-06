@@ -32,7 +32,7 @@ pub fn handler(ctx: Context<CreateShipment>, price: u64, name: Name, shipment: S
         price,
         no: shipper.count,
         reserved: [0; 3],
-        status: 0,
+        status: 1,
         shipment,
         name,
         channel: Channel::default()
