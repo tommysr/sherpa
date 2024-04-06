@@ -1,19 +1,40 @@
 <script lang="ts">
-	import type { ApiShipmentAccount, ShipmentDimensions } from '$src/utils/account/shipment';
-	import type { Entries } from '$src/utils/types/object';
+	import type { ApiShipmentAccount} from '$src/utils/account/shipment';
 	import clsx from 'clsx';
-	import ShipmentShowModal from '../Modals/ShipmentShowModal.svelte';
+	import { createEventDispatcher } from 'svelte';
 
 	export let shipmentAccount: ApiShipmentAccount;
 	export let selectedLocation: number | undefined;
 	export let shipmentId: number;
+	const dispatch = createEventDispatcher();
 
-	let showModal = false;
+	const handleShowClick = (e: MouseEvent) => {
+		dispatch('buttonClicked')
+	}
 
 	$: shipmentData = shipmentAccount.account;
 	$: locations = shipmentData.shipment.geography;
 	$: priority = getPriorityName(shipmentData.shipment.details.priority)
 	$: priorityColor = getPriorityColor(priority)
+	$: statusNumber = shipmentData.status
+	$: status = getStatusString(statusNumber)
+
+	function getStatusString(status: number) {
+		switch (status) {
+			case 5:
+				return 'Delivered'
+			case 4:
+				return 'Accepted by carrier'
+			case 3:
+				return 'Offered to carrier'
+			case 2:
+				return 'Bought by forwarder'
+			case 1: 
+				return 'Not yet bought'
+			default:
+				return 'Unknown'
+		}
+	}
 
 	function getPriorityName(priority: number) {
 		switch (priority) {
@@ -66,15 +87,15 @@
 				<br />
 				&#x2022; Priority:
 				<span class={clsx('font-semibold', priorityColor)}>{priority}</span>
+				<br />
+				&#x2022; Status:
+				<span class={clsx('font-semibold')}>{status}</span>
 			</p>
 
-			<button class="text-sm xl:text-md text-accent font-medium" on:click={() => (showModal = true)}
+			<button class="text-sm xl:text-md text-accent font-medium" on:click={handleShowClick}
 				>Show</button
 			>
 		</div>
 	</div>
 </li>
 
-{#if selectedLocation === shipmentId && showModal}
-	<ShipmentShowModal {shipmentAccount} bind:showModal />
-{/if}
