@@ -1,5 +1,6 @@
 <script>
 	export let showModal; // boolean
+	export let showCloseButton = true; // boolean
 
 	let dialog; // HTMLDialogElement
 
@@ -16,21 +17,24 @@
 <dialog
 	bind:this={dialog}
 	on:close={() => (showModal = false)}
-	class="z-index-30 rounded-3xl p-4 bg-white shadow-lg max-w-sm xl:max-w-md w-full"
+	class="z-index-30 rounded-3xl p-4 bg-white shadow-lg max-w-sm xl:max-w-md w-full overflow-visible"
 >
-	<div class="z-index-30 absolute top-5 right-5 text-lg">
-		<button on:click|stopPropagation={closeHandler}>
-			<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="w-11 cursor-pointer">
-				<path
-					stroke="var(--secondary)"
-					stroke-linecap="round"
-					stroke-linejoin="round"
-					stroke-width="32"
-					d="M368 368L144 144M368 144L144 368"
-				/>
-			</svg></button
-		>
-	</div>
+	{#if showCloseButton}
+		<div class="z-index-30 absolute top-5 right-5 text-lg">
+			<button on:click|stopPropagation={closeHandler}>
+				<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="w-11 cursor-pointer">
+					<path
+						stroke="var(--secondary)"
+						stroke-linecap="round"
+						stroke-linejoin="round"
+						stroke-width="32"
+						d="M368 368L144 144M368 144L144 368"
+					/>
+				</svg></button
+			>
+		</div>
+	{/if}
+
 	<!-- svelte-ignore a11y-no-static-element-interactions -->
 	<div on:click|stopPropagation class="p-5">
 		<slot />

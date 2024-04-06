@@ -16,6 +16,7 @@
 		className
 	)}
 	{name}
+	autocomplete="off"
 	on:keydown
 	on:change
 	on:input

@@ -4,7 +4,6 @@
 	import CarrierListElement from '$src/components/Shipment/CarrierListElement.svelte';
 	import CarriersLocations from '$src/components/ShipmentMap/CarriersLocations.svelte';
 	import ShipmentsLocations from '$src/components/ShipmentMap/ShipmentsLocations.svelte';
-	import ViewListSwitch from '$src/components/Switches/ViewListSwitch.svelte';
 	import { forwardedShipments, forwardedShipmentsMeta } from '$src/stores/forwarderShipments';
 	import { walletStore } from '$stores/wallet';
 	import type { PageData } from './$types';
@@ -65,43 +64,46 @@
 </script>
 
 <LayoutListWrapper bind:isMobileOpen>
-	<ViewListSwitch left="shipments" right="carriers" bind:isRight={operationModeSwitch} />
-	<ul>
-		{#if !isWalletConnected}
+	{#if !isWalletConnected}
+		<p
+			class="mt-1 text-center text-xl bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent w-2/3"
+		>
+			Connect your wallet to view shipments
+		</p>
+	{:else if $forwardedShipments.length != 0}
+		<div class="flex-1 flex w-full flex-col overflow-y-auto px-4">
+			<ul class="w-full flex-1 space-y-4">
+				{#if operationMode == OperationMode.SELL}
+					{#each carriers as carrier, i}
+						<CarrierListElement
+							on:click={() => onCarrierElementSelect(i)}
+							{selectedCarrier}
+							{selectedLocation}
+							carrierAccount={carrier}
+							carrierId={i}
+						/>
+					{/each}
+				{:else}
+					{#each $forwardedShipments as { meta }, i}
+						<BoughtOrderListElement
+							on:click={() => onShipmentElementSelect(i)}
+							shipmentAccount={meta}
+							{selectedLocation}
+							shipmentId={i}
+						/>
+					{/each}
+				{/if}
+			</ul>
+		</div>
+	{:else}
+		<div class="flex-1 flex items-center">
 			<p
-				class="mt-1 text-center text-lg bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent"
-			>
-				Please connect your wallet to view bought shipments
-			</p>
-		{:else if $forwardedShipments.length != 0}
-			{#if operationMode == OperationMode.SELL}
-				{#each carriers as carrier, i}
-					<CarrierListElement
-						on:click={() => onCarrierElementSelect(i)}
-						{selectedCarrier}
-						{selectedLocation}
-						carrierAccount={carrier}
-						carrierId={i}
-					/>
-				{/each}
-			{:else}
-				{#each $forwardedShipments as { meta }, i}
-					<BoughtOrderListElement
-						on:click={() => onShipmentElementSelect(i)}
-						shipmentAccount={meta}
-						{selectedLocation}
-						shipmentId={i}
-					/>
-				{/each}
-			{/if}
-		{:else}
-			<p
-				class="mt-1 text-center text-lg bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent"
+				class="mb-5 text-center text-xl bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent"
 			>
 				Nothing found
 			</p>
-		{/if}
-	</ul>
+		</div>
+	{/if}
 </LayoutListWrapper>
 
 {#if isWalletConnected}
