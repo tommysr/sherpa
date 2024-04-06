@@ -12,12 +12,12 @@ import type {
 export const dateFormSchema: yup.ObjectSchema<DatesFormInterface> = yup.object({
 	when: yup
 		.date()
-		.required('desired shipment date is required')
-		.min(new Date(), 'desired date should be in the future'),
+		.required('Desired shipment date is required')
+		.min(new Date(), 'Desired date should be in the future'),
 	deadline: yup
 		.date()
-		.required('deadline date is required')
-		.min(new Date(), 'deadline should be in the future')
+		.required('Deadline date is required')
+		.min(new Date(), 'Deadline should be in the future')
 });
 
 export const detailsFormSchema: yup.ObjectSchema<DetailsFormInterface> = yup.object({

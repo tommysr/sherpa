@@ -66,7 +66,7 @@
 		},
 		{
 			name: 'Delivered',
-			data: []
+			data: ['data']
 		}
 	];
 </script>
@@ -100,16 +100,18 @@
 			</div>
 
 			{#if insideNavData[selectedNav] && insideNavData[selectedNav].data.length != 0}
-				<ul class="w-full flex-1">
-					{#each $notForwardedShipments as account, i (account.publicKey)}
-						<OrderListElement
-							on:click={() => {}}
-							shipmentAccount={account}
-							{selectedLocation}
-							shipmentId={i}
-						/>
-					{/each}
-				</ul>
+				<div class="flex-1 flex w-full flex-col overflow-y-auto px-4 mt-5">
+					<ul class="w-full flex-1 space-y-4">
+						{#each $notForwardedShipments as account, i (account.publicKey)}
+							<OrderListElement
+								on:click={() => {}}
+								shipmentAccount={account}
+								{selectedLocation}
+								shipmentId={i}
+							/>
+						{/each}
+					</ul>
+				</div>
 			{:else}
 				<div class="flex-1 flex items-center">
 					<p
