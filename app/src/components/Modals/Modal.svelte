@@ -17,7 +17,7 @@
 <dialog
 	bind:this={dialog}
 	on:close={() => (showModal = false)}
-	class="z-index-30 rounded-3xl p-4 bg-white shadow-lg max-w-sm xl:max-w-md w-full"
+	class="z-index-30 rounded-3xl p-4 bg-white shadow-lg max-w-sm xl:max-w-md w-full overflow-visible"
 >
 	{#if showCloseButton}
 		<div class="z-index-30 absolute top-5 right-5 text-lg">

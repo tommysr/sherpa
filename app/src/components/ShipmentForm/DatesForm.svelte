@@ -1,18 +1,17 @@
 <script lang="ts">
-	import { createForm } from 'felte';
-	import { reporter, ValidationMessage } from '@felte/reporter-svelte';
-	import Button from '../Buttons/Button.svelte';
-	import { DateInput } from 'date-picker-svelte';
+	import { ValidationMessage, reporter } from '@felte/reporter-svelte';
 	import { validator } from '@felte/validator-yup';
+	import { DateInput } from 'date-picker-svelte';
+	import { createForm } from 'felte';
 	import * as yup from 'yup';
+	import Button from '../Buttons/Button.svelte';
 	import type { DatesFormInterface } from './interfaces';
 	import { dateFormSchema as schema } from './schemas';
 
 	export let initialValues: DatesFormInterface;
-	export let onSubmit;
-	export let onBack;
-
-	export let showModal = true;
+	export let onSubmit: any;
+	export let onBack: any;
+	export const showModal = true;
 
 	const { form, data, touched } = createForm<yup.InferType<typeof schema>>({
 		extend: [reporter, validator({ schema })],
@@ -34,64 +33,62 @@
 	}
 </script>
 
-<div class="my-10 flex justify-center">
+<div>
 	<h2
-		class="bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent font-bold text-3xl"
+		class="font-bold text-xl bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent"
 	>
-		Dates
+		Deadline
 	</h2>
+	<p class="text-neutral-600 text-sm max-w-sm mt-2">
+		Enter the desired date and deadline date of your shipment.
+	</p>
+
+	<form use:form class="mt-8 px-4">
+		<span class="flex items-center justify-between">
+			<p class="text-neutral-600">Deadline of the shipment:</p>
+			<div>
+				<DateInput
+					format="yyyy/MM/dd HH:mm"
+					placeholder="2000/31/12 23:59"
+					required
+					timePrecision="minute"
+					bind:value={$data.deadline}
+				/>
+
+				<ValidationMessage for="deadline" let:messages>
+					{#if messages}
+						<div class="absolute mt-1 -ml-10" role="alert">
+							<p class="text-md text-red-600 font-semibold">{messages[0]}</p>
+						</div>
+					{/if}
+				</ValidationMessage>
+			</div>
+		</span>
+
+		<span class="flex items-center justify-between mt-5">
+			<p class="text-neutral-600">Desired date of the shipment:</p>
+			<div>
+				<DateInput
+					format="yyyy/MM/dd HH:mm"
+					placeholder="2000/31/12 23:59"
+					timePrecision="minute"
+					required
+					bind:value={$data.when}
+				/>
+
+				<ValidationMessage for="when" let:messages>
+					{#if messages}
+						<div class="absolute mt-1 -ml-10" role="alert">
+							<p class="text-md text-red-600 font-semibold">{messages[0]}</p>
+						</div>
+					{/if}
+				</ValidationMessage>
+			</div>
+		</span>
+
+		<div class="flex justify-center space-x-5 mt-8">
+			<Button class="uppercase tracking-widest" on:click={() => onBack($data)}>Prev</Button>
+			<Button class="uppercase tracking-widest" type="submit">Next</Button>
+		</div>
+	</form>
 </div>
-
-<form use:form>
-	<div class="border-primary border-t text-primary-800 px-4 py-3 mb-5" role="alert">
-		<p class="font-bold">Action needed</p>
-		<p class="text-sm">Enter the desired date and deadline date of your shipment</p>
-	</div>
-
-	<div class="flex flex-col items-center gap-y-2">
-		<span>
-			Deadline of the shipment:
-			<DateInput
-				format="yyyy/MM/dd HH:mm"
-				placeholder="2000/31/12 23:59"
-				required
-				timePrecision="minute"
-				bind:value={$data.deadline}
-			/>
-		</span>
-
-		<span>
-			Desired date of the shipment:
-			<DateInput
-				format="yyyy/MM/dd HH:mm"
-				placeholder="2000/31/12 23:59"
-				timePrecision="minute"
-				required
-				bind:value={$data.when}
-			/>
-		</span>
-	</div>
-
-	<ValidationMessage for="deadline" let:messages={message}>
-		{#if message}
-			<div class="bg-red-200 border-l-4 mt-3 border-red-400 text-orange-700 p-2" role="alert">
-				<p class="font-bold">Invalid deadline</p>
-				<p>{message || ''}</p>
-			</div>
-		{/if}
-	</ValidationMessage>
-
-	<ValidationMessage for="when" let:messages={message}>
-		{#if message}
-			<div class="bg-red-200 border-l-4 mt-3 border-red-400 text-orange-700 p-2" role="alert">
-				<p class="font-bold">Invalid date</p>
-				<p>{message || ''}</p>
-			</div>
-		{/if}
-	</ValidationMessage>
-
-	<div class="flex justify-center mt-4 gap-x-2">
-		<Button on:click={() => onBack($data)}>Prev</Button>
-		<Button type="submit">Next</Button>
-	</div>
-</form>
