@@ -1,8 +1,8 @@
 <script lang="ts">
-	import { GeoJSON as GeoJson, LineLayer, Marker } from 'svelte-maplibre';
 	import type { Geography } from '$src/utils/account/shipment';
 	import clsx from 'clsx';
 	import { getContext } from 'svelte';
+	import { GeoJSON as GeoJson, LineLayer, Marker } from 'svelte-maplibre';
 	import type { MapContext } from 'svelte-maplibre/context.svelte';
 
 	export let locations: Geography<string>[];
@@ -57,7 +57,7 @@
 			lngLat={[location.from.longitude, location.from.latitude]}
 		>
 			<div
-				class={clsx('pin bounce cursor-pointer', selectedLocation == i ? 'active' : 'inactive')}
+				class={clsx('pin bounce-a cursor-pointer', selectedLocation == i ? 'active' : 'inactive')}
 			></div>
 			{#if selectedLocation === i}
 				<div class="pulse"></div>

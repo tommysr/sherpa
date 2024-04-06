@@ -4,8 +4,10 @@
 	import { page } from '$app/stores';
 
 	import WalletMultiButton from '../Wallet/WalletMultiButton.svelte';
+	import BoughtIcon from './NavbarIcons/BoughtIcon.svelte';
 	import BoxIcon from './NavbarIcons/BoxIcon.svelte';
 	import HomeIcon from './NavbarIcons/HomeIcon.svelte';
+	import IssuedIcon from './NavbarIcons/IssuedIcon.svelte';
 	import PlusIcon from './NavbarIcons/PlusIcon.svelte';
 	import SendIcon from './NavbarIcons/SendIcon.svelte';
 	import TrackIcon from './NavbarIcons/TrackIcon.svelte';
@@ -30,18 +32,18 @@ $:console.log($walletStore.publicKey?.toString(), carrierRoute)
 			svg: BoxIcon,
 			routes: [
 				{
+					name: 'Issued',
+					link: '/shipmentsMap/issued',
+					svg: IssuedIcon
+				},
+				{
+					name: 'Bought',
+					link: '/shipmentsMap/bought',
+					svg: BoughtIcon
+				},
+				{
 					name: 'Create',
 					link: '/shipmentsMap/create',
-					svg: PlusIcon
-				},
-				{
-					name: 'Buy',
-					link: '/shipmentsMap/bought',
-					svg: PlusIcon
-				},
-				{
-					name: 'Buy',
-					link: '/shipmentsMap/bought',
 					svg: PlusIcon
 				}
 			]
