@@ -6,8 +6,10 @@ import { ONE_HOUR, ONE_SOL, U64_MAX, awaitedAirdrops } from './utils'
 import {
   DF_BASE,
   DF_MODULUS,
+  decodeDecrypted,
   decodeKey,
   decodeName,
+  encodeEncypted,
   encodeKey,
   encodeName,
   getAcceptedOfferAddress,
@@ -20,6 +22,7 @@ import {
   getStateAddress
 } from '../app/src/sdk/sdk'
 import { expect } from 'chai'
+import { AES } from 'crypto-ts'
 
 describe('protocol', () => {
   // access to blockchain
@@ -452,9 +455,10 @@ describe('protocol', () => {
 
     expect(key.eqn(18)).true
 
-    // TODO: Actually encrypt here
+    let encrypted = AES.encrypt('Hello!', 'test').toString()
+
     await program.methods
-      .sendMessage(encodeKey(shared), encodeName('Hello!'))
+      .sendMessage(encodeKey(shared), encodeName(encrypted))
       .accounts({
         shipment: shipmentAddress,
         signer: carrier.publicKey
@@ -465,5 +469,9 @@ describe('protocol', () => {
     const shipmentAccount = await program.account.shipment.fetch(shipmentAddress)
 
     expect(decodeKey(shipmentAccount.channel.carrier).eq(shared)).true
+    expect(decodeName(shipmentAccount.channel.data)).eq(encrypted.toString())
+
+    const decrypted = AES.decrypt(decodeName(shipmentAccount.channel.data), 'test')
+    expect(decodeDecrypted(decrypted.words)).eq('Hello!')
   })
 })

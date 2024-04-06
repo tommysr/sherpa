@@ -1,6 +1,6 @@
 use anchor_lang::{prelude::*, solana_program::system_instruction};
 
-use crate::{ForwardedShipment, Error, Forwarder, Shipment, ShipmentTransferred, Shipper};
+use crate::{Error, ForwardedShipment, Forwarder, Shipment, ShipmentStatusUpdated, ShipmentTransferred, Shipper};
 
 #[derive(Accounts)]
 pub struct BuyShipment<'info> {
@@ -47,6 +47,11 @@ pub fn handler(ctx: Context<BuyShipment>) -> Result<()> {
     // Update owner
     shipment.forwarder = forwarder.creator;
     shipment.status = 2;
+
+    emit!(ShipmentStatusUpdated {
+        shipment: ctx.accounts.shipment.key(),
+        status: shipment.status,
+    });
 
     // Check if the buyer has enough funds
     require_gte!(ctx.accounts.signer.get_lamports(), shipment.price, Error::NotEnoughFunds);

@@ -1,6 +1,9 @@
 use anchor_lang::{prelude::*, solana_program::system_instruction};
 
-use crate::{AcceptedOffer, Carrier, Error, Forwarder, OfferAccepted, Shipment, ShipmentOffer};
+use crate::{
+    AcceptedOffer, Carrier, Error, Forwarder, OfferAccepted, Shipment, ShipmentOffer,
+    ShipmentStatusUpdated,
+};
 
 #[derive(Accounts)]
 pub struct AcceptOffer<'info> {
@@ -49,6 +52,11 @@ pub fn handler(ctx: Context<AcceptOffer>) -> Result<()> {
     require_eq!(shipment.carrier, Pubkey::default(), Error::ShipmentSold);
     shipment.carrier = carrier.creator;
     shipment.status = 4;
+
+    emit!(ShipmentStatusUpdated {
+        shipment: ctx.accounts.shipment.key(),
+        status: shipment.status,
+    });
 
     // lock the funds as a collateral
     require_gte!(

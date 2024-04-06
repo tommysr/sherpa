@@ -1,6 +1,6 @@
 use anchor_lang::prelude::*;
 
-use crate::{Error, Name, Public, Shipment};
+use crate::{Error, MessageSent, Name, Public, Shipment};
 
 #[derive(Accounts)]
 pub struct SendMessage<'info> {
@@ -19,8 +19,22 @@ pub fn handler(ctx: Context<SendMessage>, key: Public, message: Name) -> Result<
 
     if signer == &shipment.shipper {
         shipment.channel.shipper = key;
+
+        emit!(MessageSent {
+            from: shipment.shipper,
+            to: shipment.carrier,
+            about: ctx.accounts.shipment.key(),
+            message,
+        });
     } else if signer == &shipment.carrier {
         shipment.channel.carrier = key;
+
+        emit!(MessageSent {
+            from: shipment.carrier,
+            to: shipment.shipper,
+            about: ctx.accounts.shipment.key(),
+            message,
+        });
     } else {
         return Err(Error::SignerNotInChannel.into());
     }

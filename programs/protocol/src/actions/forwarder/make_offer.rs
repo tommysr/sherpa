@@ -1,6 +1,9 @@
 use anchor_lang::prelude::*;
 
-use crate::{Carrier, Error, Forwarder, OfferDetails, OfferMade, Shipment, ShipmentOffer};
+use crate::{
+    Carrier, Error, Forwarder, OfferDetails, OfferMade, Shipment, ShipmentOffer,
+    ShipmentStatusUpdated,
+};
 
 #[derive(Accounts)]
 pub struct MakeOffer<'info> {
@@ -39,6 +42,11 @@ pub fn handler(ctx: Context<MakeOffer>, payment: u64, timeout: u32) -> Result<()
 
     require_eq!(shipment.carrier, Pubkey::default(), Error::ShipmentSold);
     shipment.status = 3;
+
+    emit!(ShipmentStatusUpdated {
+        shipment: ctx.accounts.shipment.key(),
+        status: shipment.status,
+    });
 
     let now = Clock::get()?.unix_timestamp;
 
