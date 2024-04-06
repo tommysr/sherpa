@@ -19,6 +19,7 @@
 	$: myAllShipments = $searchableShipments.data.filter(
 		(el) => el.account.shipper.toString() == $walletStore.publicKey?.toString()
 	);
+
 	$: processingShipments = myAllShipments.filter((el) => el.account.status != 1);
 	$: deliveredShipments = myAllShipments.filter((el) => el.account.status == 5);
 	$: shipmentLocations = insideNavData[selectedNav].data.map((el) => el.account.shipment.geography);

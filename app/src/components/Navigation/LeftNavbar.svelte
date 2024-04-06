@@ -17,8 +17,7 @@
 	$: currentPage = $page.url.pathname;
 	$: isNavbarOpen = false;
 
-	$: carrierRoute = $userStore.carrier.registered && $walletStore.publicKey ? $walletStore.publicKey.toString() : 'register'
-$:console.log($walletStore.publicKey?.toString(), carrierRoute)
+	$: carrierRoute = $userStore.carrier.registered && $walletStore.publicKey ? `${$walletStore.publicKey.toString()}/incoming` : 'register'
 
 	$: navigation = [
 		{
@@ -46,7 +45,7 @@ $:console.log($walletStore.publicKey?.toString(), carrierRoute)
 		},
 		{
 			name: 'Forwarders',
-			link: '/todo',
+			link: '/forwarder/bought',
 			svg: SendIcon
 		}, 
 
@@ -57,7 +56,7 @@ $:console.log($walletStore.publicKey?.toString(), carrierRoute)
 			routes: [
 				{
 					name: 'Dashboard',
-					link: `/carrier/${carrierRoute}/incoming`,
+					link: `/carrier/${carrierRoute}`,
 					svg: PlusIcon
 				},
 				{

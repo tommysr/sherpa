@@ -11,6 +11,7 @@
 	let showBuyShipmentModal = false;
 	$: locationsOnMap = $notForwardedShipments.map((s) => s.account.shipment.geography);
 	let selectedLocation: number | undefined = undefined;
+	let shipmentBuyInProgress: string | undefined = undefined;
 	let isMobileOpen = false;
 
 	function onElementSelect(i: number) {
@@ -38,6 +39,7 @@
 					<OrderListElement
 						on:click={() => onElementSelect(i)}
 						on:buttonClicked={() => {
+							onElementSelect(i);
 							selectedShipment = account;
 							showBuyShipmentModal = true;
 						}}
@@ -60,7 +62,11 @@
 </LayoutListWrapper>
 
 {#if selectedShipment}
-	<ShipmentBuyModal shipmentAccount={selectedShipment} bind:showModal={showBuyShipmentModal} />
+	<ShipmentBuyModal
+		shipmentAccount={selectedShipment}
+		bind:showModal={showBuyShipmentModal}
+		bind:shipmentBuyInProgress
+	/>
 {/if}
 
 <ShipmentsLocations

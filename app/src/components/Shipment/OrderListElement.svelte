@@ -1,5 +1,5 @@
 <script lang="ts">
-	import type { ApiShipmentAccount} from '$src/utils/account/shipment';
+	import type { ApiShipmentAccount } from '$src/utils/account/shipment';
 	import clsx from 'clsx';
 	import { createEventDispatcher } from 'svelte';
 
@@ -9,30 +9,30 @@
 	const dispatch = createEventDispatcher();
 
 	const handleShowClick = (e: MouseEvent) => {
-		dispatch('buttonClicked')
-	}
+		dispatch('buttonClicked');
+	};
 
 	$: shipmentData = shipmentAccount.account;
 	$: locations = shipmentData.shipment.geography;
-	$: priority = getPriorityName(shipmentData.shipment.details.priority)
-	$: priorityColor = getPriorityColor(priority)
-	$: statusNumber = shipmentData.status
-	$: status = getStatusString(statusNumber)
+	$: priority = getPriorityName(shipmentData.shipment.details.priority);
+	$: priorityColor = getPriorityColor(priority);
+	$: statusNumber = shipmentData.status;
+	$: status = getStatusString(statusNumber);
 
 	function getStatusString(status: number) {
 		switch (status) {
 			case 5:
-				return 'Delivered'
+				return 'Delivered';
 			case 4:
-				return 'Accepted by carrier'
+				return 'Accepted by carrier';
 			case 3:
-				return 'Offered to carrier'
+				return 'Offered to carrier';
 			case 2:
-				return 'Bought by forwarder'
-			case 1: 
-				return 'Not yet bought'
+				return 'Bought by forwarder';
+			case 1:
+				return 'Not yet bought';
 			default:
-				return 'Unknown'
+				return 'Unknown';
 		}
 	}
 
@@ -98,4 +98,3 @@
 		</div>
 	</div>
 </li>
-

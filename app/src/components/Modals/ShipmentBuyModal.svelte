@@ -10,10 +10,14 @@
 	import { useSignAndSendTransaction } from '$src/utils/wallet/singAndSendTx';
 	import { getBuyShipmentTx } from '$lib/forwarder';
 	import { userStore } from '$src/stores/user';
-	import { createNotification } from '../Notification/notificationsStore';
+	import { createNotification, removeNotification } from '../Notification/notificationsStore';
+	import { createEventDispatcher } from 'svelte';
+	import { awaitedConfirmation } from '$src/stores/confirmationAwait';
 
 	export let showModal: boolean;
 	export let shipmentAccount: ApiShipmentAccount;
+
+	export let shipmentBuyInProgress: string | undefined;
 
 	$: shipmentData = shipmentAccount.account;
 	$: dimensions = Object.entries(shipmentData.shipment.dimensions) as Entries<ShipmentDimensions>;
@@ -27,6 +31,10 @@
 		return true;
 	}
 
+	const notifyBuy = () => {
+		shipmentBuyInProgress = shipmentAccount.publicKey
+	}
+
 	async function handleBuyClick() {
 		const { program } = get(anchorStore);
 		const wallet = get(walletStore);
@@ -38,7 +46,6 @@
 		if (!$walletStore.publicKey) {
 			showModal = false;
 			walletStore.openModal();
-
 			return;
 		}
 
@@ -46,6 +53,8 @@
 			createNotification({ text: 'invalid name', type: 'failed', removeAfter: 5000 });
 			return;
 		}
+
+		const id = createNotification({ text: 'signing', type: 'loading', removeAfter: undefined });
 
 		const tx = await getBuyShipmentTx(
 			program,
@@ -58,8 +67,17 @@
 		try {
 			const signature = await useSignAndSendTransaction(connection, wallet, tx);
 
+			console.log(signature)
+
+			removeNotification(id);
 			createNotification({ text: 'Tx send', type: 'success', removeAfter: 5000, signature });
+
+			const confirmation = createNotification({ text: 'waiting for confirmation', type: 'loading', removeAfter: 30000});
+			awaitedConfirmation.set(confirmation)
+
+			notifyBuy()
 		} catch (err) {
+			removeNotification(id);
 			createNotification({ text: 'Signing', type: 'failed', removeAfter: 5000 });
 		}
 	}
@@ -146,7 +164,9 @@
 		/>
 	{/if}
 
-	<div class="text-center pt-20">
-		<button on:click={handleBuyClick}>Buy</button>
-	</div>
+	{#if shipmentAccount.publicKey != shipmentBuyInProgress}
+		<div class="text-center pt-20">
+			<button on:click={handleBuyClick}>Buy</button>
+		</div>
+	{/if}
 </Modal>

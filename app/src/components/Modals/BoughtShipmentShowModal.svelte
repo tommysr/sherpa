@@ -10,7 +10,8 @@
 	import type { ApiCarrierAccount } from '$src/utils/account/carrier';
 	import { BN } from 'bn.js';
 	import { forwardedShipments, type ForwardedShipment } from '$src/stores/forwarderShipments';
-	import { createNotification } from '../Notification/notificationsStore';
+	import { createNotification, removeNotification } from '../Notification/notificationsStore';
+	import { awaitedConfirmation } from '$src/stores/confirmationAwait';
 
 	export let showModal: boolean;
 	export let carrierAccount: ApiCarrierAccount;
@@ -26,7 +27,6 @@
 
 	$: timeInSecs = time * 60;
 
-
 	const areMakeOfferParamsValid = () => {
 		if (!price || !time || price < 0 || time < 30) {
 			return false;
@@ -34,7 +34,6 @@
 
 		return true;
 	};
-
 
 	async function handleMakeOfferClick() {
 		const { program } = get(anchorStore);
@@ -49,11 +48,12 @@
 		}
 
 		if (!areMakeOfferParamsValid()) {
-			createNotification({text: 'Invalid price', type: 'failed', removeAfter: 5000})
+			createNotification({ text: 'Invalid price', type: 'failed', removeAfter: 5000 });
 
 			return;
 		}
 
+		const id = createNotification({ text: 'signing', type: 'loading', removeAfter: undefined });
 
 		const tx = await getMakeOfferTx(
 			program,
@@ -68,11 +68,15 @@
 			const signature = await useSignAndSendTransaction(connection, wallet, tx);
 
 			createNotification({ text: 'Tx send', type: 'success', removeAfter: 5000, signature });
+			removeNotification(id);
+
+			const confirmation = createNotification({ text: 'waiting for confirmation', type: 'loading', removeAfter: 30000});
+			awaitedConfirmation.set(confirmation)
 		} catch (err) {
 			createNotification({ text: 'Signing', type: 'failed', removeAfter: 5000 });
+			removeNotification(id);
 		}
 	}
-
 </script>
 
 <Modal bind:showModal>

@@ -41,6 +41,8 @@
 	} from '$src/utils/account/forwardedShipment';
 	import { parseForwardedShipmentToApiForwardedShipment } from '$src/utils/parse/forwardedShipment';
 	import { forwardedShipmentsMeta } from '$src/stores/forwarderShipments';
+	import { createNotification, removeNotification } from '$src/components/Notification/notificationsStore';
+	import { awaitedConfirmation } from '$src/stores/confirmationAwait';
 
 	let wallets: Adapter[];
 	// it's a solana devnet cluster, but consider changing it to more performant provider
@@ -99,9 +101,8 @@
 		const unsubscribeForwardedShipment = program.addEventListener(
 			'ShipmentTransferred',
 			async (event) => {
-				console.log(event);
-				const shipmentToRemove = event.shipment.toString();
-
+				console.log(event.buyer.toString())
+	
 				const forwardedShipmentPublicKey = event.forwarded;
 
 				const forwardedShipment: FetchedForwardedShipment =
@@ -112,10 +113,23 @@
 					account: parseForwardedShipmentToApiForwardedShipment(forwardedShipment)
 				};
 
+				const buyer = event.buyer;
+
+				if (buyer.toString() === $walletStore.publicKey?.toString())
+				{
+					const id = $awaitedConfirmation;
+					if (id) {
+						removeNotification(id)
+					}
+					createNotification({text: 'Purchase success', type: 'success', removeAfter: 5000})
+				}
+
 				forwardedShipmentsMeta.update((meta) => {
 					meta.push(parsedShipment);
 					return meta;
 				});
+
+
 
 				// TODO: change in searchableOrders
 
