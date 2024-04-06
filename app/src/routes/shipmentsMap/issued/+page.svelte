@@ -16,14 +16,6 @@
 	let isMobileOpen = false;
 	let selectedNav: number = 0;
 
-	function onMarkerClick(i: number) {
-		selectedLocation = i;
-
-		if (isMobileOpen) {
-			isMobileOpen = false;
-		}
-	}
-
 	$: myAllShipments = $searchableShipments.data.filter(
 		(el) => el.account.shipper.toString() == $walletStore.publicKey?.toString()
 	);
@@ -44,6 +36,14 @@
 			data: deliveredShipments
 		}
 	];
+
+	function onMarkerClick(i: number) {
+		selectedLocation = i;
+
+		if (isMobileOpen) {
+			isMobileOpen = false;
+		}
+	}
 </script>
 
 <LayoutListWrapper bind:isMobileOpen>
