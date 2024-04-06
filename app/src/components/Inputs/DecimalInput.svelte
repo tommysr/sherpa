@@ -38,6 +38,7 @@
 			className
 		)}
 		{name}
+		autocomplete="off"
 		on:keydown={onKeyDown}
 		on:change
 		on:input

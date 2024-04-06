@@ -17,6 +17,7 @@
 			'w-full bg-transparent px-3 py-2 text-sm placeholder-primary placeholder:italic placeholder:text-slate-400 lg:px-4 lg:py-2 lg:text-base rounded-lg border-2 border-gradient-to-r from-primary to-secondary',
 			className
 		)}
+		autocomplete="off"
 		on:keydown
 		on:change
 		on:input
