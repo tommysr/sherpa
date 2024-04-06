@@ -1,0 +1,1 @@
+<svelte:head><title>Incoming offers</title></svelte:head>

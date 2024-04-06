@@ -11,7 +11,7 @@
 	export let initialValues: DatesFormInterface;
 	export let onSubmit: any;
 	export let onBack: any;
-	export const showModal = true;
+	export let showModal = true;
 
 	const { form, data, touched } = createForm<yup.InferType<typeof schema>>({
 		extend: [reporter, validator({ schema })],

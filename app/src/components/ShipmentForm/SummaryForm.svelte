@@ -7,7 +7,13 @@
 	import * as yup from 'yup';
 	import type { CreateShipmentFormInterface } from './interfaces';
 
-	export let initialValues: CreateShipmentFormInterface;
+	//export let flatStates: { [key: string]: string }[];
+
+	interface UniversalInterface<T> {
+		[key: string]: UniversalInterface<T>;
+	}
+
+	export let initialValues: UniversalInterface<string | Date | number>;
 	export let onSubmit;
 	export let onBack;
 
@@ -19,13 +25,8 @@
 		});
 	});
 
-	$: console.log(flatStates);
-	const schema = yup.object({
-		create: yup.boolean()
-	});
-
-	const { form, data } = createForm<yup.InferType<typeof schema>>({
-		extend: [reporter, validator({ schema })],
+	const { form, data } = createForm({
+		extend: [reporter],
 		onSubmit
 	});
 </script>
@@ -57,6 +58,6 @@
 
 	<div class="flex justify-center mt-4 gap-x-2">
 		<Button on:click={() => onBack($data)}>Prev</Button>
-		<Button type="submit">FInalize</Button>
+		<Button type="submit">Finalize</Button>
 	</div>
 </form>

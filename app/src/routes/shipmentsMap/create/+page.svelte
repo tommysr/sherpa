@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { pushState } from '$app/navigation';
 	import { page } from '$app/stores';
+	import { CarrierFormStage } from '$src/components/CarrierForm/carrierFormStage';
 	import Modal from '$src/components/Modals/Modal.svelte';
 	import DatesForm from '$src/components/ShipmentForm/DatesForm.svelte';
 	import DetailsForm from '$src/components/ShipmentForm/DetailsForm.svelte';
@@ -101,7 +102,7 @@
 	};
 	let showModal = true;
 
-	$: form = $page.state.form ?? (startForm as FormStage);
+	$: form = $page.state.form ?? startForm;
 
 	function summarizeState() {
 		const endState = {};
@@ -204,7 +205,7 @@
 				summarizeState();
 			}
 			states = states;
-			pushState('', { form: nextStage(form), showModal: true });
+			pushState('', { form: nextStage(form), showModal: true, carrierForm: CarrierFormStage.Name });
 		}
 	}
 
@@ -228,5 +229,5 @@
 </Modal>
 
 {#if !showModal}
-	<LocationPick bind:showModal />
+	<LocationPick bind:showModal type="double" />
 {/if}
