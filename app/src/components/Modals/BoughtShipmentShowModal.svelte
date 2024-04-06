@@ -7,14 +7,10 @@
 	import { web3Store } from '$src/stores/web3';
 	import { useSignAndSendTransaction } from '$src/utils/wallet/singAndSendTx';
 	import { getMakeOfferTx } from '$lib/forwarder';
-	import Pending from '../Statuses/Pending.svelte';
-	import Empty from '../Statuses/Empty.svelte';
-	import Error from '../Statuses/Error.svelte';
-	import TransactionSent from '../Statuses/TransactionSent.svelte';
 	import type { ApiCarrierAccount } from '$src/utils/account/carrier';
-
 	import { BN } from 'bn.js';
 	import { forwardedShipments, type ForwardedShipment } from '$src/stores/forwarderShipments';
+	import { createNotification } from '../Notification/notificationsStore';
 
 	export let showModal: boolean;
 	export let carrierAccount: ApiCarrierAccount;
@@ -22,7 +18,6 @@
 
 	let time: number;
 	let price: number;
-
 	let shipment: ForwardedShipment | undefined;
 
 	$: if (selectedLocation) {
@@ -31,10 +26,6 @@
 
 	$: timeInSecs = time * 60;
 
-	let status = {
-		component: Empty,
-		statusString: ''
-	};
 
 	const areMakeOfferParamsValid = () => {
 		if (!price || !time || price < 0 || time < 30) {
@@ -44,10 +35,6 @@
 		return true;
 	};
 
-	function showError(error: string) {
-		status.component = Error;
-		status.statusString = error;
-	}
 
 	async function handleMakeOfferClick() {
 		const { program } = get(anchorStore);
@@ -62,12 +49,11 @@
 		}
 
 		if (!areMakeOfferParamsValid()) {
-			showError('price must be higher than zero and time greater than 30 minutes');
+			createNotification({text: 'Invalid price', type: 'failed', removeAfter: 5000})
+
 			return;
 		}
 
-		status.component = Pending;
-		status.statusString = 'signing transaction, follow wallet instruction';
 
 		const tx = await getMakeOfferTx(
 			program,
@@ -79,19 +65,14 @@
 		);
 
 		try {
-			const sig = await useSignAndSendTransaction(connection, wallet, tx);
+			const signature = await useSignAndSendTransaction(connection, wallet, tx);
 
-			status.component = TransactionSent;
-			status.statusString = sig;
-			console.log(sig);
+			createNotification({ text: 'Tx send', type: 'success', removeAfter: 5000, signature });
 		} catch (err) {
-			showError('signing failed');
+			createNotification({ text: 'Signing', type: 'failed', removeAfter: 5000 });
 		}
 	}
 
-	async function getLocationFromCoords(lat: number, long: number): Promise<string> {
-		return `Kraków, Poland`;
-	}
 </script>
 
 <Modal bind:showModal>
@@ -120,8 +101,6 @@
 				placeholder="time in minutes after offer will be invalid"
 			/>
 		</span>
-
-		<svelte:component this={status.component} status={status.statusString} />
 
 		<div class="text-center pt-20">
 			<button on:click={handleMakeOfferClick}>Make offer</button>

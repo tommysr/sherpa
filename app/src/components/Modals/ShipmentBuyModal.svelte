@@ -1,9 +1,5 @@
 <script lang="ts">
-	import type {
-		ApiShipmentAccount,
-		Geography,
-		ShipmentDimensions
-	} from '$src/utils/account/shipment';
+	import type { ApiShipmentAccount, ShipmentDimensions } from '$src/utils/account/shipment';
 	import type { Entries } from '$src/utils/types/object';
 	import { get } from 'svelte/store';
 	import Modal from './Modal.svelte';
@@ -12,13 +8,9 @@
 	import { walletStore } from '$src/stores/wallet';
 	import { web3Store } from '$src/stores/web3';
 	import { useSignAndSendTransaction } from '$src/utils/wallet/singAndSendTx';
-	import { fetchForwarderAccount, getBuyShipmentTx } from '$lib/forwarder';
+	import { getBuyShipmentTx } from '$lib/forwarder';
 	import { userStore } from '$src/stores/user';
-	import { searchableShipments } from '$src/stores/searchableShipments';
-	import Pending from '../Statuses/Pending.svelte';
-	import Empty from '../Statuses/Empty.svelte';
-	import Error from '../Statuses/Error.svelte';
-	import TransactionSent from '../Statuses/TransactionSent.svelte';
+	import { createNotification } from '../Notification/notificationsStore';
 
 	export let showModal: boolean;
 	export let shipmentAccount: ApiShipmentAccount;
@@ -28,21 +20,11 @@
 	$: locations = shipmentData.shipment.geography;
 	// // $: properties = Object.entries(shipmentData.shipment.details) as Entries<ShipmentDetails>;
 
-	let status = {
-		component: Empty,
-		statusString: ''
-	};
-
 	function isAccountNameValid(name: string): boolean {
 		if (name.length == 0 || name.length > 64) {
 			return false;
 		}
 		return true;
-	}
-
-	function showError(error: string) {
-		status.component = Error;
-		status.statusString = error;
 	}
 
 	async function handleBuyClick() {
@@ -61,12 +43,9 @@
 		}
 
 		if (!isAccountNameValid(name)) {
-			showError('name must be between 0 and 64 characters');
+			createNotification({ text: 'invalid name', type: 'failed', removeAfter: 5000 });
 			return;
 		}
-
-		status.component = Pending;
-		status.statusString = 'signing transaction, follow wallet instruction';
 
 		const tx = await getBuyShipmentTx(
 			program,
@@ -77,24 +56,12 @@
 		);
 
 		try {
-			const sig = await useSignAndSendTransaction(connection, wallet, tx);
+			const signature = await useSignAndSendTransaction(connection, wallet, tx);
 
-			// TODO: manipulate store to move it forward
-			// const indexToUpdate = $searchableShipments.data.findIndex(
-			// 	(s) => s.publicKey === shipmentAccount.publicKey
-			// );
-			// searchableShipments.shrink(indexToRemove);
-
-			status.component = TransactionSent;
-			status.statusString = sig;
-			console.log(sig);
+			createNotification({ text: 'Tx send', type: 'success', removeAfter: 5000, signature });
 		} catch (err) {
-			showError('signing failed');
+			createNotification({ text: 'Signing', type: 'failed', removeAfter: 5000 });
 		}
-	}
-
-	async function getLocationFromCoords(lat: number, long: number): Promise<string> {
-		return `Kraków, Poland`;
 	}
 </script>
 
@@ -178,8 +145,6 @@
 			placeholder="enter forwarder name to be registered"
 		/>
 	{/if}
-
-	<svelte:component this={status.component} status={status.statusString} />
 
 	<div class="text-center pt-20">
 		<button on:click={handleBuyClick}>Buy</button>

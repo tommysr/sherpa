@@ -36,11 +36,7 @@ $:console.log($walletStore.publicKey?.toString(), carrierRoute)
 					link: '/shipmentsMap/issued',
 					svg: IssuedIcon
 				},
-				{
-					name: 'Bought',
-					link: '/shipmentsMap/bought',
-					svg: BoughtIcon
-				},
+
 				{
 					name: 'Create',
 					link: '/shipmentsMap/create',
@@ -50,9 +46,10 @@ $:console.log($walletStore.publicKey?.toString(), carrierRoute)
 		},
 		{
 			name: 'Forwarders',
-			link: '/forwarder',
+			link: '/todo',
 			svg: SendIcon
-		},
+		}, 
+
 		{
 			name: 'Carriers',
 			link: '/carrier',

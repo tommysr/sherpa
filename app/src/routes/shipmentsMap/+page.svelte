@@ -1,9 +1,14 @@
 <script lang="ts">
 	import LayoutListWrapper from '$src/components/LayoutListWrapper.svelte';
+	import ShipmentBuyModal from '$src/components/Modals/ShipmentBuyModal.svelte';
+	import ShipmentShowModal from '$src/components/Modals/ShipmentBuyModal.svelte';
 	import OrderListElement from '$src/components/Shipment/OrderListElement.svelte';
 	import ShipmentsLocations from '$src/components/ShipmentMap/ShipmentsLocations.svelte';
 	import { notForwardedShipments } from '$src/stores/searchableShipments';
+	import type { ApiShipmentAccount } from '$src/utils/account/shipment';
 
+	let selectedShipment: ApiShipmentAccount | undefined = undefined;
+	let showBuyShipmentModal = false;
 	$: locationsOnMap = $notForwardedShipments.map((s) => s.account.shipment.geography);
 	let selectedLocation: number | undefined = undefined;
 	let isMobileOpen = false;
@@ -32,6 +37,10 @@
 				{#each $notForwardedShipments as account, i (account.publicKey)}
 					<OrderListElement
 						on:click={() => onElementSelect(i)}
+						on:buttonClicked={() => {
+							selectedShipment = account;
+							showBuyShipmentModal = true;
+						}}
 						shipmentAccount={account}
 						{selectedLocation}
 						shipmentId={i}
@@ -49,6 +58,10 @@
 		</div>
 	{/if}
 </LayoutListWrapper>
+
+{#if selectedShipment}
+	<ShipmentBuyModal shipmentAccount={selectedShipment} bind:showModal={showBuyShipmentModal} />
+{/if}
 
 <ShipmentsLocations
 	locations={locationsOnMap}
