@@ -11,9 +11,9 @@ construct_uint! {
 }
 
 #[zero_copy]
-#[derive(Debug, Default, PartialEq, BorshSerialize, BorshDeserialize, Eq)]
+#[derive(Debug, PartialEq, BorshSerialize, BorshDeserialize, Eq)]
 pub struct Public {
-    pub value: [u64; 4], // 256 bit
+    pub value: [u8; 256],
 }
 
 #[zero_copy]
@@ -22,4 +22,10 @@ pub struct Channel {
     pub shipper: Public,
     pub carrier: Public,
     pub data: Name,
+}
+
+impl Default for Public {
+    fn default() -> Self {
+        Public { value: [0; 256] }
+    }
 }

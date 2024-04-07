@@ -6,6 +6,8 @@ import { ONE_HOUR, ONE_SOL, U64_MAX, awaitedAirdrops } from './utils'
 import {
   DF_BASE,
   DF_MODULUS,
+  TEST_DF_BASE,
+  TEST_DF_MODULUS,
   decodeDecrypted,
   decodeKey,
   decodeName,
@@ -22,6 +24,7 @@ import {
 } from './sdk'
 import { expect } from 'chai'
 import { AES } from 'crypto-ts'
+import { createDiffieHellman } from 'crypto'
 
 describe('protocol', () => {
   // access to blockchain
@@ -40,6 +43,9 @@ describe('protocol', () => {
   const shipperAddress = getShipperAddress(program, shipper.publicKey)
   const forwarderAddress = getForwarderAddress(program, forwarder.publicKey)
   const carrierAddress = getCarrierAddress(program, carrier.publicKey)
+
+  // Carrier DH key
+  let carrierKey: Buffer
 
   before(async () => {
     await awaitedAirdrops(
@@ -428,11 +434,18 @@ describe('protocol', () => {
   it('open channel', async () => {
     const shipmentAddress = getShipmentAddress(program, shipper.publicKey, 0)
 
-    const secret = new BN(4)
-    const shared = DF_BASE.pow(secret).mod(DF_MODULUS)
+    const dh = createDiffieHellman(DF_MODULUS, DF_BASE)
+    dh.generateKeys()
+
+    carrierKey = dh.getPrivateKey()
+    const shared = Uint8Array.from(dh.getPublicKey())
+
+    const value = Array(256)
+      .fill(0)
+      .map((_, i) => shared[i] ?? 0)
 
     await program.methods
-      .openChannel(encodeKey(shared))
+      .openChannel({ value })
       .accounts({
         shipment: shipmentAddress,
         signer: shipper.publicKey
@@ -442,25 +455,27 @@ describe('protocol', () => {
 
     const shipmentAccount = await program.account.shipment.fetch(shipmentAddress)
 
-    expect(decodeKey(shipmentAccount.channel.shipper).eq(shared)).true
+    expect(Uint8Array.from(shipmentAccount.channel.shipper.value).toString()).eq(shared.toString())
   })
 
   it('accept channel', async () => {
     const shipmentAddress = getShipmentAddress(program, shipper.publicKey, 0)
-
-    const secret = new BN(3)
-    const shared = DF_BASE.pow(secret).mod(DF_MODULUS)
-
     const shipmentAccountBefore = await program.account.shipment.fetch(shipmentAddress)
-    const other = decodeKey(shipmentAccountBefore.channel.shipper)
-    const key = other.pow(secret).mod(DF_MODULUS)
 
-    expect(key.eqn(18)).true
+    const otherPublic = Buffer.from(Uint8Array.from(shipmentAccountBefore.channel.shipper.value))
+    const dh = createDiffieHellman(DF_MODULUS, DF_BASE)
+    dh.generateKeys()
 
-    let encrypted = AES.encrypt('Hello!', 'test').toString()
+    const secret = dh.computeSecret(otherPublic)
+    const shared = Uint8Array.from(dh.getPublicKey())
+
+    let encrypted = AES.encrypt('Hello!', secret.toString('hex')).toString()
+    const value = Array(256)
+      .fill(0)
+      .map((_, i) => shared[i] ?? 0)
 
     await program.methods
-      .sendMessage(encodeKey(shared), encodeName(encrypted))
+      .sendMessage({ value }, encodeName(encrypted))
       .accounts({
         shipment: shipmentAddress,
         signer: carrier.publicKey
@@ -470,10 +485,11 @@ describe('protocol', () => {
 
     const shipmentAccount = await program.account.shipment.fetch(shipmentAddress)
 
-    expect(decodeKey(shipmentAccount.channel.carrier).eq(shared)).true
+    expect(Uint8Array.from(shipmentAccount.channel.carrier.value).toString()).eq(shared.toString())
+
     expect(decodeName(shipmentAccount.channel.data)).eq(encrypted.toString())
 
-    const decrypted = AES.decrypt(decodeName(shipmentAccount.channel.data), 'test')
+    const decrypted = AES.decrypt(decodeName(shipmentAccount.channel.data), secret.toString('hex'))
     expect(decodeDecrypted(decrypted.words)).eq('Hello!')
   })
 
