@@ -13,7 +13,7 @@ import {
   getShipmentAddress,
   getShipperAddress
 } from '../tests/sdk'
-import { awaitedAirdrop } from '../tests/utils'
+import { ONE_SOL, awaitedAirdrop } from '../tests/utils'
 
 var fs = require('fs')
 
@@ -74,9 +74,7 @@ const run = async () => {
 
       if (Math.random() < probabilities.carrierIsAvailable) {
         const gotLocation = await chooseLocation()
-        const when = new BN(new Date().getTime().toString()).add(
-          new BN(Math.floor(60 * 60 * 24 * (Math.random() * 2)).toString())
-        )
+        const when = timeInDays(2, 1)
 
         location = {
           time: when,
@@ -111,7 +109,9 @@ const run = async () => {
 
       console.log('Creating shipment', shipperKey, shipperSigner.publicKey.toString())
 
-      const shipmentPrice = new BN((0.2 + Math.random() * 0.4) * 1e9) // 0.2 - 0.6 SOL
+      const shipmentPrice = ONE_SOL.divn(5).add(
+        ONE_SOL.muln(Math.floor(Math.random() * 40)).divn(100)
+      ) // 0.2 - 0.6 SOL
       const from = await chooseLocation()
       const to = await chooseLocation()
 
@@ -136,21 +136,20 @@ const run = async () => {
         }
       }
 
-      const when = new BN(new Date().getTime().toString()).add(
-        new BN(60)
-          .muln(60)
-          .muln(24)
-          .mul(new BN(Math.floor(60 * 60 * 24 * (Math.random() * 12 - 2)).toString()))
-      )
+      const when = timeInDays(12, 0)
 
       const shipmentData = {
+        collateral: ONE_SOL.divn(10).add(new BN(Math.random() * 4).mul(ONE_SOL.divn(10))),
+        penalty: shipmentPrice.divn(10).muln(Math.random() < 0.6 ? 1 : 2), // 10% or 20%
         geography: {
           from: {
-            ...from
+            latitude: from.latitude,
+            longitude: from.longitude
           },
           fromName: encodeName(from.parsedName),
           to: {
-            ...to
+            latitude: to.latitude,
+            longitude: to.longitude
           },
           toName: encodeName(to.parsedName)
         },
@@ -181,7 +180,7 @@ const run = async () => {
         .signers([shipperSigner])
         .rpc()
 
-      console.log('Creating shipment', shipmentData)
+      console.log('Created shipment', shipmentData)
       break
 
     default:
@@ -281,6 +280,15 @@ const randomFrom = <T>(arr: T[]): T => arr[Math.floor(Math.random() * arr.length
 
 const keypairFromSecret = (secret: string): Keypair => {
   return Keypair.fromSecretKey(Uint8Array.from(Buffer.from(secret, 'base64')))
+}
+
+const timeInDays = (days: number, sinceHours: number): BN => {
+  const now = new BN(Math.floor(new Date().getTime() / 1000).toString())
+  const timeInAWeek = new BN(3600).muln(24 * 7)
+
+  const offset = new BN(3600).muln(sinceHours)
+
+  return now.add(offset).add(timeInAWeek.muln(days).divn(7))
 }
 
 setInterval(async () => {

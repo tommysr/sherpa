@@ -1,6 +1,8 @@
 use anchor_lang::{prelude::*, solana_program::system_instruction::transfer};
 
-use crate::{AcceptedOffer, Error, Shipment, ShipmentDelivered, Shipper, State};
+use crate::{
+    AcceptedOffer, Error, Shipment, ShipmentDelivered, ShipmentStatusUpdated, Shipper, State,
+};
 
 #[derive(Accounts)]
 pub struct Confirm<'info> {
@@ -44,6 +46,11 @@ pub fn handler(ctx: Context<Confirm>) -> Result<()> {
 
         shipment.status = 5;
         task.reserved[0] = 1;
+
+        emit!(ShipmentStatusUpdated {
+            shipment: ctx.accounts.shipment.key(),
+            status: shipment.status,
+        });
 
         emit!(ShipmentDelivered {
             shipment: ctx.accounts.shipment.key(),

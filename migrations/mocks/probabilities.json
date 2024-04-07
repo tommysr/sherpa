@@ -1,9 +1,9 @@
 {
   "actions": [
-    { "action": "registerShipper", "weight": 5 },
-    { "action": "registerForwarder", "weight": 2 },
-    { "action": "registerCarrier", "weight": 10 },
-    { "action": "createShipment", "weight": 100 }
+    { "action": "registerShipper", "weight": 0 },
+    { "action": "registerForwarder", "weight": 0 },
+    { "action": "registerCarrier", "weight": 0 },
+    { "action": "createShipment", "weight": 500 }
   ],
   "carrierIsAvailable": 0.8,
   "nonSolid": 0.2,
