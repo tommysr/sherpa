@@ -39,7 +39,7 @@
 				<div
 					class="col-span-3 grid items-center opacity-80 justify-items-center w-full text-white py-2 rounded-lg bg-gradient-to-r from-primary to-secondary"
 				>
-					<div class="col-span-3">Price</div>
+					<div class="col-span-3">Name</div>
 				</div>
 
 				<div class="col-span-3 px-3 text-center">
