@@ -8,13 +8,14 @@
 	import { walletStore } from '$stores/wallet';
 	import clsx from 'clsx';
 
-	$: isWalletConnected = $walletStore.publicKey != null;
-
-	let showShipmentDetailsModal = false;
 	let selectedShipment: ApiShipmentAccount | undefined = undefined;
-	let selectedLocation: number | undefined = undefined;
+	let showShipmentDetailsModal = false;
 	let isMobileOpen = false;
 	let selectedNav: number = 0;
+
+
+	$: isWalletConnected = $walletStore.publicKey != null;
+
 
 	$: myAllShipments = $searchableShipments.data.filter(
 		(el) => el.account.shipper.toString() == $walletStore.publicKey?.toString()
@@ -22,7 +23,7 @@
 
 	$: processingShipments = myAllShipments.filter((el) => el.account.status != 1);
 	$: deliveredShipments = myAllShipments.filter((el) => el.account.status == 5);
-	$: shipmentLocations = insideNavData[selectedNav].data.map((el) => el.account.shipment.geography);
+
 	$: insideNavData = [
 		{
 			name: 'Everything',
@@ -38,12 +39,19 @@
 		}
 	];
 
-	function onMarkerClick(i: number) {
-		selectedLocation = i;
-
+	function onSelectShipment(shipment: ApiShipmentAccount) {
 		if (isMobileOpen) {
 			isMobileOpen = false;
 		}
+
+		selectedShipment = shipment;
+	}
+
+
+	function onShowClicked(shipment: ApiShipmentAccount) {
+		onSelectShipment(shipment);
+
+		showShipmentDetailsModal = true;
 	}
 </script>
 
@@ -80,16 +88,10 @@
 					<ul class="w-full flex-1 space-y-4">
 						{#each insideNavData[selectedNav].data as account, i (account.publicKey)}
 							<OrderListElement
-								on:click={() => {
-									onMarkerClick(i);
-								}}
-								on:buttonClicked={() => {
-									selectedShipment = account;
-									showShipmentDetailsModal = true;
-								}}
+								on:click={() => onSelectShipment(account)}
+								on:buttonClicked={() => onShowClicked(account)}
 								shipmentAccount={account}
-								{selectedLocation}
-								shipmentId={i}
+								selectedAccount={account.publicKey}
 							/>
 						{/each}
 					</ul>
@@ -114,10 +116,9 @@
 	/>
 {/if}
 
-<ShipmentsLocations
-	locations={shipmentLocations}
-	{onMarkerClick}
-	{selectedLocation}
-	exclusive={false}
-	isMobile={false}
-/>
+{#if isWalletConnected}
+	<ShipmentsLocations
+		shipments={insideNavData[selectedNav].data}
+		bind:selectedShipment
+	/>
+{/if}

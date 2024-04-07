@@ -5,29 +5,29 @@
 	import OrderListElement from '$src/components/Shipment/OrderListElement.svelte';
 	import ShipmentsLocations from '$src/components/ShipmentMap/ShipmentsLocations.svelte';
 	import { notForwardedShipments } from '$src/stores/searchableShipments';
+	import { walletStore } from '$src/stores/wallet';
 	import type { ApiShipmentAccount } from '$src/utils/account/shipment';
 
 	let selectedShipment: ApiShipmentAccount | undefined = undefined;
 	let showBuyShipmentModal = false;
-	$: locationsOnMap = $notForwardedShipments.map((s) => s.account.shipment.geography);
-	let selectedLocation: number | undefined = undefined;
 	let shipmentBuyInProgress: string | undefined = undefined;
 	let isMobileOpen = false;
 
-	function onElementSelect(i: number) {
-		selectedLocation = i;
+	$: isWalletConnected = $walletStore.publicKey != null;
 
+
+	function onSelectShipment(shipment: ApiShipmentAccount) {
 		if (isMobileOpen) {
 			isMobileOpen = false;
 		}
+
+		selectedShipment = shipment;
 	}
 
-	function onMarkerClick(i: number) {
-		selectedLocation = i;
+	function onShowClicked(shipment: ApiShipmentAccount) {
+		onSelectShipment(shipment);
 
-		if (isMobileOpen) {
-			isMobileOpen = false;
-		}
+		showBuyShipmentModal = true;
 	}
 </script>
 
@@ -35,17 +35,12 @@
 	{#if $notForwardedShipments.length != 0}
 		<div class="flex-1 flex w-full flex-col overflow-y-auto px-4">
 			<ul class="w-full flex-1 space-y-4">
-				{#each $notForwardedShipments as account, i (account.publicKey)}
+				{#each $notForwardedShipments as shipment, i (shipment.publicKey)}
 					<OrderListElement
-						on:click={() => onElementSelect(i)}
-						on:buttonClicked={() => {
-							onElementSelect(i);
-							selectedShipment = account;
-							showBuyShipmentModal = true;
-						}}
-						shipmentAccount={account}
-						{selectedLocation}
-						shipmentId={i}
+						on:click={() => onSelectShipment(shipment)}
+						on:buttonClicked={() => onShowClicked(shipment)}
+						shipmentAccount={shipment}
+						selectedAccount={selectedShipment?.publicKey}
 					/>
 				{/each}
 			</ul>
@@ -61,6 +56,14 @@
 	{/if}
 </LayoutListWrapper>
 
+
+{#if isWalletConnected}
+	<ShipmentsLocations
+		shipments={$notForwardedShipments}
+		bind:selectedShipment
+	/>
+{/if}
+
 {#if selectedShipment}
 	<ShipmentBuyModal
 		shipmentAccount={selectedShipment}
@@ -68,11 +71,3 @@
 		bind:shipmentBuyInProgress
 	/>
 {/if}
-
-<ShipmentsLocations
-	locations={locationsOnMap}
-	{onMarkerClick}
-	exclusive={false}
-	{selectedLocation}
-	isMobile={false}
-/>

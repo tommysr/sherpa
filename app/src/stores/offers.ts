@@ -27,9 +27,9 @@ export const shipmentOffers = derived<
 	([$searchableShipments, $shipmentsOffersMeta], set) => {
 		const mapped = $shipmentsOffersMeta
 			.map((meta) => {
-				const searchAddress = meta.account.offeror;
+				const searchAddress = meta.account.shipment;
 				const shipment = $searchableShipments.filtered.find(
-					(a) => a.account.forwarder === searchAddress
+					(a) => a.publicKey === searchAddress
 				);
 
 				if (shipment !== undefined) {

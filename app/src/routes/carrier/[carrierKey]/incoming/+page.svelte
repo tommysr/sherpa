@@ -11,32 +11,27 @@
 	import { PublicKey } from '@solana/web3.js';
 	import { useSignAndSendTransaction } from '$utils/wallet/singAndSendTx';
 	import { createNotification } from '$components/Notification/notificationsStore';
+	import ShipmentsLocations from '$src/components/ShipmentMap/ShipmentsLocations.svelte';
+	import type { ApiShipmentAccount } from '$src/utils/account/shipment';
 
-	let selectedLocation: number | undefined = undefined;
 	let isMobileOpen = false;
-	let isOpen = false;
-
-	let showShipmentDetailsModal = false;
 	let selectedOffer: OfferedShipment | undefined = undefined;
+	let showShipmentDetailsModal = false;
 
-	$: shipmentLocations = $shipmentOffers.map(
-		(offerWithShipment) => offerWithShipment.shipment.account.shipment.geography
-	);
+	$: shipments = $shipmentOffers.map((offerWithShipment) => offerWithShipment.shipment);
 
-	function onElementSelect(i: number) {
-		selectedLocation = i;
-
+	function onElementSelect(offer: OfferedShipment) {
 		if (isMobileOpen) {
 			isMobileOpen = false;
 		}
+
+		selectedOffer = offer;
 	}
 
-	function onMarkerClick(i: number) {
-		selectedLocation = i;
+	function onShowClicked(offer: OfferedShipment) {
+		onElementSelect(offer);
 
-		if (isMobileOpen) {
-			isMobileOpen = false;
-		}
+		showShipmentDetailsModal = true;
 	}
 
 	const acceptShipmentOffer = async () => {
@@ -81,19 +76,19 @@
 
 <svelte:head><title>Incoming offers</title></svelte:head>
 
-
 {#if $shipmentOffers.length != 0}
 	<div class="flex-1 flex w-full flex-col overflow-y-auto px-4 mt-5">
 		<ul class="w-full flex-1 space-y-4">
 			{#each $shipmentOffers as offer, i}
-					<OfferListElement
-						offerMeta={offer.meta}
-						on:click={() => onElementSelect(i)}
-						on:buttonClick={async () => {
-							selectedOffer = offer;
-							await acceptShipmentOffer();
-						}}
-					/>
+				<OfferListElement
+					offerAccount={offer.meta}
+					on:click={() => onElementSelect(offer)}
+					on:acceptClick={async () => {
+					onElementSelect(offer)
+						await acceptShipmentOffer();
+					}}
+					on:buttonClick={() => onShowClicked(offer)}
+				/>
 			{/each}
 		</ul>
 	</div>
@@ -115,8 +110,4 @@
 	/>
 {/if}
 
-<ShipmentLocations
-	locations={shipmentLocations}
-	{onMarkerClick}
-	{selectedLocation}
-/>
+<ShipmentsLocations {shipments} selectedShipment={selectedOffer?.shipment} />

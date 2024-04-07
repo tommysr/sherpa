@@ -3,32 +3,27 @@
 	import ShipmentLocations from '$src/components/ShipmentMap/ShipmentsLocations.svelte';
 	import { acceptedShipmentOffers, type AcceptedShipment } from '$src/stores/acceptedOffers';
 	import AcceptedOfferListElement from '$src/components/AcceptedOffer/AcceptedOfferListElement.svelte';
+	import ShipmentsLocations from '$src/components/ShipmentMap/ShipmentsLocations.svelte';
 
-	let selectedLocation: number | undefined = undefined;
 	let isMobileOpen = false;
-	let isOpen = false;
-
 	let showShipmentDetailsModal = false;
 	let selectedAcceptedOffer: AcceptedShipment | undefined = undefined;
 
-	$: shipmentLocations = $acceptedShipmentOffers.map(
-		(offerWithShipment) => offerWithShipment.shipment.account.shipment.geography
-	);
+	$: shipments = $acceptedShipmentOffers.map((offerWithShipment) => offerWithShipment.shipment);
 
-	function onElementSelect(i: number) {
-		selectedLocation = i;
 
+	function onElementSelect(offer: AcceptedShipment) {
 		if (isMobileOpen) {
 			isMobileOpen = false;
 		}
+
+		selectedAcceptedOffer = offer;
 	}
 
-	function onMarkerClick(i: number) {
-		selectedLocation = i;
+	function onShowClicked(offer: AcceptedShipment) {
+		onElementSelect(offer);
 
-		if (isMobileOpen) {
-			isMobileOpen = false;
-		}
+		showShipmentDetailsModal = true;
 	}
 </script>
 
@@ -40,14 +35,9 @@
 			{#each $acceptedShipmentOffers as offer, i}
 				<AcceptedOfferListElement
 					acceptedOfferMeta={offer.meta}
-					on:click={() => onElementSelect(i)}
-					on:buttonClick={() => {
-						selectedAcceptedOffer = offer;
-					}}
-					on:shipmentShow={() => {
-						selectedAcceptedOffer = offer;
-						showShipmentDetailsModal = !showShipmentDetailsModal;
-					}}
+					on:click={() => onElementSelect(offer)}
+					on:buttonClick={() => onElementSelect(offer)}
+					on:shipmentShow={() => onShowClicked(offer)}
 				/>
 			{/each}
 		</ul>
@@ -70,10 +60,5 @@
 	/>
 {/if}
 
-<ShipmentLocations
-	locations={shipmentLocations}
-	{onMarkerClick}
-	{selectedLocation}
-	exclusive={false}
-	isMobile={false}
-/>
+
+<ShipmentsLocations {shipments} selectedShipment={selectedAcceptedOffer?.shipment} />

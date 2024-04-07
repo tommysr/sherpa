@@ -1,5 +1,4 @@
 <script lang="ts">
-	import CarrierListElement from '$src/components/Shipment/CarrierListElement.svelte';
 	import OrderListElement from '$src/components/Shipment/OrderListElement.svelte';
 	import CarriersLocations from '$src/components/ShipmentMap/CarriersLocations.svelte';
 	import ShipmentsLocations from '$src/components/ShipmentMap/ShipmentsLocations.svelte';
@@ -27,20 +26,28 @@
 			)
 		: [];
 
-	$:console.log(myForwarderShipments)
+	function onSelectShipment(shipment: ApiShipmentAccount) {
+		//TODO
+		// if (isMobileOpen) {
+		// 	isMobileOpen = false;
+		// }
+
+		selectedShipment = shipment;
+	}
+
+	function onShowClicked(shipment: ApiShipmentAccount) {
+		onSelectShipment(shipment);
+
+		showShipmentDetailsModal = true;
+	}
 </script>
 
 <div class="flex-1 flex w-full flex-col overflow-y-auto px-4 mt-5">
 	<ul class="w-full flex-1 space-y-4">
 		{#each myForwarderShipments as { meta, shipment }, i (meta.publicKey)}
 			<OrderListElement
-				on:click={() => {
-					selectedShipment = shipment;
-				}}
-				on:buttonClicked={() => {
-					selectedShipment = shipment;
-					showShipmentDetailsModal = true;
-				}}
+				on:click={() => onSelectShipment(shipment)}
+				on:buttonClicked={() => onShowClicked(shipment)}
 				shipmentAccount={shipment}
 				selectedAccount={selectedShipment?.publicKey}
 			/>
@@ -61,13 +68,11 @@
 		bind:selectedCarrier
 		on:makeOfferClick={() => (showMakeOfferModal = true)}
 	/>
-{/if}
 
-{#if selectedShipment}
 	<ShipmentInformationModal
-		shipmentAccount={selectedShipment}
-		bind:showModal={showShipmentDetailsModal}
-	/>
+	shipmentAccount={selectedShipment}
+	bind:showModal={showShipmentDetailsModal}
+/>
 {/if}
 
 {#if selectedShipment && selectedCarrier}
