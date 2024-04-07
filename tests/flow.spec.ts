@@ -490,6 +490,7 @@ describe('protocol', () => {
         task: taskAddress,
         signer: shipper.publicKey,
         payer: shipper.publicKey,
+        shipperOwner: shipper.publicKey,
         forwarderOwner: forwarder.publicKey,
         carrierOwner: carrier.publicKey,
         state: stateAddress

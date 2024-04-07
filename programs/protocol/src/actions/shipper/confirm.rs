@@ -25,6 +25,11 @@ pub struct Confirm<'info> {
     pub payer: Signer<'info>,
 
     #[account(mut,
+        constraint = shipment.load().unwrap().shipper == *shipper_owner.key @ Error::SignerNotAnAuthority
+    )]
+    /// CHECK: can be any account
+    pub shipper_owner: AccountInfo<'info>,
+    #[account(mut,
         constraint = shipment.load().unwrap().forwarder == *forwarder_owner.key @ Error::SignerNotAnAuthority
     )]
     /// CHECK: can be any account
@@ -40,7 +45,7 @@ pub struct Confirm<'info> {
 }
 
 pub fn handler(ctx: Context<Confirm>) -> Result<()> {
-    let (payment, collateral, penalty) = {
+    let (price, payment, collateral, penalty) = {
         let task = &mut ctx.accounts.task.load_mut()?;
         let shipment = &mut ctx.accounts.shipment.load_mut()?;
 
@@ -58,6 +63,7 @@ pub fn handler(ctx: Context<Confirm>) -> Result<()> {
         });
 
         (
+            shipment.price,
             task.details.payment,
             shipment.shipment.collateral,
             shipment.shipment.penalty,
@@ -73,7 +79,7 @@ pub fn handler(ctx: Context<Confirm>) -> Result<()> {
     transfer(
         &ctx.accounts.shipment.key(),
         &ctx.accounts.forwarder_owner.key(),
-        penalty,
+        penalty + price - payment,
     );
 
     Ok(())
