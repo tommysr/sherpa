@@ -1,26 +1,27 @@
 <script lang="ts">
-	import { pushState } from '$app/navigation';
+	import { goto, pushState } from '$app/navigation';
 	import { page } from '$app/stores';
 	import Modal from '$src/components/Modals/Modal.svelte';
 
+	import AvailabilityForm from '$src/components/CarrierForm/AvailabilityForm.svelte';
+	import { CarrierFormStage, nextStage } from '$src/components/CarrierForm/carrierFormStage';
+	import type { RegisterCarrierFormInterface } from '$src/components/CarrierForm/interfaces';
 	import LocationPick from '$src/components/ShipmentForm/LocationPick.svelte';
 	import NameForm from '$src/components/ShipmentForm/NameForm.svelte';
+	import { getRegisterCarrierIx } from '$src/lib/carrier';
 	import { anchorStore } from '$src/stores/anchor';
+	import { defaultLocation } from '$src/stores/locationsPick';
 	import { walletStore } from '$src/stores/wallet';
 	import { web3Store } from '$src/stores/web3';
 	import { userStore } from '$stores/user';
-	import { get } from 'svelte/store';
 	import { useSignAndSendTransaction } from '$utils/wallet/singAndSendTx';
-	import { defaultLocation } from '$src/stores/locationsPick';
-	import type { RegisterCarrierFormInterface } from '$src/components/CarrierForm/interfaces';
-	import { CarrierFormStage, nextStage } from '$src/components/CarrierForm/carrierFormStage';
-	import { getRegisterCarrierIx } from '$src/lib/carrier';
 	import { Transaction } from '@solana/web3.js';
-	import AvailabilityForm from '$src/components/CarrierForm/AvailabilityForm.svelte';
+	import { get } from 'svelte/store';
 
-	import { FormStage } from '$src/components/ShipmentForm/formStage';
-	import SummaryForm from '$src/components/ShipmentForm/SummaryForm.svelte';
 	import { createNotification } from '$src/components/Notification/notificationsStore';
+
+	import SummaryForm from '$src/components/CarrierForm/SummaryForm.svelte';
+	import { FormStage } from '$src/components/ShipmentForm/formStage';
 
 	const forms = {
 		name: {
@@ -75,16 +76,14 @@
 		if (!$walletStore.publicKey) {
 			walletStore.openModal();
 
-
 			createNotification({
 				text: 'Wallet not connected',
 				type: 'failed',
 				removeAfter: 5000
 			});
 
-			return
+			return;
 		}
-		
 
 		const {
 			locationWithTime: { latitude, longitude, name: locationName, when },
@@ -104,9 +103,14 @@
 		try {
 			const signature = await useSignAndSendTransaction(connection, wallet, tx);
 
-			createNotification({text: 'Transaction send', type:'success', removeAfter: 10000, signature})
+			createNotification({
+				text: 'Transaction send',
+				type: 'success',
+				removeAfter: 10000,
+				signature
+			});
 		} catch (e) {
-			createNotification({text: 'Transaction send', type: 'failed', removeAfter: 10000})
+			createNotification({ text: 'Transaction send', type: 'failed', removeAfter: 10000 });
 		}
 	}
 
@@ -134,8 +138,13 @@
 
 <svelte:head><title>Register as a carrier</title></svelte:head>
 
-<Modal {showModal} closeHandler={() => history.back()}>
-	<div class="mt-10 w-full flex flex-col space-y-7">
+<Modal
+	{showModal}
+	closeHandler={() => history.back()}
+	on:backdropClick={() => goto('/carrier')}
+	showCloseButton={false}
+>
+	<div class="w-full flex flex-col space-y-7">
 		<svelte:component
 			this={forms[form].component}
 			{onSubmit}

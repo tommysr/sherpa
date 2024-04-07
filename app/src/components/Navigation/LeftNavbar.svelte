@@ -3,22 +3,25 @@
 
 	import { page } from '$app/stores';
 
+	import { userStore } from '$src/stores/user';
+	import { walletStore } from '$src/stores/wallet';
 	import WalletMultiButton from '../Wallet/WalletMultiButton.svelte';
-	import BoughtIcon from './NavbarIcons/BoughtIcon.svelte';
 	import BoxIcon from './NavbarIcons/BoxIcon.svelte';
+	import DashboardIcon from './NavbarIcons/DashboardIcon.svelte';
 	import HomeIcon from './NavbarIcons/HomeIcon.svelte';
 	import IssuedIcon from './NavbarIcons/IssuedIcon.svelte';
 	import PlusIcon from './NavbarIcons/PlusIcon.svelte';
+	import RegisterIcons from './NavbarIcons/RegisterIcons.svelte';
 	import SendIcon from './NavbarIcons/SendIcon.svelte';
 	import TrackIcon from './NavbarIcons/TrackIcon.svelte';
-	import { userStore } from '$src/stores/user';
-	import { walletStore } from '$src/stores/wallet';
 
 	$: currentPage = $page.url.pathname;
 	$: isNavbarOpen = false;
 
-	$: carrierRoute = $userStore.carrier.registered && $walletStore.publicKey ? $walletStore.publicKey.toString() : 'register'
-$:console.log($walletStore.publicKey?.toString(), carrierRoute)
+	$: carrierRoute =
+		$userStore.carrier.registered && $walletStore.publicKey
+			? $walletStore.publicKey.toString()
+			: 'register';
 
 	$: navigation = [
 		{
@@ -35,11 +38,6 @@ $:console.log($walletStore.publicKey?.toString(), carrierRoute)
 					name: 'Issued',
 					link: '/shipmentsMap/issued',
 					svg: IssuedIcon
-				},
-				{
-					name: 'Bought',
-					link: '/shipmentsMap/bought',
-					svg: BoughtIcon
 				},
 				{
 					name: 'Create',
@@ -61,13 +59,13 @@ $:console.log($walletStore.publicKey?.toString(), carrierRoute)
 				{
 					name: 'Dashboard',
 					link: `/carrier/${carrierRoute}/incoming`,
-					svg: PlusIcon
+					svg: DashboardIcon
 				},
 				{
-					name: 'Buy',
+					name: 'Register',
 					link: '/carrier/register',
-					svg: PlusIcon
-				},
+					svg: RegisterIcons
+				}
 			]
 		}
 	];
@@ -75,9 +73,9 @@ $:console.log($walletStore.publicKey?.toString(), carrierRoute)
 
 <nav class="hidden md:block">
 	<div
-		class="fixed left-5 w-10 z-10 bg-white rounded-full top-1/2 transform -translate-y-1/2 py-3 px-7 shadow-lg"
+		class="fixed left-5 w-10 z-10 bg-white rounded-full top-1/2 transform -translate-y-1/2 py-1.5 px-7 shadow-lg"
 	>
-		<div class="flex flex-col items-center justify-center space-y-4">
+		<div class="flex flex-col items-center justify-center space-y-3">
 			{#each navigation as { name, link, svg, routes }}
 				<div
 					class={clsx(
@@ -89,7 +87,10 @@ $:console.log($walletStore.publicKey?.toString(), carrierRoute)
 						<a href={link}
 							><svelte:component
 								this={svg}
-								className={clsx(currentPage === link ? 'fill-primary' : 'fill-gray-500')}
+								className={clsx(
+									'hover:scale-125 transition-all ease-in-out duration-150',
+									currentPage === link ? 'fill-primary' : 'fill-gray-500'
+								)}
 							/></a
 						>
 						<span
@@ -105,11 +106,14 @@ $:console.log($walletStore.publicKey?.toString(), carrierRoute)
 								<a href={link}
 									><svelte:component
 										this={svg}
-										className={clsx(currentPage === link ? 'fill-primary' : 'fill-gray-500')}
+										className={clsx(
+											'hover:scale-125 transition-all ease-in-out duration-150',
+											currentPage === link ? 'fill-primary' : 'fill-gray-500'
+										)}
 									/></a
 								>
 								<span
-									class="opacity-0 group-hover:opacity-100 duration-300 bg-white absolute left-12 -top-3 p-2 rounded-lg shadow"
+									class="opacity-0 group-hover:opacity-100 duration-300 bg-white absolute left-11 -top-3 p-2 rounded-lg shadow"
 								>
 									{name}
 								</span>
