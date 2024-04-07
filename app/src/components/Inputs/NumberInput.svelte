@@ -10,33 +10,22 @@
 	export { className as class };
 </script>
 
-<input
-	class={clsx(
-		'w-full rounded-3xl bg-transparent px-3 py-2 text-sm font-normal placeholder-primary placeholder:italic placeholder:text-slate-400 lg:px-4 lg:py-2 lg:text-base',
-		className
-	)}
-	{name}
-	autocomplete="off"
-	on:keydown
-	on:change
-	on:input
-	on:keyup
-	bind:value
-	disabled={$$props.disabled}
-	type="number"
-	{placeholder}
-	{required}
-/>
-
-<style lang="scss">
-	input::-webkit-outer-spin-button,
-	input::-webkit-inner-spin-button {
-		-webkit-appearance: none;
-		margin: 0;
-	}
-
-	/* Firefox */
-	input[type='number'] {
-		-moz-appearance: textfield;
-	}
-</style>
+<div class="rounded-lg border-2 border-gradient-to-r from-primary to-secondary">
+	<input
+		class={clsx(
+			className,
+			'rounded-3xl bg-transparent px-3 py-2 text-sm font-normal placeholder-primary placeholder:italic placeholder:text-slate-400 lg:px-4 lg:py-2 lg:text-base'
+		)}
+		{name}
+		autocomplete="off"
+		on:keydown
+		on:change
+		on:input
+		on:keyup
+		bind:value
+		disabled={$$props.disabled}
+		type="number"
+		{placeholder}
+		{required}
+	/>
+</div>
