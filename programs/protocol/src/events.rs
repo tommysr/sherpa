@@ -45,3 +45,9 @@ pub struct ShipmentStatusUpdated {
     pub shipment: Pubkey,
     pub status: u8,
 }
+
+#[event]
+pub struct ShipmentDelivered {
+    pub shipment: Pubkey,
+    pub status: u8,
+}

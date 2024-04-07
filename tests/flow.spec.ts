@@ -1,6 +1,6 @@
 import * as anchor from '@coral-xyz/anchor'
 import { BN, Program } from '@coral-xyz/anchor'
-import { Protocol } from '../app/src/utils/idl/types/protocol'
+import { Protocol } from '../target/types/protocol'
 import { Keypair, PublicKey, SystemProgram } from '@solana/web3.js'
 import { ONE_HOUR, ONE_SOL, U64_MAX, awaitedAirdrops } from './utils'
 import {
@@ -9,7 +9,6 @@ import {
   decodeDecrypted,
   decodeKey,
   decodeName,
-  encodeEncypted,
   encodeKey,
   encodeName,
   getAcceptedOfferAddress,
@@ -20,7 +19,7 @@ import {
   getShipmentAddress,
   getShipperAddress,
   getStateAddress
-} from '../app/src/sdk/sdk'
+} from './sdk'
 import { expect } from 'chai'
 import { AES } from 'crypto-ts'
 
@@ -55,8 +54,7 @@ describe('protocol', () => {
       .initializeState()
       .accounts({
         state: stateAddress,
-        admin: admin.publicKey,
-        systemProgram: SystemProgram.programId
+        admin: admin.publicKey
       })
       .signers([admin])
       .rpc()
@@ -70,8 +68,7 @@ describe('protocol', () => {
       .registerShipper(encodeName('Alice'))
       .accounts({
         shipper: shipperAddress,
-        signer: shipper.publicKey,
-        systemProgram: SystemProgram.programId
+        signer: shipper.publicKey
       })
       .signers([shipper])
       .rpc()
@@ -87,6 +84,8 @@ describe('protocol', () => {
     const shipmentAddress = getShipmentAddress(program, shipper.publicKey, 0)
     const shipmentPrice = ONE_SOL.divn(2)
     const shipmentData = {
+      collateral: ONE_SOL.divn(5),
+      penalty: ONE_SOL.divn(10),
       geography: {
         from: {
           latitude: 0,
@@ -127,7 +126,7 @@ describe('protocol', () => {
         shipment: shipmentAddress,
         shipper: shipperAddress,
         signer: shipper.publicKey,
-        systemProgram: SystemProgram.programId
+        payer: shipper.publicKey
       })
       .signers([shipper])
       .rpc()
@@ -142,6 +141,8 @@ describe('protocol', () => {
     expect(shipmentAccount.status).eq(1)
     expect(shipmentAccount.price.eq(shipmentPrice)).true
     expect(shipmentAccount.no).eq(0)
+    expect(shipmentAccount.shipment.collateral.eq(shipmentData.collateral)).true
+    expect(shipmentAccount.shipment.penalty.eq(shipmentData.penalty)).true
     expect(shipmentAccount.shipment.geography.from).to.deep.equal(shipmentData.geography.from)
     expect(shipmentAccount.shipment.geography.to).to.deep.equal(shipmentData.geography.to)
     expect(decodeName(shipmentAccount.shipment.geography.fromName)).eq('Krakow, main square')
@@ -160,8 +161,10 @@ describe('protocol', () => {
 
   it('create second shipment', async () => {
     const shipmentAddress = getShipmentAddress(program, shipper.publicKey, 1)
-    const shipmentPrice = new BN(3).mul(ONE_SOL)
+    const shipmentPrice = ONE_SOL.divn(10)
     const shipmentData = {
+      collateral: ONE_SOL.muln(20),
+      penalty: ONE_SOL.divn(25),
       geography: {
         from: {
           latitude: 1,
@@ -202,7 +205,7 @@ describe('protocol', () => {
         shipment: shipmentAddress,
         shipper: shipperAddress,
         signer: shipper.publicKey,
-        systemProgram: SystemProgram.programId
+        payer: shipper.publicKey
       })
       .signers([shipper])
       .rpc()
@@ -216,6 +219,8 @@ describe('protocol', () => {
     expect(shipmentAccount.status).eq(1)
     expect(shipmentAccount.price.eq(shipmentPrice)).true
     expect(shipmentAccount.no).eq(1)
+    expect(shipmentAccount.shipment.collateral.eq(shipmentData.collateral)).true
+    expect(shipmentAccount.shipment.penalty.eq(shipmentData.penalty)).true
     expect(shipmentAccount.shipment.geography.from).to.deep.equal(shipmentData.geography.from)
     expect(shipmentAccount.shipment.geography.to).to.deep.equal(shipmentData.geography.to)
     expect(decodeName(shipmentAccount.shipment.geography.fromName)).eq('Kielce')
@@ -238,7 +243,7 @@ describe('protocol', () => {
       .accounts({
         forwarder: forwarderAddress,
         signer: forwarder.publicKey,
-        systemProgram: SystemProgram.programId
+        payer: forwarder.publicKey
       })
       .signers([forwarder])
       .rpc()
@@ -271,14 +276,13 @@ describe('protocol', () => {
         shipper: shipperAddress,
         forwarder: forwarderAddress,
         signer: forwarder.publicKey,
-        payer: forwarder.publicKey,
-        shipmentOwner: shipper.publicKey
+        payer: forwarder.publicKey
       })
       .signers([forwarder])
       .rpc()
 
     const balanceAfter = await connection.getBalance(forwarder.publicKey)
-    expect(balanceBefore - balanceAfter > ONE_SOL.divn(2).toNumber()).true
+    expect(balanceBefore - balanceAfter > ONE_SOL.divn(10).toNumber()).true
 
     const shipmentAccount = await program.account.shipment.fetch(shipmentAddress)
     expect(shipmentAccount.shipper.equals(shipper.publicKey)).true
@@ -343,13 +347,14 @@ describe('protocol', () => {
     })
 
     await program.methods
-      .makeOffer(ONE_SOL, 3600)
+      .makeOffer(ONE_SOL.divn(4), 3600)
       .accounts({
         offer: offerAddress,
         shipment: shipmentAddress,
         forwarder: forwarderAddress,
         carrier: carrierAddress,
-        signer: forwarder.publicKey
+        signer: forwarder.publicKey,
+        payer: forwarder.publicKey
       })
       .signers([forwarder])
       .rpc()
@@ -362,8 +367,7 @@ describe('protocol', () => {
 
     const offerAccount = await program.account.shipmentOffer.fetch(offerAddress)
     expect(offerAccount.offeror.equals(forwarder.publicKey)).true
-    expect(offerAccount.details.payment.eq(ONE_SOL)).true
-    expect(offerAccount.details.collateral.eqn(0)).true
+    expect(offerAccount.details.payment.eq(ONE_SOL.divn(4))).true
     expect(offerAccount.details.deadline.eq(U64_MAX)).true
 
     const carrierAccount = await program.account.carrier.fetch(carrierAddress)
@@ -396,8 +400,7 @@ describe('protocol', () => {
         forwarder: forwarderAddress,
         carrier: carrierAddress,
         signer: carrier.publicKey,
-        payer: carrier.publicKey,
-        offerOwner: forwarder.publicKey
+        payer: carrier.publicKey
       })
       .signers([carrier])
       .rpc()
@@ -416,7 +419,6 @@ describe('protocol', () => {
     expect(taskAccount.shipment.equals(shipmentAddress)).true
     expect(taskAccount.shipment.equals(offerAccount.shipment)).true
     expect(taskAccount.details.payment.eq(offerAccount.details.payment)).true
-    expect(taskAccount.details.collateral.eq(offerAccount.details.collateral)).true
     expect(taskAccount.details.deadline.eq(offerAccount.details.deadline)).true
     expect(taskAccount.no).eq(0)
 
@@ -473,5 +475,29 @@ describe('protocol', () => {
 
     const decrypted = AES.decrypt(decodeName(shipmentAccount.channel.data), 'test')
     expect(decodeDecrypted(decrypted.words)).eq('Hello!')
+  })
+
+  it('confirm delivery', async () => {
+    const shipmentAddress = getShipmentAddress(program, shipper.publicKey, 0)
+    const taskAddress = getAcceptedOfferAddress(program, carrier.publicKey, 0)
+    const shipperAddress = getShipperAddress(program, shipper.publicKey)
+
+    await program.methods
+      .confirmDelivery()
+      .accounts({
+        shipment: shipmentAddress,
+        shipper: shipperAddress,
+        task: taskAddress,
+        signer: shipper.publicKey,
+        payer: shipper.publicKey,
+        forwarderOwner: forwarder.publicKey,
+        carrierOwner: carrier.publicKey,
+        state: stateAddress
+      })
+      .signers([shipper])
+      .rpc()
+
+    const shipmentAccount = await program.account.shipment.fetch(shipmentAddress)
+    expect(shipmentAccount.status).eq(5)
   })
 })

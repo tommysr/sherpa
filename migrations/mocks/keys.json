@@ -99,6 +99,101 @@
       "type": "forwarder",
       "name": "Dorota Express",
       "secret": "tS+YEqnxP8Vzlta2neW89cHPUgfGg06VJuDSJn0/Y73U1N8XJjv6LCoH0Woz8cRWhj4aV5RpDYphudwyWDqt3Q=="
+    },
+    {
+      "type": "shipper",
+      "name": "Nadine Store",
+      "secret": "5q7+Gv5fwymPG0FS/XZwCsBjGQ4cpzYgsZ7f2zgaJHpdJx7op+Mi3Xl7QOGdtyH/108Czg1KoKP001WrJs3Ikg=="
+    },
+    {
+      "type": "forwarder",
+      "name": "Anna Express",
+      "secret": "RrRpAnqRRifsupxoniAwg7fQUs/b5dIzlIe7Hoh4j7kAsnhGviEv9f1Fj8ymkFixuS/2scug3Q8vbaXMsC9COA=="
+    },
+    {
+      "type": "shipper",
+      "name": "Marcin Worldwide",
+      "secret": "bJkWPaZ5biR9zQhVie5bwuHwEdKcv3idvuI/7jGdRg1hUlbLbJgIXpIX3YT6HYmDUVjM5HY7Gbx1O+aSHg8chg=="
+    },
+    {
+      "type": "forwarder",
+      "name": "Stefan Distribution",
+      "secret": "hmFdL9V3w8iTUA5JRBQ5X8J0p8FtfjUUMF+myTR3yOekE12sISuPMWjmAkF9ugeUJfu78sqQjL2iEEs7wklInQ=="
+    },
+    {
+      "type": "shipper",
+      "name": "Tanja Global",
+      "secret": "+BytRc10ffnDJ4mBGnHqFncRA8MwJQVCFZzNhYTEONoyTloBFIYq0zgIxaJv0fORxgC5lSoDnUUOXE3NgJ5/6w=="
+    },
+    {
+      "type": "shipper",
+      "name": "Jan Tech",
+      "secret": "mhWLd90Za5ktaRG9W3e3znx3Z1WgkUIhMCeWKGrq4OOZd54xVyf0D3S/eecKP+AMszs47hOGO2i9S2DcPB7mpg=="
+    },
+    {
+      "type": "carrier",
+      "name": "Benjamin Dispatch",
+      "secret": "Kh1Zz7fuUD9mObBcFOVLiGesE2CM6qdazVNBKzSuGc73aRWYvn1EElfZ1KK285Z6paFxFOI9S56gxR31N5Roww=="
+    },
+    {
+      "type": "shipper",
+      "name": "Daniela Trade",
+      "secret": "W7Mgoo7Fquki+bw8pav29m2qjUxK4qDTIRj3A7M2rhg6/JAfwcCJJwb4Lilj37ZuTmJHxIrXxK51sBE8nORSRw=="
+    },
+    {
+      "type": "shipper",
+      "name": "Tomasz Direct",
+      "secret": "HsOdsYZHqpN3DK2C+Ub2o+5tm3E09/9Ru0Vg9FzahpfExYK487oOZXQlqSPGKp9pdnY0hU/ajCYMu/aDzakT5Q=="
+    },
+    {
+      "type": "shipper",
+      "name": "Paweł Trade",
+      "secret": "3J92FRWL2Tcdz/AEjCq3tcQ7PdkKzoXzVGvZLobfUhH3TCxWd1ZNjlgzYzZC+412gJIhAedrDb2H7MmqeMdUGw=="
+    },
+    {
+      "type": "carrier",
+      "name": "Renata Delivery",
+      "secret": "tF5uO44UyCAYwwo5J9KFw1x5fvo39HGIBMs5mZdPni4nB9jw7EIdAjD1fuwikHHLDkZ4pbICNXAU94jPRRLwnQ=="
+    },
+    {
+      "type": "shipper",
+      "name": "Monika Market",
+      "secret": "2cnLz9vUPGTxIdaTQtG01OEOmH3eTudamk3DMdEnVBIx78Mh+0HWpXJtw+4xFQ5fv1ZUst+faZaLwFzwBQaDqg=="
+    },
+    {
+      "type": "shipper",
+      "name": "Renata Link",
+      "secret": "cChC3QnEeaT4ln2HfV8oUp3fik9Swes1rInaZI/rsG5x+MAY+iSXZlFTEbR+cirZ54lbMOlFspE9J6dMKRt7QA=="
+    },
+    {
+      "type": "forwarder",
+      "name": "Andrea Shipping",
+      "secret": "in5gNWoilnxbVgayNSv/82vk36EpzJKQ/y0NzApH5Req+o/UwU3pFxRhQBOKM0uHTUtZRfxiWI/uPy9c9TJJJg=="
+    },
+    {
+      "type": "forwarder",
+      "name": "Tanja Trans",
+      "secret": "v0gN+mePcesTYNTZ714rkG2su5KrHnK9yTTw0qGiMPVFbbfAJVAhdaalTX7GSKa/ItxSOdYt7ieGXKSv1qeuiQ=="
+    },
+    {
+      "type": "shipper",
+      "name": "Barbara Shop",
+      "secret": "MNW1JGN5zu6BVwXC4pACm/k/Yw4lORVUEwUscUUOHTMKGNv4/yzSYwFmVdgSDu+taXCQfxICkbsIRI0xv7hpDw=="
+    },
+    {
+      "type": "shipper",
+      "name": "Hanna Shop",
+      "secret": "He2ngLpE1GMwnvoVMHL52xQ4ChfwVT6njAVJoebNTh4n7pQCibmowv602uLI9oJLvGpJ+koIbNZ4qvK1270kdQ=="
+    },
+    {
+      "type": "shipper",
+      "name": "Alexander Tech",
+      "secret": "aYFNtvEopdLwiAbF8CVUKzfTV/VffxlQTZu8ul3imUUbVDqjGSPfl8MCqwpS+xkGYgSbvM3XQiN87UNTENaFBQ=="
+    },
+    {
+      "type": "shipper",
+      "name": "Zofia Trade",
+      "secret": "r8kLngZ2Bc2/oyY0hvsvzmwcyspPU8Ll1Vyq7E7ApLpP5QdQ/LqU50JhZ9k/vh3yoBhG7xzmQMPbOMT18dMckQ=="
     }
   ]
 }

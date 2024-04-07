@@ -64,4 +64,8 @@ pub mod protocol {
     pub fn send_message(ctx: Context<SendMessage>, key: Public, message: Name) -> Result<()> {
         actions::channel::send_message::handler(ctx, key, message)
     }
+
+    pub fn confirm_delivery(ctx: Context<Confirm>) -> Result<()> {
+        actions::shipper::confirm::handler(ctx)
+    }
 }

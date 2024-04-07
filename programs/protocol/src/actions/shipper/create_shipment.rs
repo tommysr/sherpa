@@ -1,4 +1,4 @@
-use anchor_lang::prelude::*;
+use anchor_lang::{prelude::*, solana_program::system_instruction};
 
 use crate::{Channel, Error, Name, Shipment, ShipmentCreated, ShipmentData, Shipper};
 
@@ -22,28 +22,47 @@ pub struct CreateShipment<'info> {
 }
 
 pub fn handler(ctx: Context<CreateShipment>, price: u64, name: Name, shipment: ShipmentData) -> Result<()> {
-    let shipper = &mut ctx.accounts.shipper.load_mut()?;
-    let account = &mut ctx.accounts.shipment.load_init()?;
-    
-    **account = Shipment {
-        shipper: *ctx.accounts.signer.key,
-        forwarder: Pubkey::default(),
-        carrier: Pubkey::default(),
-        price,
-        no: shipper.count,
-        reserved: [0; 3],
-        status: 1,
-        shipment,
-        name,
-        channel: Channel::default()
-    };
-    
-    shipper.count += 1;
+    {    
+        let shipper = &mut ctx.accounts.shipper.load_mut()?;
+        let account = &mut ctx.accounts.shipment.load_init()?;
+        
+        **account = Shipment {
+            shipper: *ctx.accounts.signer.key,
+            forwarder: Pubkey::default(),
+            carrier: Pubkey::default(),
+            price,
+            no: shipper.count,
+            reserved: [0; 3],
+            status: 1,
+            shipment,
+            name,
+            channel: Channel::default()
+        };
+        
+        shipper.count += 1;
 
-    emit!(ShipmentCreated { 
-        shipper: ctx.accounts.shipper.key(), 
-        shipment: ctx.accounts.shipment.key()
-    });
+        emit!(ShipmentCreated { 
+            shipper: ctx.accounts.shipper.key(), 
+            shipment: ctx.accounts.shipment.key()
+        });
+    }
+
+    // Invoke the transfer instruction
+    let transfer_instruction = system_instruction::transfer(
+        ctx.accounts.payer.key,
+        &ctx.accounts.shipment.key(),
+        price,
+    );
+
+    anchor_lang::solana_program::program::invoke_signed(
+        &transfer_instruction,
+        &[
+            ctx.accounts.payer.to_account_info(),
+            ctx.accounts.shipment.to_account_info(),
+            ctx.accounts.system_program.to_account_info(),
+        ],
+        &[],
+    )?;
 
     Ok(())
 }

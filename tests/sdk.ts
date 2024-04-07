@@ -224,4 +224,21 @@ export const encrypt = (plain: string, key: BNN) => {
   return encodeKey(r.add(DF_MODULUS).add(key).mod(DF_MODULUS))
 }
 
-export const decrypt = (encrypted: BNN, key: BNN) => {}
+export const decodeDecrypted = (words: number[]): string => {
+  let result: number[] = []
+
+  for (let i of words) {
+    result.push((i >> 24) % 256)
+    result.push((i >> 16) % 256)
+    result.push((i >> 8) % 256)
+    result.push(i % 256)
+  }
+
+  let decoded = utils.bytes.utf8.decode(Buffer.from(result))
+
+  while (decoded[decoded.length - 1] === '\n') {
+    decoded = decoded.slice(0, -1)
+  }
+
+  return decoded
+}

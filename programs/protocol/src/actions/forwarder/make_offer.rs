@@ -54,7 +54,6 @@ pub fn handler(ctx: Context<MakeOffer>, payment: u64, timeout: u32) -> Result<()
         offeror: forwarder.creator,
         details: OfferDetails {
             payment,
-            collateral: 0,
             deadline: u64::MAX,
         },
         shipment: ctx.accounts.shipment.key(),
