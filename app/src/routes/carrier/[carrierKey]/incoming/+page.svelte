@@ -119,6 +119,4 @@
 	locations={shipmentLocations}
 	{onMarkerClick}
 	{selectedLocation}
-	exclusive={false}
-	isMobile={false}
 />

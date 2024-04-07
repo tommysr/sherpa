@@ -1,7 +1,7 @@
 <script lang="ts">
 	import type { ApiCarrierAccount } from '$src/utils/account/carrier';
 	import clsx from 'clsx';
-	import BoughtShipmentShowModal from '../Modals/BoughtShipmentShowModal.svelte';
+	import BoughtShipmentShowModal from '../Modals/MakeOfferModal.svelte';
 
 	export let carrierAccount: ApiCarrierAccount;
 	export let selectedCarrier: number | undefined;

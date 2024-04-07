@@ -26,9 +26,9 @@ export const forwardedShipments = derived<
 	([$searchableShipments, $forwardedShipmentsMeta], set) => {
 		const mapped = $forwardedShipmentsMeta
 			.map((meta) => {
-				const searchAddress = meta.account.forwarder;
+				const searchAddress = meta.account.shipment;
 				const shipment = $searchableShipments.filtered.find(
-					(a) => a.account.forwarder === searchAddress
+					(a) => a.publicKey === searchAddress
 				);
 
 				if (shipment !== undefined) {
@@ -38,6 +38,8 @@ export const forwardedShipments = derived<
 				}
 			})
 			.filter((item) => item !== null) as ForwardedShipment[];
+
+			console.log(mapped)
 
 		set(mapped);
 	},

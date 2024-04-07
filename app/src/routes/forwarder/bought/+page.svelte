@@ -8,116 +8,72 @@
 	import { walletStore } from '$src/stores/wallet';
 	import type { ApiShipmentAccount } from '$src/utils/account/shipment';
 	import type { PageData } from './$types';
-
-	enum OperationMode {
-		VIEW,
-		SELL
-	}
+	import MakeOfferModal from '$src/components/Modals/MakeOfferModal.svelte';
+	import type { ApiCarrierAccount } from '$src/utils/account/carrier';
 
 	export let data: PageData;
 
 	let selectedShipment: ApiShipmentAccount | undefined = undefined;
+	let selectedCarrier: ApiCarrierAccount | undefined = undefined;
 	let showShipmentDetailsModal = false;
-
-	let selectedLocation: number | undefined = undefined;
-	let selectedCarrier: number | undefined = undefined;
-	let isMobileOpen = false;
-	let operationModeSwitch = false;
+	let showMakeOfferModal = false;
 
 	$: carriers = data.carriers;
-	$: locationsOnMap = $forwardedShipments.map((s) => s.shipment.account.shipment.geography);
 	$: isWalletConnected = $walletStore.publicKey != null;
-	$: operationMode = operationModeSwitch ? OperationMode.SELL : OperationMode.VIEW;
-	$: isExclusiveMode = operationMode == OperationMode.SELL && selectedLocation != undefined;
 
-	$: if ($walletStore.publicKey) {
-		// TODO: make it custom
-		forwardedShipmentsMeta.update((s) => {
-			s.filter((s) => s.account.forwarder === $walletStore.publicKey?.toString());
+	$: myForwarderShipments = isWalletConnected
+		? $forwardedShipments.filter(
+				(s) => s.meta.account.forwarder.toString() === $walletStore.publicKey?.toString()
+			)
+		: [];
 
-			return s;
-		});
-	}
-
-	function onMarkerClick(i: number) {
-		selectedLocation = i;
-
-		if (isMobileOpen) {
-			isMobileOpen = false;
-		}
-	}
-
-	function onCarrierElementSelect(i: number) {
-		selectedCarrier = i;
-
-		if (isMobileOpen) {
-			isMobileOpen = false;
-		}
-	}
-
-	function onCarrierMarkerClick(i: number) {
-		selectedCarrier = i;
-	}
+	$:console.log(myForwarderShipments)
 </script>
 
-{#if operationMode == OperationMode.SELL}
-	<div class="flex-1 flex w-full flex-col overflow-y-auto px-4 mt-5">
-		<ul class="w-full flex-1 space-y-4">
-			{#each carriers as carrier, i}
-				<CarrierListElement
-					on:click={() => onCarrierElementSelect(i)}
-					{selectedCarrier}
-					{selectedLocation}
-					carrierAccount={carrier}
-					carrierId={i}
-				/>
-			{/each}
-		</ul>
-	</div>
-{:else}
-	<div class="flex-1 flex w-full flex-col overflow-y-auto px-4 mt-5">
-		<ul class="w-full flex-1 space-y-4">
-			{#each $forwardedShipments as { meta, shipment }, i}
-				<OrderListElement
-					on:click={() => {
-						selectedShipment = shipment;
-						onMarkerClick(i);
-					}}
-					on:buttonClicked={() => {
-						selectedShipment = shipment;
-						showShipmentDetailsModal = true;
-					}}
-					shipmentAccount={shipment}
-					{selectedLocation}
-					shipmentId={i}
-				/>
-			{/each}
-		</ul>
-	</div>
-{/if}
+<div class="flex-1 flex w-full flex-col overflow-y-auto px-4 mt-5">
+	<ul class="w-full flex-1 space-y-4">
+		{#each myForwarderShipments as { meta, shipment }, i (meta.publicKey)}
+			<OrderListElement
+				on:click={() => {
+					selectedShipment = shipment;
+				}}
+				on:buttonClicked={() => {
+					selectedShipment = shipment;
+					showShipmentDetailsModal = true;
+				}}
+				shipmentAccount={shipment}
+				selectedAccount={selectedShipment?.publicKey}
+			/>
+		{/each}
+	</ul>
+</div>
 
 {#if isWalletConnected}
 	<ShipmentsLocations
-		locations={locationsOnMap}
-		{onMarkerClick}
-		{selectedLocation}
-		exclusive={isExclusiveMode}
-		isMobile={false}
+		shipments={myForwarderShipments.map((el) => el.shipment)}
+		bind:selectedShipment
 	/>
+{/if}
 
-	{#if carriers.length != 0}
-		<CarriersLocations
-			{carriers}
-			{selectedCarrier}
-			onMarkerClick={onCarrierMarkerClick}
-			isMobile={false}
-		/>
-	{/if}
+{#if selectedShipment}
+	<CarriersLocations
+		{carriers}
+		bind:selectedCarrier
+		on:makeOfferClick={() => (showMakeOfferModal = true)}
+	/>
 {/if}
 
 {#if selectedShipment}
 	<ShipmentInformationModal
 		shipmentAccount={selectedShipment}
 		bind:showModal={showShipmentDetailsModal}
+	/>
+{/if}
+
+{#if selectedShipment && selectedCarrier}
+	<MakeOfferModal
+		shipmentAccount={selectedShipment}
+		carrierAccount={selectedCarrier}
+		bind:showModal={showMakeOfferModal}
 	/>
 {/if}

@@ -1,19 +1,19 @@
 <script lang="ts">
-	import type { Geography } from '$src/utils/account/shipment';
+	import type { ApiShipmentAccount, Geography } from '$src/utils/account/shipment';
 	import clsx from 'clsx';
 	import { LngLatBounds } from 'maplibre-gl';
-	import { getContext } from 'svelte';
+	import { createEventDispatcher, getContext } from 'svelte';
 	import { GeoJSON as GeoJson, LineLayer, Marker } from 'svelte-maplibre';
 	import type { MapContext } from 'svelte-maplibre/context.svelte';
 
-	export let locations: Geography<string>[];
-	export let selectedLocation: number | undefined;
-	export let onMarkerClick: (location: number) => void;
-	export let isMobile: boolean;
+	export let shipments: ApiShipmentAccount[];
+	export let selectedShipment: ApiShipmentAccount | undefined = undefined;
 
-	export let exclusive: boolean;
+	function isSelected(key: string) {
+		return selectedShipment ? selectedShipment.publicKey == key : false;
+	}
 
-	// const getMidPoint = ([x1, y1], [x2, y2]): [number, number] => [(x1 + x2) / 2, (y1 + y2) / 2];
+	$: selectedShipmentLocation = selectedShipment?.account.shipment.geography;
 
 	const getBounds = ([lng1, lat1], [lng2, lat2]): LngLatBounds => {
 		return new LngLatBounds([
@@ -24,16 +24,13 @@
 		]);
 	};
 
-	// TODO: consider bounds with current zoom, if they will include it
-	$: if (selectedLocation !== undefined) {
-		if (locations[selectedLocation]) {
-			flyToLocation(
-				getBounds(
-					[locations[selectedLocation].from.longitude, locations[selectedLocation].from.latitude],
-					[locations[selectedLocation].to.longitude, locations[selectedLocation].to.latitude]
-				)
-			);
-		}
+	$: if (selectedShipmentLocation !== undefined) {
+		flyToLocation(
+			getBounds(
+				[selectedShipmentLocation.from.longitude, selectedShipmentLocation.from.latitude],
+				[selectedShipmentLocation.to.longitude, selectedShipmentLocation.to.latitude]
+			)
+		);
 	}
 
 	let store = getContext<MapContext>(Symbol.for('svelte-maplibre')).map;
@@ -43,17 +40,16 @@
 		map = $store;
 	}
 
-	function onMarkerChange(i: number) {
-		onMarkerClick(i);
-		selectedLocation = i;
-	}
+	const onMarkerClick = (shipment: ApiShipmentAccount)  => {
+		selectedShipment = shipment;
+	};
 
 	function flyToLocation(bounds: LngLatBounds) {
 		map.fitBounds(bounds, {
 			duration: 2000,
 			animate: true,
-			// offset: isMobile ? [0, -100] : [-200, 0], 
-			// padding: {'right': 600, 'left':100}, 
+			// offset: isMobile ? [0, -100] : [-200, 0],
+			// padding: {'right': 600, 'left':100},
 			padding: 100
 		});
 		// map.flyTo({
@@ -65,24 +61,28 @@
 	}
 </script>
 
-{#each locations as location, i}
-	{#if exclusive && selectedLocation !== i}
-		<div></div>
-	{:else}
-		<Marker
-			on:click={() => onMarkerChange(i)}
-			lngLat={[location.from.longitude, location.from.latitude]}
-		>
-			<div
-				class={clsx('pin bounce-a cursor-pointer', selectedLocation == i ? 'active' : 'inactive')}
-			></div>
-			{#if selectedLocation === i}
-				<div class="pulse"></div>
-			{/if}
-		</Marker>
-	{/if}
+{#each shipments as shipment}
+	{@const location = shipment.account.shipment.geography}
+	{@const selectedKey = selectedShipment?.publicKey}
+	{@const currentKey = shipment.publicKey}
 
-	{#if selectedLocation === i}
+
+	<Marker
+		on:click={() => onMarkerClick(shipment)}
+		lngLat={[location.from.longitude, location.from.latitude]}
+	>
+		<div
+			class={clsx(
+				'pin bounce-a cursor-pointer',
+				selectedKey === currentKey ? 'active' : 'inactive'
+			)}
+		></div>
+		{#if selectedKey === currentKey}
+			<div class="pulse"></div>
+		{/if}
+	</Marker>
+
+	{#if selectedKey === currentKey}
 		<Marker lngLat={[location.to.longitude, location.to.latitude]}>
 			<div class={clsx('pin', 'active')}></div>
 			<div class="pulse"></div>

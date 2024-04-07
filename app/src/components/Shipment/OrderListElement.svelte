@@ -4,13 +4,14 @@
 	import { createEventDispatcher } from 'svelte';
 
 	export let shipmentAccount: ApiShipmentAccount;
-	export let selectedLocation: number | undefined;
-	export let shipmentId: number;
-	const dispatch = createEventDispatcher();
+	export let selectedAccount: string | undefined = undefined;
 
+	const dispatch = createEventDispatcher();
 	const handleShowClick = (e: MouseEvent) => {
 		dispatch('buttonClicked');
 	};
+
+	$: console.log(shipmentAccount)
 
 	$: shipmentData = shipmentAccount.account;
 	$: locations = shipmentData.shipment.geography;
@@ -69,7 +70,7 @@
 	on:click
 	class={clsx(
 		'rounded-lg shadow cursor-pointer w-full',
-		selectedLocation == shipmentId ? 'bg-secondary-100' : 'bg-white'
+		selectedAccount === shipmentAccount.publicKey ? 'bg-secondary-100' : 'bg-white'
 	)}
 >
 	<div class="px-4 py-5 sm:px-6">

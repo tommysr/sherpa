@@ -12,18 +12,14 @@
 	import { forwardedShipments, type ForwardedShipment } from '$src/stores/forwarderShipments';
 	import { createNotification, removeNotification } from '../Notification/notificationsStore';
 	import { awaitedConfirmation } from '$src/stores/confirmationAwait';
+	import type { ApiShipmentAccount } from '$src/utils/account/shipment';
 
 	export let showModal: boolean;
 	export let carrierAccount: ApiCarrierAccount;
-	export let selectedLocation: number | undefined;
+	export let shipmentAccount: ApiShipmentAccount;
 
 	let time: number;
 	let price: number;
-	let shipment: ForwardedShipment | undefined;
-
-	$: if (selectedLocation) {
-		shipment = $forwardedShipments.at(selectedLocation);
-	}
 
 	$: timeInSecs = time * 60;
 
@@ -60,7 +56,7 @@
 			new BN(price * 10 ** 9),
 			timeInSecs,
 			$walletStore.publicKey!,
-			new PublicKey(shipment?.shipment.publicKey as string), // TODO: handle it
+			new PublicKey(shipmentAccount.publicKey),
 			new PublicKey(carrierAccount.account.authority)
 		);
 
