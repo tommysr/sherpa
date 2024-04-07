@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { Marker } from 'svelte-maplibre';
+	import { Marker, Popup } from 'svelte-maplibre';
 	import clsx from 'clsx';
 	import { getContext } from 'svelte';
 	import type { MapContext } from 'svelte-maplibre/context.svelte';
@@ -13,35 +13,45 @@
 	let store = getContext<MapContext>(Symbol.for('svelte-maplibre')).map;
 	let map: maplibregl.Map;
 
-	$: locationsWithName = carriers.map((carrier) => {
-		return { name: carrier.account.name, location: carrier.account.availability.location };
-	});
+	$: displayedLocations = carriers;
 
-	$: if (selectedCarrier !== undefined && map) {
-		if (locationsWithName[selectedCarrier]) {
-			flyToLocation([
-				locationsWithName[selectedCarrier].location.longitude,
-				locationsWithName[selectedCarrier].location.latitude
-			]);
-		}
-	}
+	// $: if (selectedCarrier !== undefined && map) {
+	// 	if (locationsWithName[selectedCarrier]) {
+	// 		flyToLocation([
+	// 			locationsWithName[selectedCarrier].location.longitude,
+	// 			locationsWithName[selectedCarrier].location.latitude
+	// 		]);
+	// 	}
+	// }
 
 	$: if ($store) {
 		map = $store;
 	}
 
+	const fitCarriersToBounds = () => {
+		const bounds = map.getBounds();
+		// TODO: add filtering
+
+		displayedLocations = carriers.filter(
+			({
+				account: {
+					availability: { location }
+				}
+			}) => bounds.contains([location.longitude, location.latitude])
+		);
+	};
+
 	$: if (map) {
 		map.on('dragend', (e) => {
-			const bounds = map.getBounds();
-			// TODO: add filtering
-			// filterByBounds(bounds);
+			fitCarriersToBounds();
 		});
 
 		map.on('zoomend', (e) => {
-			const bounds = map.getBounds();
-			// filterByBounds(bounds);
+			fitCarriersToBounds();
 		});
 	}
+
+	$: console.log(displayedLocations.length);
 
 	function onMarkerChange(i: number) {
 		onMarkerClick(i);
@@ -58,8 +68,21 @@
 	}
 </script>
 
-{#each locationsWithName as { name, location }, i}
+{#each displayedLocations as { publicKey, account }, i}
+	{@const name = account.name}
+	{@const location = account.availability.location}
+	{@const offersCount = account.offersCount}
+	{@const taskCount = account.tasksCount}
+
 	<Marker on:click={() => onMarkerChange(i)} lngLat={[location.longitude, location.latitude]}>
+		<Popup>
+			<p>Name: {name}</p>
+			<p>Offers: {offersCount}</p>
+			<p>Tasks: {taskCount}</p>
+			<button class="border rounded-xl border-primary-500 px-2 py-1 text-sm font-md"
+				>Make offer</button
+			>
+		</Popup>
 		<div
 			class={clsx(
 				'carrier pin bounce cursor-pointer',

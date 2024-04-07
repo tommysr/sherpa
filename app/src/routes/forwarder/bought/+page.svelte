@@ -105,7 +105,7 @@
 		isMobile={false}
 	/>
 
-	{#if operationMode == OperationMode.SELL}
+	{#if carriers.length != 0}
 		<CarriersLocations
 			{carriers}
 			{selectedCarrier}
