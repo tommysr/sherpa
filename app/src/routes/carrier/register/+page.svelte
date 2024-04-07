@@ -20,6 +20,7 @@
 
 	import { FormStage } from '$src/components/ShipmentForm/formStage';
 	import SummaryForm from '$src/components/ShipmentForm/SummaryForm.svelte';
+	import { createNotification } from '$src/components/Notification/notificationsStore';
 
 	const forms = {
 		name: {
@@ -72,11 +73,18 @@
 		const { connection } = get(web3Store);
 
 		if (!$walletStore.publicKey) {
-			showModal = false;
 			walletStore.openModal();
 
-			throw 'wallet not connected';
+
+			createNotification({
+				text: 'Wallet not connected',
+				type: 'failed',
+				removeAfter: 5000
+			});
+
+			return
 		}
+		
 
 		const {
 			locationWithTime: { latitude, longitude, name: locationName, when },
@@ -93,16 +101,18 @@
 				locationName
 			})
 		);
+		try {
+			const signature = await useSignAndSendTransaction(connection, wallet, tx);
 
-		return await useSignAndSendTransaction(connection, wallet, tx);
+			createNotification({text: 'Transaction send', type:'success', removeAfter: 10000, signature})
+		} catch (e) {
+			createNotification({text: 'Transaction send', type: 'failed', removeAfter: 10000})
+		}
 	}
 
 	async function onSubmit(values) {
-		console.log(values, states);
 		if (form == CarrierFormStage.Summary) {
-			await registerCarrier(states as RegisterCarrierFormInterface)
-				.then((sig) => console.log(sig))
-				.catch((err) => console.error(err));
+			await registerCarrier(states as RegisterCarrierFormInterface);
 		} else {
 			states[form] = values;
 

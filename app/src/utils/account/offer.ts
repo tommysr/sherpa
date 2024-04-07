@@ -11,18 +11,18 @@ export interface OfferDetails<BigNumber, U64MAX> {
 	deadline: U64MAX;
 }
 
-export interface ShipmentOfferStruct<BigNumber, Key, U64MAX> {
+export interface ShipmentOfferStruct<Date, BigNumber, Key, U64MAX> {
 	offeror: Key;
 	shipment: Key;
 	details: OfferDetails<BigNumber, U64MAX>;
-	submitted: BigNumber;
-	timeout: BigNumber;
+	submitted: Date;
+	timeout: Date;
 	no: number;
 	reserved: number[] //4
 }
 
-export type ShipmentOffer = ShipmentOfferStruct<BN, PublicKey, BN>;
-export type ApiShipmentOffer = ShipmentOfferStruct<number, string, string>;
+export type ShipmentOffer = ShipmentOfferStruct<BN, BN, PublicKey, BN>;
+export type ApiShipmentOffer = ShipmentOfferStruct<string, number, string, string>;
 
 export type ShipmentOfferAccount = ProgramAccount<ShipmentOffer>;
 

@@ -14,9 +14,10 @@ export function parseOfferToApiOffer(offerAccount: ShipmentOffer): ApiShipmentOf
 	return {
 		...offerAccount,
 		offeror: offerAccount.offeror.toString(),
-		submitted: offerAccount.submitted.toNumber(),
-		timeout: offerAccount.timeout.toNumber(),
+		submitted: new Date(offerAccount.submitted.toNumber() * 1000).toISOString(),
+		timeout: new Date(offerAccount.timeout.toNumber() * 1000).toISOString(),
 		shipment: offerAccount.shipment.toString(),
 		details: parseOfferDetails(offerAccount.details)
 	};
 }
+

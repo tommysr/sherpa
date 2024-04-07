@@ -219,8 +219,8 @@
 
 <Modal
 	{showModal}
-	showCloseButton={false}
 	on:backdropClick={() => goto('/shipmentsMap')}
+	showCloseButton={false}
 	closeHandler={() => history.back()}
 >
 	<svelte:component

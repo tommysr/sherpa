@@ -12,15 +12,21 @@
 
 	$: shipmentData = shipmentAccount.account;
 	$: locations = shipmentData.shipment.geography;
+	$: priority = getPriorityName(shipmentData.shipment.details.priority)
+	$: priorityColor = getPriorityColor(priority)
 
-	$: dimensions = Object.entries(shipmentData.shipment.dimensions) as Entries<ShipmentDimensions>;
-	// $: properties = Object.entries(shipmentData.shipment.details) as Entries<ShipmentDetails>;
-
-	async function getLocationFromCoords(lat: number, long: number): Promise<string> {
-		return `Kraków, Poland`;
+	function getPriorityName(priority: number) {
+		switch (priority) {
+			case 4:
+				return 'High';
+			case 3:
+				return 'Medium';
+			case 2:
+				return 'Low';
+			default:
+				return 'Default';
+		}
 	}
-
-	const priority = ['High', 'Medium', 'Low'][Math.floor(Math.random() * 3)];
 
 	function getPriorityColor(priority: string) {
 		switch (priority) {
@@ -59,7 +65,7 @@
 				{locations.fromName + ' → ' + locations.toName}
 				<br />
 				&#x2022; Priority:
-				<span class={clsx('font-semibold', getPriorityColor(priority))}>{priority}</span>
+				<span class={clsx('font-semibold', priorityColor)}>{priority}</span>
 			</p>
 
 			<button class="text-sm xl:text-md text-accent font-medium" on:click={() => (showModal = true)}

@@ -9,7 +9,7 @@
 	</div>
 
 	<div class="flex justify-left items-center space-x-4">
-		<label for="fragility">Priority:</label>
+		<label for="priority">Priority:</label>
 		<select
 			name="priority"
 			required
