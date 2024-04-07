@@ -1,26 +1,20 @@
 <script lang="ts">
-	import { Control, ControlButton, ControlGroup } from 'svelte-maplibre';
 	import { page } from '$app/stores';
-	import { get } from 'svelte/store';
+	import LayoutListWrapper from '$src/components/LayoutListWrapper.svelte';
+	import { acceptedShipmentsOffersMeta } from '$src/stores/acceptedOffers';
 	import { anchorStore } from '$src/stores/anchor';
-	import type {
-		ApiShipmentOfferAccount,
-		ShipmentOffer,
-		ShipmentOfferAccount
-	} from '$src/utils/account/offer';
-	import { parseOfferToApiOffer } from '$src/utils/parse/offer';
-	import { type AcceptedShipment, acceptedShipmentsOffersMeta } from '$src/stores/acceptedOffers';
 	import { shipmentsOffersMeta } from '$src/stores/offers';
+	import { walletStore } from '$src/stores/wallet';
 	import type {
 		AcceptedShipmentOffer,
 		ApiAcceptedShipmentOfferAccount
 	} from '$src/utils/account/acceptedOffer';
+	import type { ApiShipmentOfferAccount, ShipmentOffer } from '$src/utils/account/offer';
 	import { parseAcceptedOfferToApiAcceptedOffer } from '$src/utils/parse/acceptedOffer';
-	import { onMount } from 'svelte';
-	import { walletStore } from '$src/stores/wallet';
-	import Page from '../+page.svelte';
-	import LayoutListWrapper from '$src/components/LayoutListWrapper.svelte';
+	import { parseOfferToApiOffer } from '$src/utils/parse/offer';
 	import clsx from 'clsx';
+	import { onMount } from 'svelte';
+	import { get } from 'svelte/store';
 	const { program } = get(anchorStore);
 
 	let selectedNav: number = 0;
@@ -99,18 +93,20 @@
 	$: key = $page.params['carrierKey'];
 	$: absolutePath = `/carrier/${key}`;
 	$: url = $page.url.pathname;
-	$: carrierPage = url.split('/').at(-1)
+	$: carrierPage = url.split('/').at(-1);
 
-	$: console.log(carrierPage)
+	$: console.log(carrierPage);
 </script>
 
 <LayoutListWrapper bind:isMobileOpen>
 	{#if !isWalletConnected}
-		<p
-			class="mt-1 text-center text-xl bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent w-2/3"
-		>
-			Connect your wallet to view shipments
-		</p>
+		<div class="w-full flex justify-center items-center">
+			<p
+				class="text-center text-xl bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent w-2/3"
+			>
+				Connect your wallet to view shipments
+			</p>
+		</div>
 	{:else}
 		<div class="h-full flex w-full flex-col items-center">
 			<div class="inline-flex shadow-sm bg-white rounded-lg m-4 flex-none">
@@ -120,9 +116,9 @@
 							aria-current="page"
 							class={clsx(
 								'px-4 py-2 text-md font-semibold',
-								(carrierPage == name
+								carrierPage == name
 									? 'bg-gradient-to-r from-primary to-secondary text-white'
-									: 'bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent'),
+									: 'bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent',
 								i == 0 && 'rounded-l-lg',
 								i == routes.length - 1 && 'rounded-r-lg'
 							)}
