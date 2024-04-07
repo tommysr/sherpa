@@ -61,7 +61,7 @@
 		}
 	};
 
-	let startForm = $userStore.shipper.registered ? FormStage.Price : FormStage.Name;
+	let startForm = $userStore.shipper.registered ? FormStage.ShipmentName : FormStage.Name;
 
 	let states: CreateShipmentFormInterface = {
 		name: {
