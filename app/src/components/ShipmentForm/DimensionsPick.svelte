@@ -18,47 +18,82 @@
 	export let isMetricTon: boolean = false;
 </script>
 
-<div class="flex flex-row gap-x-10">
-	<div>
-		<label>
-			Metric tons
-			<input name="isMetricTon" type="checkbox" bind:checked={isMetricTon} />
-		</label>
-	</div>
-
-	<div>
-		<h4>Weight metrics</h4>
-		<input type="radio" name="weightMetrics" bind:group={metrics.weight} value="kg" />
-		<label for="kg">kg</label>
-
-		<input type="radio" name="weightMetrics" bind:group={metrics.weight} value="lb" />
-		<label for="lb">lb</label>
-	</div>
-
-	<div>
-		<h4>Distance metrics</h4>
+<div class="flex justify-around mb-8">
+	<div class="flex flex-col justify-start items-center">
+		<h4 class="text-neutral-600 text-sm mb-2">Metric tons</h4>
 		<input
-			type="radio"
-			id="m"
-			name="distanceMetrics"
-			bind:group={metrics.distance}
-			value="m"
-			required
+			name="isMetricTon"
+			type="checkbox"
+			class="w-4 h-4 bg-gray-100 border-gray-300 rounded"
+			bind:checked={isMetricTon}
 		/>
-		<label for="m">m</label>
-		<input type="radio" name="distanceMetrics" bind:group={metrics.distance} value="ft" required />
-		<label for="ft">ft</label>
+	</div>
+
+	<div class="flex flex-col justify-start items-center">
+		<h4 class="text-neutral-600 text-sm mb-2">Weight metrics</h4>
+
+		<div class="flex space-x-4">
+			<div class="flex items-center">
+				<input
+					type="radio"
+					name="weightMetrics"
+					class="w-4 h-4 text-primary bg-gray-100 border-gray-300"
+					bind:group={metrics.weight}
+					value="kg"
+				/>
+				<label for="kg" class="ms-1 text-sm text-gray-900">Kg</label>
+			</div>
+			<div class="flex items-center">
+				<input
+					type="radio"
+					name="weightMetrics"
+					class="w-4 h-4 text-primary bg-gray-100 border-gray-300"
+					bind:group={metrics.weight}
+					value="lb"
+				/>
+				<label for="lb" class="ms-1 text-sm text-gray-900">Lb</label>
+			</div>
+		</div>
+	</div>
+
+	<div class="flex flex-col justify-start items-center">
+		<h4 class="text-neutral-600 text-sm mb-2">Distance metrics</h4>
+
+		<div class="flex space-x-4">
+			<div class="flex items-center">
+				<input
+					type="radio"
+					name="distanceMetrics"
+					bind:group={metrics.distance}
+					value="m"
+					required
+					class="w-4 h-4 text-primary bg-gray-100 border-gray-300"
+				/>
+				<label for="m" class="ms-1 text-sm text-gray-900">M</label>
+			</div>
+			<div class="flex items-center">
+				<input
+					type="radio"
+					name="distanceMetrics"
+					class="w-4 h-4 text-primary bg-gray-100 border-gray-300"
+					bind:group={metrics.distance}
+					value="ft"
+				/>
+				<label for="ft" class="ms-1 text-sm text-gray-900">Ft</label>
+			</div>
+		</div>
 	</div>
 </div>
+
 {#if isMetricTon}
 	<div
-		class="col-span-2 grid grid-cols-2 opacity-100 items-center justify-items-center w-full text-white py-2 rounded-lg bg-gradient-to-r from-primary to-secondary"
+		class="grid grid-cols-2 gap-3 items-center justify-items-center w-full text-white py-2 rounded-lg bg-gradient-to-r from-primary to-secondary"
 	>
-		<div class="">weight</div>
-		<div class="">volume</div>
+		<div class="">Weight</div>
+		<div class="">Volume</div>
 	</div>
 	<div
-		class="col-span-2 grid grid-cols-2 opacity-100 items-center justify-items-center w-full text-primary py-2"
+		class="grid grid-cols-2 gap-3 opacity-100 items-center justify-items-center w-full text-primary py-2"
 	>
 		<div>
 			<span>
@@ -73,16 +108,14 @@
 
 {#if !isMetricTon}
 	<div
-		class="col-span-4 grid grid-cols-4 opacity-100 items-center justify-items-center w-full text-white py-2 rounded-lg bg-gradient-to-r from-primary to-secondary"
+		class="grid grid-cols-4 gap-3 items-center justify-items-center w-full text-white py-2 rounded-lg bg-gradient-to-r from-primary to-secondary"
 	>
 		<div class="">Width</div>
 		<div class="">Height</div>
 		<div class="">Depth</div>
 		<div class="">Weight</div>
 	</div>
-	<div
-		class="col-span-4 grid grid-cols-4 opacity-100 items-center justify-items-center w-full text-primary py-2"
-	>
+	<div class="grid grid-cols-4 gap-3 items-center justify-items-center w-full text-primary py-2">
 		<div>
 			<span>
 				<DecimalInput
