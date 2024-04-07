@@ -5,7 +5,6 @@
 	let dialog; // HTMLDialogElement
 
 	export let closeHandler = () => {
-		console.log('closing');
 		showModal = false;
 	};
 

@@ -38,6 +38,9 @@
 
 		if (!$walletStore.publicKey) {
 			showModal = false;
+
+			createNotification({ text: 'wallet not connected', type: 'failed', removeAfter: 5000 });
+
 			walletStore.openModal();
 
 			return;

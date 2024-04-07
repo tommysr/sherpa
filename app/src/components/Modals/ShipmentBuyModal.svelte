@@ -24,8 +24,8 @@
 	$: locations = shipmentData.shipment.geography;
 	// // $: properties = Object.entries(shipmentData.shipment.details) as Entries<ShipmentDetails>;
 
-	function isAccountNameValid(name: string): boolean {
-		if (name.length == 0 || name.length > 64) {
+	function isAccountNameValid(name: string | null): boolean {
+		if (!name || name.length == 0 || name.length > 64) {
 			return false;
 		}
 		return true;
@@ -61,13 +61,11 @@
 			$walletStore.publicKey,
 			new PublicKey(shipmentAccount.publicKey),
 			new PublicKey(shipmentAccount.account.shipper),
-			name
+			name!
 		);
 
 		try {
 			const signature = await useSignAndSendTransaction(connection, wallet, tx);
-
-			console.log(signature)
 
 			removeNotification(id);
 			createNotification({ text: 'Tx send', type: 'success', removeAfter: 5000, signature });

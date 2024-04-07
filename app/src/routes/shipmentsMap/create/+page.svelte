@@ -3,6 +3,10 @@
 	import { page } from '$app/stores';
 	import { CarrierFormStage } from '$src/components/CarrierForm/carrierFormStage';
 	import Modal from '$src/components/Modals/Modal.svelte';
+	import {
+		createNotification,
+		removeNotification
+	} from '$src/components/Notification/notificationsStore';
 	import DatesForm from '$src/components/ShipmentForm/DatesForm.svelte';
 	import DetailsForm from '$src/components/ShipmentForm/DetailsForm.svelte';
 	import DimensionsForm from '$src/components/ShipmentForm/DimensionsForm.svelte';
@@ -15,6 +19,7 @@
 	import type { CreateShipmentFormInterface } from '$src/components/ShipmentForm/interfaces';
 	import { getCreateShipmentTx } from '$src/lib/shipper';
 	import { anchorStore } from '$src/stores/anchor';
+	import { awaitedConfirmation } from '$src/stores/confirmationAwait';
 	import { defaultLocation } from '$src/stores/locationsPick';
 	import { walletStore } from '$src/stores/wallet';
 	import { web3Store } from '$src/stores/web3';
@@ -61,7 +66,7 @@
 		}
 	};
 
-	let startForm = $userStore.shipper.registered ? FormStage.Price : FormStage.Name;
+	let startForm = $userStore.shipper.registered ? FormStage.ShipmentName : FormStage.Name;
 
 	let states: CreateShipmentFormInterface = {
 		name: {
@@ -120,9 +125,12 @@
 
 		if (!$walletStore.publicKey) {
 			showModal = false;
+
+			createNotification({ text: 'wallet not connected', type: 'failed', removeAfter: 5000 });
+
 			walletStore.openModal();
 
-			throw 'wallet not connected';
+			return;
 		}
 
 		const {
@@ -153,6 +161,8 @@
 		if (dimensions.isMetricTon) {
 			width = shitCheck(dimensions.volume);
 		}
+
+		const id = createNotification({ text: 'signing', type: 'loading', removeAfter: undefined });
 
 		const tx = await getCreateShipmentTx(
 			program,
@@ -186,17 +196,30 @@
 
 				price: price ?? 0
 			},
-			shipper.name != '' ? shipper.name : name
+			shipper.name ?? name
 		);
 
-		return await useSignAndSendTransaction(connection, wallet, tx);
+		try {
+			const signature = await useSignAndSendTransaction(connection, wallet, tx);
+
+			createNotification({ text: 'Tx send', type: 'success', removeAfter: 5000, signature });
+			removeNotification(id);
+
+			const confirmation = createNotification({
+				text: 'waiting for confirmation',
+				type: 'loading',
+				removeAfter: 30000
+			});
+			awaitedConfirmation.set(confirmation);
+		} catch (err) {
+			createNotification({ text: 'Signing', type: 'failed', removeAfter: 5000 });
+			removeNotification(id);
+		}
 	}
 
 	async function onSubmit(values) {
 		if (form == FormStage.Summary) {
-			await buyShipment(states as CreateShipmentFormInterface)
-				.then((sig) => console.log(sig))
-				.catch((err) => console.error(err));
+			await buyShipment(states as CreateShipmentFormInterface);
 		} else {
 			console.log(form, values);
 			states[form] = values;

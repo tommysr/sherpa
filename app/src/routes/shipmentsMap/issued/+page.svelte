@@ -91,7 +91,7 @@
 								on:click={() => onSelectShipment(account)}
 								on:buttonClicked={() => onShowClicked(account)}
 								shipmentAccount={account}
-								selectedAccount={account.publicKey}
+								selectedAccount={selectedShipment?.publicKey}
 							/>
 						{/each}
 					</ul>

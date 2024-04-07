@@ -29,8 +29,6 @@
 	$: src = $pickedLocations.src;
 	$: dst = $pickedLocations.dst;
 
-	$: console.log(src, $pickedLocations.src);
-
 	$: if (src.toString() != lastSrcLocation.toString()) {
 		srcLocationDisabled = true;
 		lastSrcLocation = src;

@@ -11,8 +11,6 @@
 		dispatch('buttonClicked');
 	};
 
-	$: console.log(shipmentAccount)
-
 	$: shipmentData = shipmentAccount.account;
 	$: locations = shipmentData.shipment.geography;
 	$: priority = getPriorityName(shipmentData.shipment.details.priority);

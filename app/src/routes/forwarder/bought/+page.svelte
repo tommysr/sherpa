@@ -42,18 +42,28 @@
 	}
 </script>
 
-<div class="flex-1 flex w-full flex-col overflow-y-auto px-4 mt-5">
-	<ul class="w-full flex-1 space-y-4">
-		{#each myForwarderShipments as { meta, shipment }, i (meta.publicKey)}
-			<OrderListElement
-				on:click={() => onSelectShipment(shipment)}
-				on:buttonClicked={() => onShowClicked(shipment)}
-				shipmentAccount={shipment}
-				selectedAccount={selectedShipment?.publicKey}
-			/>
-		{/each}
-	</ul>
-</div>
+{#if myForwarderShipments.length != 0}
+	<div class="flex-1 flex w-full flex-col overflow-y-auto px-4 mt-5">
+		<ul class="w-full flex-1 space-y-4">
+			{#each myForwarderShipments as { meta, shipment }, i (meta.publicKey)}
+				<OrderListElement
+					on:click={() => onSelectShipment(shipment)}
+					on:buttonClicked={() => onShowClicked(shipment)}
+					shipmentAccount={shipment}
+					selectedAccount={selectedShipment?.publicKey}
+				/>
+			{/each}
+		</ul>
+	</div>
+{:else}
+	<div class="flex-1 flex items-center">
+		<p
+			class="mb-5 text-center text-xl bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent"
+		>
+			Nothing found
+		</p>
+	</div>
+{/if}
 
 {#if isWalletConnected}
 	<ShipmentsLocations
@@ -70,9 +80,9 @@
 	/>
 
 	<ShipmentInformationModal
-	shipmentAccount={selectedShipment}
-	bind:showModal={showShipmentDetailsModal}
-/>
+		shipmentAccount={selectedShipment}
+		bind:showModal={showShipmentDetailsModal}
+	/>
 {/if}
 
 {#if selectedShipment && selectedCarrier}

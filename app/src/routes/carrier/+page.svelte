@@ -4,8 +4,6 @@
 
 	export let data: PageData;
 	$: carriers = data.carriers;
-
-	$: console.log(carriers);
 </script>
 
 <!-- CONSIDER: Moving this into layout, allowing carrier to view other carriers nearby  -->

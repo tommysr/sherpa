@@ -41,7 +41,10 @@
 	} from '$src/utils/account/forwardedShipment';
 	import { parseForwardedShipmentToApiForwardedShipment } from '$src/utils/parse/forwardedShipment';
 	import { forwardedShipmentsMeta } from '$src/stores/forwarderShipments';
-	import { createNotification, removeNotification } from '$src/components/Notification/notificationsStore';
+	import {
+		createNotification,
+		removeNotification
+	} from '$src/components/Notification/notificationsStore';
 	import { awaitedConfirmation } from '$src/stores/confirmationAwait';
 
 	let wallets: Adapter[];
@@ -53,22 +56,21 @@
 	// check if user is registered as forwarder, shipper or carrier
 	// this is done on wallet sign in/sign out, when user changes wallet
 	$: if ($walletStore.publicKey) {
-
 		fetchForwarderAccount(program, $walletStore.publicKey).then(({ account, accountKey }) => {
 			if (account) {
-				userStore.registerForwarder(decodeName(account.name));
+				userStore.registerForwarder(decodeName(account.name), accountKey.toString());
 			}
 		});
 
 		fetchShipperAccount(program, $walletStore.publicKey).then(({ account, accountKey }) => {
 			if (account) {
-				userStore.registerShipper(decodeName(account.name));
+				userStore.registerShipper(decodeName(account.name), accountKey.toString());
 			}
 		});
 
 		fetchCarrierAccount(program, $walletStore.publicKey).then(({ account, accountKey }) => {
 			if (account) {
-				userStore.registerCarrier(decodeName(account.name));
+				userStore.registerCarrier(decodeName(account.name), accountKey.toString());
 			}
 		});
 	} else {
@@ -81,7 +83,7 @@
 		const unsubscribeShipmentCreated = program.addEventListener(
 			'ShipmentCreated',
 			async (event) => {
-				console.log(event);
+
 				const shipmentPublicKey = event.shipment;
 
 				const shipment: FetchedShipment = await program.account.shipment.fetch(shipmentPublicKey);
@@ -90,6 +92,16 @@
 					publicKey: shipmentPublicKey.toString(),
 					account: parseShipmentToApiShipment(shipment)
 				};
+
+				const shipper = event.shipper;
+
+				if (shipper.toString() === $userStore.shipper.key) {
+					const id = $awaitedConfirmation;
+					if (id) {
+						removeNotification(id);
+					}
+					createNotification({ text: 'shipment', type: 'success', removeAfter: 5000 });
+				}
 
 				searchableShipments.extend({
 					...parsedShipment,
@@ -101,8 +113,8 @@
 		const unsubscribeForwardedShipment = program.addEventListener(
 			'ShipmentTransferred',
 			async (event) => {
-				console.log(event.buyer.toString())
-	
+				console.log(event.buyer.toString());
+
 				const forwardedShipmentPublicKey = event.forwarded;
 
 				const forwardedShipment: FetchedForwardedShipment =
@@ -115,21 +127,18 @@
 
 				const buyer = event.buyer;
 
-				if (buyer.toString() === $walletStore.publicKey?.toString())
-				{
+				if (buyer.toString() === $userStore.forwarder.key) {
 					const id = $awaitedConfirmation;
 					if (id) {
-						removeNotification(id)
+						removeNotification(id);
 					}
-					createNotification({text: 'Purchase success', type: 'success', removeAfter: 5000})
+					createNotification({ text: 'Buy', type: 'success', removeAfter: 5000 });
 				}
 
 				forwardedShipmentsMeta.update((meta) => {
 					meta.push(parsedShipment);
 					return meta;
 				});
-
-
 
 				// TODO: change in searchableOrders
 
@@ -146,7 +155,6 @@
 
 		return [unsubscribeForwardedShipment, unsubscribeShipmentCreated];
 	}
-
 
 	onMount(() => {
 		wallets = [

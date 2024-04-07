@@ -44,7 +44,6 @@ export const getCreateShipmentTx = async (
 	shipmentParams: CreateShipmentParams,
 	shipperName: string
 ): Promise<Transaction> => {
-	console.log(shipmentParams)
 
 	const tx = new Transaction();
 
@@ -64,10 +63,11 @@ export const getCreateShipmentTx = async (
 	const { deadline, when, price, name, details, dimensions, geography } = shipmentParams;
 
 
+	console.log(shipmentParams, deadline.valueOf(), when.valueOf())
 
 	const ix = await program.methods
 		.createShipment(new BN(price * 10 ** 9), encodeName(name), {
-			deadline: new BN(deadline.valueOf()),
+			deadline: new BN(Math.floor(deadline.valueOf() / 1000)),
 			details,
 			dimensions: {
 				depth: dimensions.depth * 1000,
@@ -80,7 +80,7 @@ export const getCreateShipmentTx = async (
 				fromName: encodeName(geography.fromName),
 				toName: encodeName(geography.toName)
 			},
-			when: new BN(when.valueOf())
+			when: new BN(Math.floor(when.valueOf() / 1000)),
 		})
 		.accounts({
 			shipper,
