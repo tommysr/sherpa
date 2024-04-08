@@ -5,7 +5,7 @@
 
 <slot />
 
-<div class="fixed bottom-0 left-0">
+<div class="fixed bottom-0 left-0 z-40">
 	{#each $notificationStore as notification}
 		<Notification {notification} />
 	{/each}

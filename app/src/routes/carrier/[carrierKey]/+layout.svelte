@@ -1,22 +1,10 @@
 <script lang="ts">
 	import { page } from '$app/stores';
 	import LayoutListWrapper from '$src/components/LayoutListWrapper.svelte';
-	import { acceptedShipmentsOffersMeta } from '$src/stores/acceptedOffers';
 	import { anchorStore } from '$src/stores/anchor';
-	import type { ApiShipmentOfferAccount, ShipmentOffer } from '$src/utils/account/offer';
-	import { parseOfferToApiOffer } from '$src/utils/parse/offer';
-
-	import { shipmentsOffersMeta } from '$src/stores/offers';
 	import { walletStore } from '$src/stores/wallet';
-	import type {
-		AcceptedShipmentOffer,
-		ApiAcceptedShipmentOfferAccount
-	} from '$src/utils/account/acceptedOffer';
-	import { parseAcceptedOfferToApiAcceptedOffer } from '$src/utils/parse/acceptedOffer';
 	import clsx from 'clsx';
-	import { onMount } from 'svelte';
 	import { get } from 'svelte/store';
-	const { program } = get(anchorStore);
 
 	let isMobileOpen = false;
 	$: isWalletConnected = $walletStore.publicKey != null;
@@ -29,63 +17,6 @@
 			name: 'Accepted'
 		}
 	];
-
-	function subscribeToOffersEvents(): number[] {
-		const unsubscribeOfferMade = program.addEventListener('OfferMade', async (event) => {
-			const offerPublicKey = event.offer;
-
-			// Carrier is only interested in offers made to him
-			if (!$walletStore.publicKey || event.to.toString() != $walletStore.publicKey.toString()) {
-				return;
-			}
-
-			const offer: ShipmentOffer = await program.account.shipmentOffer.fetch(offerPublicKey);
-
-			const parsedOffer: ApiShipmentOfferAccount = {
-				publicKey: offerPublicKey.toString(),
-				account: parseOfferToApiOffer(offer)
-			};
-
-			shipmentsOffersMeta.update((s) => {
-				s = [...s, parsedOffer];
-				return s;
-			});
-		});
-
-		// this is also information which forwarder cares about
-		const unsubscribeOfferAccepted = program.addEventListener('OfferAccepted', async (event) => {
-			const acceptedOfferPublicKey = event.offer;
-
-			// Check not to include foreign offers just these which carrier accepted during session
-			if (!$walletStore.publicKey || event.to.toString() != $walletStore.publicKey.toString()) {
-				return;
-			}
-
-			const acceptedOffer: AcceptedShipmentOffer =
-				await program.account.acceptedOffer.fetch(acceptedOfferPublicKey);
-
-			const parsedOffer: ApiAcceptedShipmentOfferAccount = {
-				publicKey: acceptedOfferPublicKey.toString(),
-				account: parseAcceptedOfferToApiAcceptedOffer(acceptedOffer)
-			};
-
-			acceptedShipmentsOffersMeta.update((s) => {
-				s = [...s, parsedOffer];
-				return s;
-			});
-		});
-
-		return [unsubscribeOfferMade, unsubscribeOfferAccepted];
-	}
-
-	onMount(() => {
-		const unsubscribe = subscribeToOffersEvents();
-		return () => {
-			for (const listener of unsubscribe) {
-				program.removeEventListener(listener);
-			}
-		};
-	});
 
 	$: key = $page.params['carrierKey'];
 	$: absolutePath = `/carrier/${key}`;

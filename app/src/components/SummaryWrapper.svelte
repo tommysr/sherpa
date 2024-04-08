@@ -170,7 +170,7 @@
 				class="col-span-3 grid grid-cols-3 opacity-80 items-center justify-items-center w-full text-white py-2 rounded-lg bg-gradient-to-r from-primary to-secondary"
 			>
 				<div>Weight</div>
-				<div class="col-span-2">Depth x Height x Width</div>
+				<div class="col-span-2">Width x Height x Length</div>
 			</div>
 
 			<div class="self-center">
@@ -178,7 +178,7 @@
 				{shipment.dimensions.weightMetrics}
 			</div>
 			<div class="col-span-2">
-				{shipment.dimensions.width} x {shipment.dimensions.height} x {shipment.dimensions.depth}
+				{shipment.dimensions.height} x {shipment.dimensions.width} x {shipment.dimensions.depth}
 				{shipment.dimensions.distanceMetrics}
 			</div>
 		</div>

@@ -157,6 +157,7 @@
 							<OrderListElement
 								showStatus
 								on:click={() => onSelectShipment(account)}
+								on:buttonClicked={() => onShowClicked(account)}
 								acceptCallback={onClickConfirm}
 								shipmentAccount={account}
 								selectedAccount={selectedShipment?.publicKey}

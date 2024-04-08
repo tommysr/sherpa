@@ -1,12 +1,15 @@
 <script lang="ts">
 	import type { OfferedShipment } from '$src/stores/offers';
-	import type { ApiShipmentOfferAccount } from '$src/utils/account/offer';
 	import clsx from 'clsx';
 	import { createEventDispatcher } from 'svelte';
+import {shortPublicKey} from '$utils/utils'
 
 	export let offerAccount: OfferedShipment;
 	export let selectedShipment: string | undefined = undefined;
+
+	$: shipment = offerAccount.shipment.account;
 	$: offer = offerAccount.meta.account;
+	$: forwarderKey = shortPublicKey(shipment.forwarder)
 
 	const dispatch = createEventDispatcher();
 
@@ -30,7 +33,7 @@
 >
 	<div class="px-4 py-5 sm:px-6">
 		<div class="flex items-center justify-between">
-			<h3 class="sm:text-md xl:text-lg leading-6 font-medium text-gray-900">Forwarder name</h3>
+			<h3 class="sm:text-md xl:text-lg leading-6 font-medium text-gray-900">{forwarderKey}</h3>
 			<p
 				class="mt-1 text-md bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent font-bold"
 			>
@@ -39,7 +42,7 @@
 		</div>
 		<div class="mt-3 xl:mt-5 flex items-center justify-between">
 			<p class="text-xs xl:sm font-medium text-gray-500 mr-6 xl:mr-12">
-				Submitted: {new Date(offer.submitted).toUTCString()}
+				&#x2022; Submitted: {new Date(offer.submitted).toUTCString()}
 				<br />
 				&#x2022; Expires on: {new Date(offer.timeout).toUTCString()}
 			</p>

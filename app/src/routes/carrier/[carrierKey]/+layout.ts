@@ -6,7 +6,7 @@ import type { ApiShipmentOfferAccount } from '$src/utils/account/offer';
 import { error } from '@sveltejs/kit';
 
 /** @type {import('./$types').PageLoad } */
-export async function load({ fetch, params }): Promise<{ offers: ApiShipmentOfferAccount[] }> {
+export async function load({ fetch, params }): Promise<{ offers: ApiShipmentOfferAccount[], accepted: ApiAcceptedShipmentOfferAccount[];}> {
 
 
 	try {
@@ -33,7 +33,7 @@ export async function load({ fetch, params }): Promise<{ offers: ApiShipmentOffe
 		acceptedShipmentsOffersMeta.set(acceptedOffers)
 
 
-		return { offers };
+		return { offers, accepted: acceptedOffers };
 	} catch {
 		throw error(404, 'Not found');
 	}
