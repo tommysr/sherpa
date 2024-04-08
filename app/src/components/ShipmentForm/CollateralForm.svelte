@@ -32,7 +32,7 @@
 
 	<form use:form class="mt-8">
 		<span>
-			<p class="text-neutral-600">Insurance value (collateral):</p>
+			<p class="text-neutral-600 ml-1">Insurance value (collateral):</p>
 			<div>
 				<DecimalInput name="collateral" placeholder="1 SOL" />
 
@@ -46,8 +46,8 @@
 			</div>
 		</span>
 
-		<span>
-			<p class="text-neutral-600">Cancelation fee (penalty)</p>
+		<div class="mt-6">
+			<p class="text-neutral-600 ml-1">Cancelation fee (penalty)</p>
 			<div>
 				<DecimalInput name="penalty" placeholder="1 SOL" />
 
@@ -59,7 +59,7 @@
 					{/if}
 				</ValidationMessage>
 			</div>
-		</span>
+		</div>
 		<div class="flex justify-center space-x-5 mt-8">
 			<Button class="uppercase tracking-widest" on:click={() => onBack($data)}>Prev</Button>
 			<Button class="uppercase tracking-widest" type="submit">Next</Button>

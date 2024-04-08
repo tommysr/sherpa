@@ -6,7 +6,7 @@
 
 <div
 	class={clsx(
-		'fixed md:hidden w-full bottom-0 left-0 md:top-2/3 flex-col flex z-10 rounded-3xl xl:max-w-md p-4 shadow-xl overflow-y-scroll bg-background ease-in-out transition-all duration-300',
+		'fixed md:hidden w-full bottom-0 left-0 md:top-2/3 flex-col flex z-10 rounded-t-3xl xl:max-w-md pt-4 shadow-xl bg-background ease-in-out transition-all duration-300',
 		isMobileOpen ? 'h-3/4' : 'h-1/5'
 	)}
 >
@@ -54,7 +54,7 @@
 		{/if}
 	</div>
 
-	<div class="flex justify-center items-center flex-1">
+	<div class="flex justify-center flex-1 mt-3 overflow-y-scroll">
 		<slot />
 	</div>
 </div>

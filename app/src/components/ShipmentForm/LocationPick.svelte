@@ -1,13 +1,5 @@
 <script lang="ts">
-	import {
-		Control,
-		ControlButton,
-		ControlGroup,
-		DefaultMarker,
-		GeolocateControl,
-		Popup,
-		type MarkerClickInfo
-	} from 'svelte-maplibre';
+	import { Marker, Popup, type MarkerClickInfo } from 'svelte-maplibre';
 
 	import { pickedLocations } from '$src/stores/locationsPick';
 
@@ -27,33 +19,36 @@
 	};
 </script>
 
-<GeolocateControl
-	position="top-left"
-	fitBoundsOptions={{ maxZoom: 12 }}
-	showAccuracyCircle={false}
-/>
-<Control position="top-left" class="flex flex-col gap-y-2">
-	<ControlGroup>
-		<ControlButton
+<div class="fixed top-2/3 transform left-1/2 -translate-x-1/2">
+	<div
+		class="flex flex-col justify-between items-center bg-gradient-to-r from-primary to-secondary px-4 py-3 rounded-3xl hover:scale-105 transition-all ease-in-out duration-150 shadow-lg"
+	>
+		<button
+			class=" text-white text-lg"
 			on:click={() => {
 				showModal = true;
 			}}
 		>
-			M</ControlButton
-		>
-	</ControlGroup>
-</Control>
+			Confirm location
+		</button>
+	</div>
+</div>
 
-<DefaultMarker on:dragend={onDragEnd} bind:lngLat={srcLocation} draggable>
-	<Popup offset={[0, -10]}>
-		<div class="text-lg font-bold">Package source</div>
-	</Popup>
-</DefaultMarker>
+<Marker on:dragend={onDragEnd} bind:lngLat={srcLocation} draggable>
+	<div class="pin active"></div>
+
+	{#if type === 'double'}
+		<Popup open offset={[-5, -10]}>
+			<div class="text-sm font-bold">From</div>
+		</Popup>
+	{/if}
+</Marker>
 
 {#if type === 'double'}
-	<DefaultMarker on:dragend={onDragEnd} bind:lngLat={dstLocation} draggable>
-		<Popup offset={[0, -10]}>
-			<div class="text-lg font-bold">Package destination</div>
+	<Marker on:dragend={onDragEnd} bind:lngLat={dstLocation} draggable>
+		<div class="pin active"></div>
+		<Popup open offset={[-5, -10]}>
+			<div class="text-sm font-bold">To</div>
 		</Popup>
-	</DefaultMarker>
+	</Marker>
 {/if}

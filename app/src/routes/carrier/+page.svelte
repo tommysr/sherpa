@@ -15,23 +15,19 @@
 	{@const acceptedCount = account.tasksCount}
 
 	<Marker lngLat={[location.longitude, location.latitude]}>
-		<div class="pin-carrier cursor-pointer bounce-a"></div>
+		<div class="pin-carrier bounce-a cursor-pointer"></div>
 
-		<Popup openOn="hover" offset={[-5, -10]}>
+		<Popup offset={[-5, -10]}>
 			<div class="flex flex-col px-2 justify-center items-center">
 				<div
 					class="bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent text-base font-bold"
 				>
 					{name}
 				</div>
-				<div
-					class="mt-2 bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent text-sm"
-				>
+				<div class="mt-2 text-neutral-600 text-sm">
 					offers: {offersCount}
 				</div>
-				<div
-					class="bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent text-sm"
-				>
+				<div class="text-neutral-600 text-sm">
 					accepted: {acceptedCount}
 				</div>
 			</div>

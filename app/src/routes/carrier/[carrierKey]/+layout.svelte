@@ -23,10 +23,10 @@
 
 	const routes = [
 		{
-			name: 'incoming'
+			name: 'Incoming'
 		},
 		{
-			name: 'accepted'
+			name: 'Accepted'
 		}
 	];
 
@@ -91,7 +91,6 @@
 	$: absolutePath = `/carrier/${key}`;
 	$: url = $page.url.pathname;
 	$: carrierPage = url.split('/').at(-1);
-
 </script>
 
 <LayoutListWrapper bind:isMobileOpen>
@@ -107,12 +106,12 @@
 		<div class="h-full flex w-full flex-col items-center">
 			<div class="inline-flex shadow-sm bg-white rounded-lg m-4 flex-none">
 				{#each routes as { name }, i}
-					<a href={`${absolutePath}/${name}`}>
+					<a href={`${absolutePath}/${name.toLowerCase()}`}>
 						<button
 							aria-current="page"
 							class={clsx(
 								'px-4 py-2 text-md font-semibold',
-								carrierPage == name
+								carrierPage == name.toLowerCase()
 									? 'bg-gradient-to-r from-primary to-secondary text-white'
 									: 'bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent',
 								i == 0 && 'rounded-l-lg',

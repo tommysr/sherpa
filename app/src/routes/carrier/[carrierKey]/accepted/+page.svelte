@@ -1,9 +1,8 @@
 <script lang="ts">
-	import ShipmentInformationModal from '$src/components/Modals/ShipmentInformationModal.svelte';
-	import ShipmentLocations from '$src/components/ShipmentMap/ShipmentsLocations.svelte';
-	import { acceptedShipmentOffers, type AcceptedShipment } from '$src/stores/acceptedOffers';
 	import AcceptedOfferListElement from '$src/components/AcceptedOffer/AcceptedOfferListElement.svelte';
+	import ShipmentInformationModal from '$src/components/Modals/ShipmentInformationModal.svelte';
 	import ShipmentsLocations from '$src/components/ShipmentMap/ShipmentsLocations.svelte';
+	import { acceptedShipmentOffers, type AcceptedShipment } from '$src/stores/acceptedOffers';
 	import type { ApiShipmentAccount } from '$src/utils/account/shipment';
 
 	let showShipmentDetailsModal = false;
@@ -12,10 +11,9 @@
 
 	$: shipments = $acceptedShipmentOffers.map((offerWithShipment) => offerWithShipment.shipment);
 
-
 	function onElementSelect(offer: AcceptedShipment) {
 		selectedAcceptedOffer = offer;
-		selectedShipment= offer.shipment
+		selectedShipment = offer.shipment;
 	}
 
 	function onShowClicked(offer: AcceptedShipment) {
@@ -58,6 +56,5 @@
 		bind:showModal={showShipmentDetailsModal}
 	/>
 {/if}
-
 
 <ShipmentsLocations {shipments} bind:selectedShipment />

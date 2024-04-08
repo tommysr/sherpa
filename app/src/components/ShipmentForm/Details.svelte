@@ -5,7 +5,7 @@
 <div class="flex flex-col px-4 space-y-7">
 	<div class="flex justify-left items-center space-x-4">
 		<label for="count">Count:</label>
-		<NumberInput name="count" class="w-32" />
+		<NumberInput name="count" class="w-32 h-9" />
 	</div>
 
 	<div class="flex justify-left items-center space-x-4">
