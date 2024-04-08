@@ -67,7 +67,7 @@ export interface Shipment<ChannelPublicKey, ChannelMessage, Name, Date, BigNumbe
 }
 
 export type FetchedShipment = Shipment<Public, Message, AccountName, BN, BN, PublicKey>;
-export type ParsedShipment = Shipment<Uint8Array, string, string, string, number, string>;
+export type ParsedShipment = Shipment<number[], string, string, string, number, string>;
 
 export type ShipmentAccount = ProgramAccount<FetchedShipment>;
 export type ApiShipmentAccount = ApiProgramAccount<ParsedShipment>;

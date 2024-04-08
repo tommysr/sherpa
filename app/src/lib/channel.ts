@@ -4,6 +4,7 @@ import type { Program } from '@coral-xyz/anchor';
 import { TransactionInstruction, type PublicKey } from '@solana/web3.js';
 import {  createDiffieHellman } from 'diffie-hellman';
 import { AES } from 'crypto-ts';
+import { zoomTransition } from 'svelte-maplibre';
 
 const getSharedKeyFromAccount = async (
 	program: Program<Protocol>,
@@ -31,7 +32,9 @@ export const getSendMessageIx = async (
 	otherPublic: Buffer,
 	message: string
 ): Promise<TransactionInstruction> => {
-	const dh = createDiffieHellman(privateKey);
+	const dh = createDiffieHellman(DF_MODULUS);
+	dh.setPrivateKey(privateKey)
+	dh.generateKeys()
 
 	const secret = dh.computeSecret(otherPublic);
 	const shared = Uint8Array.from(dh.getPublicKey());

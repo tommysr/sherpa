@@ -39,8 +39,8 @@ export function parseShipmentToApiShipment(
 		price: shipmentAcc.price.toNumber(),
 		name: decodeName(shipmentAcc.name),
 		channel: {
-			carrier: Uint8Array.from(shipmentAcc.channel.carrier.value),
-			shipper:  Uint8Array.from(shipmentAcc.channel.shipper.value),
+			carrier: shipmentAcc.channel.carrier.value,
+			shipper:  shipmentAcc.channel.shipper.value,
 			data: decodeName(shipmentAcc.channel.data)
 		},
 		shipment: parseShipmentDataToApiShipmentData(shipmentAcc.shipment)

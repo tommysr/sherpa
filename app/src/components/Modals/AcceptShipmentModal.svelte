@@ -47,8 +47,7 @@
 		const sharedKey = dh.getPublicKey();
 
 		return { privateKey, sharedKey };
-	}
-	
+	}	
 	const handleAcceptOfferClick = async (message: string) => {
 		const { program } = get(anchorStore);
 		const wallet = get(walletStore);
@@ -74,11 +73,14 @@
 			offer.meta.account.no
 		);
 
+
+		console.log(offer.shipment.account.channel.shipper)
+		console.log(offer.shipment.account.channel.carrier)
 		const ix = await prepareSendMessageIx(
 			program,
 			$walletStore.publicKey!,
 			new PublicKey(offer.shipment.publicKey),
-			Buffer.from(offer.shipment.account.channel.shipper),
+			Buffer.from(Uint8Array.from(offer.shipment.account.channel.shipper)),
 			message
 		);
 

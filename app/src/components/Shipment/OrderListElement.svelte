@@ -41,11 +41,14 @@
 
 	let message = 'will be visible after accepting';
 
+
+
 	$: if (isViewerShipper && shipmentData.status == 4) {
 		const privateKey = getDecryptionKey(shipmentAccount.publicKey);
 		if (privateKey) {
 			const dh = createDiffieHellman(privateKey);
-			const secret = dh.computeSecret(shipmentAccount.account.channel.carrier);
+	
+			const secret = dh.computeSecret(Buffer.from(Uint8Array.from(shipmentAccount.account.channel.carrier)));
 			message = decodeDecrypted(
 				AES.decrypt(shipmentAccount.account.channel.data, secret.toString('hex')).words
 			);
