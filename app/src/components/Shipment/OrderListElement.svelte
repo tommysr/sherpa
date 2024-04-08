@@ -29,9 +29,8 @@
 		try {
 			const privateKey = getLocalStorage(localStorageKey);
 
-			if (privateKey && typeof privateKey == 'string') {
-				console.log(privateKey);
-				return privateKey as string;
+			if (privateKey) {
+				return privateKey as Buffer;
 			} else {
 				return null;
 			}
@@ -44,9 +43,15 @@
 
 	$: if (isViewerShipper && shipmentData.status == 4) {
 		const privateKey = getDecryptionKey(shipmentAccount.publicKey);
-		const dh = createDiffieHellman(privateKey, 'base64');
-		const secret = dh.computeSecret(shipmentAccount.account.channel.carrier, 'hex');
-		message = decodeDecrypted(AES.decrypt(shipmentAccount.account.channel.data, secret).words);
+		if (privateKey) {
+			const dh = createDiffieHellman(privateKey);
+			const secret = dh.computeSecret(shipmentAccount.account.channel.carrier);
+			message = decodeDecrypted(
+				AES.decrypt(shipmentAccount.account.channel.data, secret.toString('hex')).words
+			);
+		} else {
+			message = 'private key not found';
+		}
 	}
 
 	function getStatusString(status: number) {
