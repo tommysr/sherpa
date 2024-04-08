@@ -176,9 +176,11 @@
 				>Show</button
 			>
 
-			<button class="text-sm xl:text-md text-accent font-medium" on:click={acceptCallback}
-				>Confirm</button
-			>
+			{#if shipmentAccount.account.status == 4}
+				<button class="text-sm xl:text-md text-accent font-medium" on:click={acceptCallback}
+					>Confirm</button
+				>
+			{/if}
 		</div>
 	</div>
 </li>
