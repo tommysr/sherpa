@@ -2,6 +2,7 @@ export enum FormStage {
 	Name = 'name',
 	ShipmentName = 'shipmentName',
 	Price = 'price',
+	Collateral = 'collateral',
 	Dates = 'dates',
 	Dimensions = 'dimensions',
 	Details = 'details',
@@ -16,6 +17,8 @@ export function nextStage(f: FormStage): FormStage {
 		case FormStage.ShipmentName:
 			return FormStage.Price;
 		case FormStage.Price:
+			return FormStage.Collateral;
+		case FormStage.Collateral:
 			return FormStage.Dates;
 		case FormStage.Dates:
 			return FormStage.Dimensions;

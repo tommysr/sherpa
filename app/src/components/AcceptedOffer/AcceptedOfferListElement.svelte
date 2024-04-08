@@ -1,8 +1,10 @@
 <script lang="ts">
 	import type { ApiAcceptedShipmentOfferAccount } from '$src/utils/account/acceptedOffer';
+	import clsx from 'clsx';
 	import { createEventDispatcher } from 'svelte';
 
 	export let acceptedOfferMeta: ApiAcceptedShipmentOfferAccount;
+	export let selectedAccount: string | undefined = undefined;
 
 	const dispatch = createEventDispatcher();
 
@@ -15,7 +17,10 @@
 
 <!-- svelte-ignore a11y-click-events-have-key-events -->
 <!-- svelte-ignore a11y-no-noninteractive-element-interactions -->
-<div on:click class="rounded-lg bg-orange-50 border border-orange-200">
+<li on:click 	class={clsx(
+	'rounded-lg shadow cursor-pointer w-full',
+	selectedAccount === acceptedOfferMeta.publicKey ? 'bg-secondary-100' : 'bg-white'
+)}>
 	<div class="px-4 py-5 sm:px-6">
 		<div class="flex items-center justify-between">
 			<h3 class="sm:text-md xl:text-lg leading-6 font-medium text-gray-900">Forwarder name</h3>
@@ -39,4 +44,4 @@
 			>
 		</div>
 	</div>
-</div>
+</li>

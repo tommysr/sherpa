@@ -1,7 +1,10 @@
 import BN from 'bn.js'
 import { schoolAirportRoute } from './routes'
+import { ONE_SOL } from '../../tests/utils'
 
 export const crateFromSchoolToAirport = {
+  collateral: ONE_SOL,
+  penalty: ONE_SOL.divn(5),
   geography: schoolAirportRoute,
   dimensions: {
     weight: 1500 * 1000, // 1.5t

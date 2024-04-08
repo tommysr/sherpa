@@ -11,6 +11,11 @@ export interface PriceFormInterface {
 	price?: number;
 }
 
+export interface CollateralFormInterface {
+	collateral?: number;
+	penalty?: number;
+}
+
 export interface DimensionsFormInterface {
 	isMetricTon: boolean;
 	weight?: number;
@@ -42,6 +47,7 @@ export interface CreateShipmentFormInterface {
 	name: NameFormInterface;
 	shipmentName: NameFormInterface;
 	price: PriceFormInterface;
+	collateral: CollateralFormInterface;
 	dates: DatesFormInterface;
 	dimensions: DimensionsFormInterface;
 	details: DetailsFormInterface;

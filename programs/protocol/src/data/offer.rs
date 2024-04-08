@@ -4,7 +4,6 @@ use anchor_lang::prelude::*;
 #[derive(Debug, Default, PartialEq, Eq)]
 pub struct OfferDetails {
     pub payment: u64,
-    pub collateral: u64,
     pub deadline: u64,
 }
 

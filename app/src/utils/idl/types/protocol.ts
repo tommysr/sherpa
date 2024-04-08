@@ -217,11 +217,6 @@ export type Protocol = {
           "isSigner": true
         },
         {
-          "name": "shipmentOwner",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
           "name": "systemProgram",
           "isMut": false,
           "isSigner": false
@@ -318,11 +313,6 @@ export type Protocol = {
           "isSigner": true
         },
         {
-          "name": "offerOwner",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
           "name": "systemProgram",
           "isMut": false,
           "isSigner": false
@@ -387,10 +377,66 @@ export type Protocol = {
         {
           "name": "message",
           "type": {
-            "defined": "Name"
+            "defined": "Message"
           }
         }
       ]
+    },
+    {
+      "name": "confirmDelivery",
+      "accounts": [
+        {
+          "name": "task",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "shipment",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "shipper",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "signer",
+          "isMut": false,
+          "isSigner": true
+        },
+        {
+          "name": "payer",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "shipperOwner",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "forwarderOwner",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "carrierOwner",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "state",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": []
     }
   ],
   "accounts": [
@@ -703,8 +749,8 @@ export type Protocol = {
             "name": "value",
             "type": {
               "array": [
-                "u64",
-                4
+                "u8",
+                256
               ]
             }
           }
@@ -731,7 +777,7 @@ export type Protocol = {
           {
             "name": "data",
             "type": {
-              "defined": "Name"
+              "defined": "Message"
             }
           }
         ]
@@ -746,8 +792,25 @@ export type Protocol = {
             "name": "value",
             "type": {
               "array": [
-                "u32",
-                16
+                "u8",
+                64
+              ]
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "Message",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "value",
+            "type": {
+              "array": [
+                "u8",
+                256
               ]
             }
           }
@@ -761,10 +824,6 @@ export type Protocol = {
         "fields": [
           {
             "name": "payment",
-            "type": "u64"
-          },
-          {
-            "name": "collateral",
             "type": "u64"
           },
           {
@@ -885,6 +944,14 @@ export type Protocol = {
         "kind": "struct",
         "fields": [
           {
+            "name": "collateral",
+            "type": "u64"
+          },
+          {
+            "name": "penalty",
+            "type": "u64"
+          },
+          {
             "name": "geography",
             "type": {
               "defined": "Geography"
@@ -1001,6 +1068,63 @@ export type Protocol = {
         {
           "name": "shipment",
           "type": "publicKey",
+          "index": false
+        }
+      ]
+    },
+    {
+      "name": "MessageSent",
+      "fields": [
+        {
+          "name": "from",
+          "type": "publicKey",
+          "index": false
+        },
+        {
+          "name": "to",
+          "type": "publicKey",
+          "index": false
+        },
+        {
+          "name": "about",
+          "type": "publicKey",
+          "index": false
+        },
+        {
+          "name": "message",
+          "type": {
+            "defined": "Message"
+          },
+          "index": false
+        }
+      ]
+    },
+    {
+      "name": "ShipmentStatusUpdated",
+      "fields": [
+        {
+          "name": "shipment",
+          "type": "publicKey",
+          "index": false
+        },
+        {
+          "name": "status",
+          "type": "u8",
+          "index": false
+        }
+      ]
+    },
+    {
+      "name": "ShipmentDelivered",
+      "fields": [
+        {
+          "name": "shipment",
+          "type": "publicKey",
+          "index": false
+        },
+        {
+          "name": "status",
+          "type": "u8",
           "index": false
         }
       ]
@@ -1279,11 +1403,6 @@ export const IDL: Protocol = {
           "isSigner": true
         },
         {
-          "name": "shipmentOwner",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
           "name": "systemProgram",
           "isMut": false,
           "isSigner": false
@@ -1380,11 +1499,6 @@ export const IDL: Protocol = {
           "isSigner": true
         },
         {
-          "name": "offerOwner",
-          "isMut": true,
-          "isSigner": false
-        },
-        {
           "name": "systemProgram",
           "isMut": false,
           "isSigner": false
@@ -1449,10 +1563,66 @@ export const IDL: Protocol = {
         {
           "name": "message",
           "type": {
-            "defined": "Name"
+            "defined": "Message"
           }
         }
       ]
+    },
+    {
+      "name": "confirmDelivery",
+      "accounts": [
+        {
+          "name": "task",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "shipment",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "shipper",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "signer",
+          "isMut": false,
+          "isSigner": true
+        },
+        {
+          "name": "payer",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "shipperOwner",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "forwarderOwner",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "carrierOwner",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "state",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": []
     }
   ],
   "accounts": [
@@ -1765,8 +1935,8 @@ export const IDL: Protocol = {
             "name": "value",
             "type": {
               "array": [
-                "u64",
-                4
+                "u8",
+                256
               ]
             }
           }
@@ -1793,7 +1963,7 @@ export const IDL: Protocol = {
           {
             "name": "data",
             "type": {
-              "defined": "Name"
+              "defined": "Message"
             }
           }
         ]
@@ -1808,8 +1978,25 @@ export const IDL: Protocol = {
             "name": "value",
             "type": {
               "array": [
-                "u32",
-                16
+                "u8",
+                64
+              ]
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "Message",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "value",
+            "type": {
+              "array": [
+                "u8",
+                256
               ]
             }
           }
@@ -1823,10 +2010,6 @@ export const IDL: Protocol = {
         "fields": [
           {
             "name": "payment",
-            "type": "u64"
-          },
-          {
-            "name": "collateral",
             "type": "u64"
           },
           {
@@ -1947,6 +2130,14 @@ export const IDL: Protocol = {
         "kind": "struct",
         "fields": [
           {
+            "name": "collateral",
+            "type": "u64"
+          },
+          {
+            "name": "penalty",
+            "type": "u64"
+          },
+          {
             "name": "geography",
             "type": {
               "defined": "Geography"
@@ -2063,6 +2254,63 @@ export const IDL: Protocol = {
         {
           "name": "shipment",
           "type": "publicKey",
+          "index": false
+        }
+      ]
+    },
+    {
+      "name": "MessageSent",
+      "fields": [
+        {
+          "name": "from",
+          "type": "publicKey",
+          "index": false
+        },
+        {
+          "name": "to",
+          "type": "publicKey",
+          "index": false
+        },
+        {
+          "name": "about",
+          "type": "publicKey",
+          "index": false
+        },
+        {
+          "name": "message",
+          "type": {
+            "defined": "Message"
+          },
+          "index": false
+        }
+      ]
+    },
+    {
+      "name": "ShipmentStatusUpdated",
+      "fields": [
+        {
+          "name": "shipment",
+          "type": "publicKey",
+          "index": false
+        },
+        {
+          "name": "status",
+          "type": "u8",
+          "index": false
+        }
+      ]
+    },
+    {
+      "name": "ShipmentDelivered",
+      "fields": [
+        {
+          "name": "shipment",
+          "type": "publicKey",
+          "index": false
+        },
+        {
+          "name": "status",
+          "type": "u8",
           "index": false
         }
       ]

@@ -1,12 +1,11 @@
-import { encodeName, getShipmentAddress, getShipperAddress } from '$sdk/sdk';
+import { encodeString, getShipmentAddress, getShipperAddress } from '$sdk/sdk';
 import type { ShipmentData } from '$src/utils/account/shipment';
 import type { Protocol } from '$src/utils/idl/types/protocol';
 import type { Program } from '@coral-xyz/anchor';
 import { Transaction, type PublicKey, type TransactionInstruction } from '@solana/web3.js';
 import { BN } from 'bn.js';
-import { deprecate } from 'util';
 
-export type CreateShipmentParams = ShipmentData<Date, string> & {
+export type CreateShipmentParams = ShipmentData<number, Date, string> & {
 	price: number; // in SOL currently
 	name: string; // max 64 characters, but idk where to enforce it
 };
@@ -27,11 +26,11 @@ export const getRegisterShipperIx = async (
 	name: string
 ): Promise<TransactionInstruction> => {
 	const registerShipperIx = await program.methods
-		.registerShipper(encodeName(name))
+		.registerShipper(encodeString(name))
 		.accounts({
 			shipper,
 			signer,
-			payer: signer,
+			payer: signer
 		})
 		.instruction();
 
@@ -44,7 +43,6 @@ export const getCreateShipmentTx = async (
 	shipmentParams: CreateShipmentParams,
 	shipperName: string
 ): Promise<Transaction> => {
-
 	const tx = new Transaction();
 
 	const { account: shipperAccount, accountKey: shipper } = await fetchShipperAccount(
@@ -57,18 +55,17 @@ export const getCreateShipmentTx = async (
 		tx.add(ix);
 	}
 
-
 	const shipment = getShipmentAddress(program, signer, shipperAccount ? shipperAccount.count : 0);
 
-	const { deadline, when, price, name, details, dimensions, geography } = shipmentParams;
-
-
-	console.log(shipmentParams, deadline.valueOf(), when.valueOf())
+	const { deadline, when, price, name, details, dimensions, geography, collateral, penalty } =
+		shipmentParams;
 
 	const ix = await program.methods
-		.createShipment(new BN(price * 10 ** 9), encodeName(name), {
-			deadline: new BN(Math.floor(deadline.valueOf() / 1000)),
+		.createShipment(new BN(price * 10 ** 9), encodeString(name), {
+			deadline: new BN(deadline.valueOf() / 1000),
 			details,
+			collateral: new BN(collateral),
+			penalty: new BN(penalty),
 			dimensions: {
 				depth: dimensions.depth * 1000,
 				height: dimensions.height * 1000,
@@ -77,16 +74,16 @@ export const getCreateShipmentTx = async (
 			},
 			geography: {
 				...geography,
-				fromName: encodeName(geography.fromName),
-				toName: encodeName(geography.toName)
+				fromName: encodeString(geography.fromName),
+				toName: encodeString(geography.toName)
 			},
-			when: new BN(Math.floor(when.valueOf() / 1000)),
+			when: new BN(Math.floor(when.valueOf() / 1000))
 		})
 		.accounts({
 			shipper,
 			shipment,
 			signer,
-			payer: signer,
+			payer: signer
 		})
 		.instruction();
 

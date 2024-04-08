@@ -11,7 +11,7 @@ export type IAnchorStore = {
 };
 
 // TODO: make it dynamic
-export const PROGRAM_ID = new PublicKey('SynkXxnhyVSK66ewC6i7onyf2sn5VKxiYc8a7tWmZRp');
+export const PROGRAM_ID = new PublicKey('D6na56Wd31BXMmMUziNTsScQUnUVe6QVmxrpDJG7azpT');
 
 // TODO: change it to helius
 const unconnectedConnection = new Connection('https://api.devnet.solana.com');

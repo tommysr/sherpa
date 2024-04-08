@@ -1,6 +1,7 @@
 import { defaultLocation } from '$src/stores/locationsPick';
 import * as yup from 'yup';
 import type {
+	CollateralFormInterface,
 	DatesFormInterface,
 	DetailsFormInterface,
 	DimensionsFormInterface,
@@ -126,4 +127,18 @@ export const priceFormSchema: yup.ObjectSchema<PriceFormInterface> = yup.object(
 		.transform((value) => (isNaN(value) ? 0 : value))
 		.required('Price is required')
 		.test('is-zero', 'Price must be greater than 0', (val) => val > 0)
+});
+
+export const collateralFormSchema: yup.ObjectSchema<CollateralFormInterface> = yup.object({
+	collateral: yup
+		.number()
+		.transform((value) => (isNaN(value) ? 0 : value))
+		.required('Collateral is required')
+		.test('is-zero', 'Collateral must be non negative', (val) => val >= 0),
+
+	penalty: yup
+		.number()
+		.transform((value) => (isNaN(value) ? 0 : value))
+		.required('Penalty is required')
+		.test('is-zero', 'Penalty must be non negative', (val) => val >= 0)
 });

@@ -1,4 +1,4 @@
-import { encodeName, getCarrierAddress } from '$src/sdk/sdk';
+import { encodeString, getCarrierAddress } from '$src/sdk/sdk';
 import type { Availability } from '$src/utils/account/carrier';
 import type { AccountName } from '$src/utils/account/common';
 import type { Protocol } from '$src/utils/idl/types/protocol';
@@ -26,11 +26,11 @@ export const getRegisterCarrierIx = async (
 	const availabilityAnchor: Availability<BN, AccountName> = {
 		location: availability.location,
 		time: new BN(availability.time.valueOf()),
-		locationName: encodeName(availability.locationName)
+		locationName: encodeString(availability.locationName)
 	};
 
 	const registerCarrierIx = await program.methods
-		.registerCarrier(encodeName(name), availabilityAnchor)
+		.registerCarrier(encodeString(name), availabilityAnchor)
 		.accounts({
 			carrier,
 			signer,

@@ -13,6 +13,7 @@
   "dependencies": {
     "@coral-xyz/anchor": "^0.29.0",
     "@types/node": "^20.12.2",
+    "crypto-ts": "^1.0.2",
     "real-random-address": "^1.1.0"
   },
   "devDependencies": {
