@@ -20,6 +20,8 @@
 	$: carriers = data.carriers;
 	$: isWalletConnected = $walletStore.publicKey != null;
 
+	$: shipments = myAcceptedShipments.map((offerWithShipment) => offerWithShipment.shipment);
+
 	// not disappear until accepted
 	$: myAcceptedShipments = isWalletConnected
 		? $acceptedShipmentOffers.filter(
@@ -27,7 +29,13 @@
 			)
 		: [];
 
-	function onShowClicked(shipment: AcceptedShipment) {
+	function onElementSelect(accepted: AcceptedShipment) {
+		selectedOffer = accepted;
+		selectedShipment = accepted.shipment;
+	}
+
+	function onShowClicked(accepted: AcceptedShipment) {
+		onElementSelect(accepted);
 		showShipmentDetailsModal = true;
 	}
 </script>
@@ -37,6 +45,7 @@
 		<ul class="w-full flex-1 space-y-4">
 			{#each myAcceptedShipments as accepted, i (accepted.meta.publicKey)}
 				<ForwarderAcceptedListElement
+					on:click={() => onElementSelect(accepted)}
 					offerAccount={accepted}
 					on:buttonClick={() => onShowClicked(accepted)}
 					selectedShipment={selectedShipment?.publicKey}
@@ -60,3 +69,5 @@
 		bind:showModal={showShipmentDetailsModal}
 	/>
 {/if}
+
+<ShipmentsLocations {shipments} bind:selectedShipment />

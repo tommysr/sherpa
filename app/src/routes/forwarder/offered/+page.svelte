@@ -15,9 +15,16 @@
 
 	export let data: PageData;
 
+
+
 	let selectedShipment: ApiShipmentAccount | undefined = undefined;
 	let selectedOffer: OfferedShipment | undefined = undefined;
 	let showShipmentDetailsModal = false;
+
+
+
+	$: shipments = myOfferedShipments.map((offerWithShipment) => offerWithShipment.shipment);
+
 
 	$: carriers = data.carriers;
 	$: isWalletConnected = $walletStore.publicKey != null;
@@ -31,9 +38,13 @@
 			)
 		: [];
 
+	function onElementSelect(offer: OfferedShipment) {
+		selectedOffer = offer;
+		selectedShipment = offer.shipment;
+	}
 
 	function onShowClicked(offer: OfferedShipment) {
-    selectedOffer = offer;
+		onElementSelect(offer);
 		showShipmentDetailsModal = true;
 	}
 </script>
@@ -44,8 +55,9 @@
 			{#each myOfferedShipments as offer, i (offer.meta.publicKey)}
 				<ForwarderOfferListElement
 					offerAccount={offer}
+					on:click={() => onElementSelect(offer)}
 					on:buttonClick={() => onShowClicked(offer)}
-          selectedShipment={selectedShipment?.publicKey}
+					selectedShipment={selectedShipment?.publicKey}
 				/>
 			{/each}
 		</ul>
@@ -60,10 +72,11 @@
 	</div>
 {/if}
 
-
 {#if selectedOffer}
 	<ShipmentInformationModal
 		shipmentAccount={selectedOffer.shipment}
 		bind:showModal={showShipmentDetailsModal}
 	/>
 {/if}
+
+<ShipmentsLocations {shipments} bind:selectedShipment />
