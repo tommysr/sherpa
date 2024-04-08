@@ -56,6 +56,6 @@ export const getShipmentSummary = (shipmentData: ParsedShipment) => {
 	} as CreateShipmentFormInterface;
 };
 
-const shortPublicKey = (publicKey: string) => {
+export const shortPublicKey = (publicKey: string) => {
 	return `${publicKey.slice(0, 4)}...${publicKey.slice(-4)}`;
 };

@@ -66,7 +66,6 @@ export const getAcceptShipmentOfferTx = async (
 			offer,
 			task,
 			signer,
-			offerOwner: forwarderAuthority,
 			payer: signer
 		})
 		.instruction();
