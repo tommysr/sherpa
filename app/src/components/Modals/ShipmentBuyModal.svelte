@@ -96,7 +96,7 @@
 	{#if !$userStore.forwarder.registered}
 		<hr class="my-6" />
 		<div class="px-4 text-neutral-600">
-			<p class="px-3 text-center">
+			<p class="px-3 text-center text-sm">
 				You are not registered as a forwarder. Please enter your name to be registered as a
 				forwarder.
 			</p>
