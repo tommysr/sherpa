@@ -102,10 +102,10 @@
 			</p>
 
 			<input
-				class="w-full p-4 rounded-xl border border-primary-200 mt-2"
+				class="mt-4 w-full bg-transparent px-3 py-2 text-sm placeholder-primary placeholder:italic placeholder:text-slate-400 lg:px-4 lg:py-2 lg:text-base rounded-lg border-2 border-gradient-to-r from-primary to-secondary"
 				type="text"
 				bind:value={$userStore.forwarder.name}
-				placeholder="enter forwarder name to be registered"
+				placeholder="Enter forwarder name to be registered"
 			/>
 		</div>
 	{/if}

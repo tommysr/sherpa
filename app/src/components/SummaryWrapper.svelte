@@ -60,7 +60,7 @@
 	const { shipper } = get(userStore);
 </script>
 
-<div class="w-full flex flex-col text-xs xl:text-base space-y-3 xl:space-y-5 text-neutral-600">
+<div class="w-full flex flex-col text-xs xl:text-sm space-y-3 xl:space-y-5 text-neutral-600">
 	<div class="grid grid-cols-3 justify-items-center gap-y-4">
 		<div
 			class="col-span-3 grid grid-cols-3 opacity-80 items-center justify-items-center w-full text-white py-2 rounded-lg bg-gradient-to-r from-primary to-secondary"
@@ -127,8 +127,8 @@
 			<div class="col-span-3">Locations</div>
 		</div>
 
-		<div class="col-span-3 flex items-center space-x-5">
-			<p>{shipment.locations.sourceName}</p>
+		<div class="col-span-3 flex items-center space-x-2 px-1">
+			<p class="text-center">{shipment.locations.sourceName}</p>
 			<svg
 				xmlns="http://www.w3.org/2000/svg"
 				width="16"
@@ -142,12 +142,12 @@
 					d="M1 8a.5.5 0 0 1 .5-.5h11.793l-3.147-3.146a.5.5 0 0 1 .708-.708l4 4a.5.5 0 0 1 0 .708l-4 4a.5.5 0 0 1-.708-.708L13.293 8.5H1.5A.5.5 0 0 1 1 8"
 				/>
 			</svg>
-			<p>{shipment.locations.destinationName}</p>
+			<p class="text-center">{shipment.locations.destinationName}</p>
 		</div>
 	</div>
 
-	<div class="grid grid-cols-2 justify-items-center gap-y-4">
-		{#if shipment.dimensions.isMetricTon}
+	{#if shipment.dimensions.isMetricTon}
+		<div class="grid grid-cols-2 justify-items-center gap-y-4">
 			<div
 				class="col-span-2 grid grid-cols-2 opacity-80 items-center justify-items-center w-full text-white py-2 rounded-lg bg-gradient-to-r from-primary to-secondary"
 			>
@@ -163,7 +163,9 @@
 				{shipment.dimensions.volume}
 				{shipment.dimensions.distanceMetrics}<sup>3</sup>
 			</div>
-		{:else}
+		</div>
+	{:else}
+		<div class="grid grid-cols-3 justify-items-center gap-y-4">
 			<div
 				class="col-span-3 grid grid-cols-3 opacity-80 items-center justify-items-center w-full text-white py-2 rounded-lg bg-gradient-to-r from-primary to-secondary"
 			>
@@ -171,7 +173,7 @@
 				<div class="col-span-2">Depth x Height x Width</div>
 			</div>
 
-			<div>
+			<div class="self-center">
 				{shipment.dimensions.weight}
 				{shipment.dimensions.weightMetrics}
 			</div>
@@ -179,8 +181,8 @@
 				{shipment.dimensions.width} x {shipment.dimensions.height} x {shipment.dimensions.depth}
 				{shipment.dimensions.distanceMetrics}
 			</div>
-		{/if}
-	</div>
+		</div>
+	{/if}
 
 	<div class="grid grid-cols-2 justify-items-center gap-y-4">
 		<div
