@@ -13,10 +13,12 @@
 	import { createNotification } from '$components/Notification/notificationsStore';
 	import ShipmentsLocations from '$src/components/ShipmentMap/ShipmentsLocations.svelte';
 	import type { ApiShipmentAccount } from '$src/utils/account/shipment';
+	import AcceptShipmentModal from '$src/components/Modals/AcceptShipmentModal.svelte';
 
 	let isMobileOpen = false;
 	let selectedOffer: OfferedShipment | undefined = undefined;
 	let showShipmentDetailsModal = false;
+	let showAcceptOfferModal = false;
 
 	$: shipments = $shipmentOffers.map((offerWithShipment) => offerWithShipment.shipment);
 
@@ -33,45 +35,6 @@
 
 		showShipmentDetailsModal = true;
 	}
-
-	const acceptShipmentOffer = async () => {
-		const { program } = get(anchorStore);
-		const wallet = get(walletStore);
-		const { connection } = get(web3Store);
-
-		if (!$walletStore.publicKey) {
-			walletStore.openModal();
-
-			createNotification({
-				text: 'Wallet not connected',
-				type: 'failed',
-				removeAfter: 5000
-			});
-
-			return;
-		}
-
-		const tx = await getAcceptShipmentOfferTx(
-			program,
-			$walletStore.publicKey,
-			new PublicKey(selectedOffer!.meta.account.offeror),
-			new PublicKey(selectedOffer!.shipment.publicKey),
-			selectedOffer!.meta.account.no
-		);
-
-		try {
-			const sig = await useSignAndSendTransaction(connection, wallet, tx);
-
-			createNotification({
-				text: 'Transaction send',
-				type: 'success',
-				removeAfter: 5000,
-				signature: sig
-			});
-		} catch (err) {
-			createNotification({ text: 'Transaction send', type: 'failed', removeAfter: 5000 });
-		}
-	};
 </script>
 
 <svelte:head><title>Incoming offers</title></svelte:head>
@@ -84,10 +47,11 @@
 					offerAccount={offer.meta}
 					on:click={() => onElementSelect(offer)}
 					on:acceptClick={async () => {
-					onElementSelect(offer)
-						await acceptShipmentOffer();
+						onElementSelect(offer);
+						showAcceptOfferModal = true;
 					}}
 					on:buttonClick={() => onShowClicked(offer)}
+					selectedAccount={selectedOffer?.meta.publicKey}
 				/>
 			{/each}
 		</ul>
@@ -108,6 +72,8 @@
 		shipmentAccount={selectedOffer.shipment}
 		bind:showModal={showShipmentDetailsModal}
 	/>
+
+	<AcceptShipmentModal offer={selectedOffer} bind:showModal={showAcceptOfferModal} />
 {/if}
 
 <ShipmentsLocations {shipments} selectedShipment={selectedOffer?.shipment} />

@@ -134,7 +134,6 @@
 	}
 
 	function generateKeys() {
-		console.log(DF_BASE, DF_MODULUS)
 		let dh = createDiffieHellman(DF_MODULUS, DF_BASE.toString());
 		dh.generateKeys();
 		const privateKey = dh.getPrivateKey('base64');

@@ -143,7 +143,7 @@
 
 				const shipper = event.shipper;
 
-				if (shipper.toString() === $userStore.shipper.key) {
+				if (shipper.toString() === $walletStore.publicKey?.toString()) {
 					const id = $awaitedConfirmation;
 					if (id) {
 						removeNotification(id);
@@ -175,7 +175,7 @@
 
 				const buyer = event.buyer;
 
-				if (buyer.toString() === $userStore.forwarder.key) {
+				if (buyer.toString() === $walletStore.publicKey?.toString()) {
 					const id = $awaitedConfirmation;
 					if (id) {
 						removeNotification(id);

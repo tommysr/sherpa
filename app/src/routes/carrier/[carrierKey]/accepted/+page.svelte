@@ -38,6 +38,7 @@
 					on:click={() => onElementSelect(offer)}
 					on:buttonClick={() => onElementSelect(offer)}
 					on:shipmentShow={() => onShowClicked(offer)}
+					selectedAccount={offer.meta.publicKey}
 				/>
 			{/each}
 		</ul>

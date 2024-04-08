@@ -1,7 +1,12 @@
 <script lang="ts">
 	import type { ApiShipmentAccount } from '$src/utils/account/shipment';
+	import { getLocalStorage } from '$src/utils/wallet/localStorage';
 	import clsx from 'clsx';
 	import { createEventDispatcher } from 'svelte';
+	import { createDiffieHellman } from 'diffie-hellman';
+	import { AES } from 'crypto-ts';
+	import { walletStore } from '$src/stores/wallet';
+	import { decodeDecrypted, decodeName } from '$src/sdk/sdk';
 
 	export let shipmentAccount: ApiShipmentAccount;
 	export let selectedAccount: string | undefined = undefined;
@@ -17,6 +22,32 @@
 	$: priorityColor = getPriorityColor(priority);
 	$: statusNumber = shipmentData.status;
 	$: status = getStatusString(statusNumber);
+	$: isViewerShipper =
+		$walletStore.publicKey && $walletStore.publicKey.toString() === shipmentData.shipper;
+
+	function getDecryptionKey(localStorageKey: string) {
+		try {
+			const privateKey = getLocalStorage(localStorageKey);
+
+			if (privateKey && typeof privateKey == 'string') {
+				console.log(privateKey);
+				return privateKey as string;
+			} else {
+				return null;
+			}
+		} catch (err) {
+			return null;
+		}
+	}
+
+	let message = 'will be visible after accepting';
+
+	$: if (isViewerShipper && shipmentData.status == 4) {
+		const privateKey = getDecryptionKey(shipmentAccount.publicKey);
+		const dh = createDiffieHellman(privateKey, 'base64');
+		const secret = dh.computeSecret(shipmentAccount.account.channel.carrier, 'hex');
+		message = decodeDecrypted(AES.decrypt(shipmentAccount.account.channel.data, secret).words);
+	}
 
 	function getStatusString(status: number) {
 		switch (status) {
@@ -89,6 +120,10 @@
 				<br />
 				&#x2022; Status:
 				<span class={clsx('font-semibold')}>{status}</span>
+				&#x2022; Message:
+				{#if isViewerShipper}
+					<span class={clsx('font-semibold')}>{message}</span>
+				{/if}
 			</p>
 
 			<button class="text-sm xl:text-md text-accent font-medium" on:click={handleShowClick}
