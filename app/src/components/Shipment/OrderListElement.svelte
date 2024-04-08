@@ -81,7 +81,9 @@
 >
 	<div class="px-4 py-5 sm:px-6">
 		<div class="flex items-center justify-between">
-			<h3 class="sm:text-md xl:text-lg leading-6 font-medium text-gray-900">{shipmentData.name}</h3>
+			<h3 class="text-base xl:text-lg leading-6 font-medium text-gray-900">
+				{shipmentData.name}
+			</h3>
 			<p
 				class="mt-1 text-base bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent font-bold"
 			>
@@ -89,7 +91,7 @@
 			</p>
 		</div>
 		<div class="mt-3 xl:mt-5 flex items-center justify-between">
-			<p class="text-xs xl:sm font-medium text-gray-500 mr-6 xl:mr-12">
+			<p class="text-xs font-medium text-gray-500 mr-6 xl:mr-12">
 				&#x2022; Starting location: <span class="font-semibold">{locations.fromName}</span>
 				<br />
 				&#x2022; Destination: <span class="font-semibold">{locations.toName}</span>

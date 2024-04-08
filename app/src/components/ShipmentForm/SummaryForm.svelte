@@ -5,45 +5,6 @@
 	import SummaryWrapper from '../SummaryWrapper.svelte';
 	import type { CreateShipmentFormInterface } from './interfaces';
 
-	let fragilityMap = {
-		1: 'Very fragile',
-		2: 'Fragile',
-		3: 'Normal',
-		4: 'Robust',
-		5: 'Very robust'
-	};
-
-	let priorityMap = {
-		1: {
-			name: 'Very low',
-			color: 'text-green-500'
-		},
-		2: {
-			name: 'Low',
-			color: 'text-green-300'
-		},
-		3: {
-			name: 'Medium',
-			color: 'text-orange-400'
-		},
-		4: {
-			name: 'High',
-			color: 'text-red-500'
-		},
-		5: {
-			name: 'Very high',
-			color: 'text-red-800'
-		}
-	};
-
-	let accessMap = {
-		1: 'Only car',
-		2: 'Truck up to 10t',
-		3: 'Truck over 10t',
-		4: 'Something else',
-		5: "Can't tell"
-	};
-
 	export let onSubmit;
 	export let onBack;
 	export let showModal = true;
@@ -53,8 +14,6 @@
 		extend: [reporter],
 		onSubmit
 	});
-
-	$: console.log(initialValues);
 </script>
 
 <div class="text-sm text-neutral-600">

@@ -15,9 +15,9 @@
 	{@const acceptedCount = account.tasksCount}
 
 	<Marker lngLat={[location.longitude, location.latitude]}>
-		<div class="pin-carrier bounce-a"></div>
+		<div class="pin-carrier bounce-a cursor-pointer"></div>
 
-		<Popup openOn="hover" offset={[-5, -10]}>
+		<Popup offset={[-5, -10]}>
 			<div class="flex flex-col px-2 justify-center items-center">
 				<div
 					class="bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent text-base font-bold"

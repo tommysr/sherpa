@@ -248,8 +248,7 @@
 <Modal
 	{showModal}
 	on:backdropClick={() => goto('/shipmentsMap')}
-	showCloseButton={false}
-	closeHandler={() => history.back()}
+	closeHandler={() => goto('/shipmentsMap')}
 >
 	<svelte:component
 		this={forms[form].component}

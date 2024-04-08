@@ -60,7 +60,7 @@
 	const { shipper } = get(userStore);
 </script>
 
-<div class="w-full flex flex-col space-y-5 text-neutral-600">
+<div class="w-full flex flex-col text-xs xl:text-base space-y-3 xl:space-y-5 text-neutral-600">
 	<div class="grid grid-cols-3 justify-items-center gap-y-4">
 		<div
 			class="col-span-3 grid grid-cols-3 opacity-80 items-center justify-items-center w-full text-white py-2 rounded-lg bg-gradient-to-r from-primary to-secondary"

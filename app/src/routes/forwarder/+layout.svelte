@@ -25,11 +25,13 @@
 
 <LayoutListWrapper bind:isMobileOpen>
 	{#if !isWalletConnected}
-		<p
-			class="mt-1 text-center text-xl bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent w-2/3"
-		>
-			Connect your wallet to view shipments
-		</p>
+		<div class="w-full flex justify-center items-center">
+			<p
+				class="text-center text-xl bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent w-2/3"
+			>
+				Connect your wallet to view shipments
+			</p>
+		</div>
 	{:else}
 		<div class="h-full flex w-full flex-col items-center">
 			<div class="inline-flex shadow-sm bg-white rounded-lg m-4 flex-none">
