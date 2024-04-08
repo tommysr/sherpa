@@ -6,7 +6,7 @@
 	import { createDiffieHellman } from 'diffie-hellman';
 	import { AES } from 'crypto-ts';
 	import { walletStore } from '$src/stores/wallet';
-	import { decodeDecrypted, decodeName } from '$src/sdk/sdk';
+	import { DF_MODULUS, decodeDecrypted, decodeName } from '$src/sdk/sdk';
 
 	export let shipmentAccount: ApiShipmentAccount;
 	export let selectedAccount: string | undefined = undefined;
@@ -46,7 +46,9 @@
 	$: if (isViewerShipper && shipmentData.status == 4) {
 		const privateKey = getDecryptionKey(shipmentAccount.publicKey);
 		if (privateKey) {
-			const dh = createDiffieHellman(privateKey);
+			const dh = createDiffieHellman(DF_MODULUS);
+			dh.setPrivateKey(privateKey)
+			dh.generateKeys();
 	
 			const secret = dh.computeSecret(Buffer.from(Uint8Array.from(shipmentAccount.account.channel.carrier)));
 			message = decodeDecrypted(
