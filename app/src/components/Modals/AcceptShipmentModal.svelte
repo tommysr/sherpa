@@ -35,11 +35,11 @@
 	) {
 		const { privateKey, sharedKey } = generateKeys();
 
-		setLocalStorage(shipment.toString(), privateKey);
+		setLocalStorage<string>(`carrier${shipment.toString()}` , privateKey.toString('hex'));
 
 		return await getSendMessageIx(program, shipment, signer, privateKey, shipperSharedKey, message);
 	}
-
+	
 	function generateKeys() {
 		let dh = createDiffieHellman(DF_MODULUS);
 		dh.generateKeys();

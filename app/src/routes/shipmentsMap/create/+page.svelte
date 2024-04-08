@@ -152,7 +152,7 @@
 
 		const { privateKey, sharedKey } = generateKeys();
 
-		setLocalStorage(shipment.toString(), privateKey);
+		setLocalStorage<string>(`shipper${shipment.toString()}`, privateKey.toString('hex'));
 
 		return await getOpenChannelIx(program, shipment, signer, sharedKey);
 	}
