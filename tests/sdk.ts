@@ -123,55 +123,31 @@ export const getAcceptedOfferAddress = (program, carrier: PublicKey, index: numb
   return offerAddress
 }
 
-export const encodeName = (utf8Name: string) => {
+export const encodeString = (utf8Name: string, length: 64 | 256 = 64) => {
   const encoded = utils.bytes.utf8.encode(utf8Name)
 
-  if (encoded.length > 64) {
+  if (encoded.length > length) {
     throw new Error('name too long')
   }
 
-  const value: number[] = []
-  for (let i = 0; i < encoded.length; i++) {
-    switch (i % 4) {
-      case 0:
-        value.push(encoded[i])
-        break
-      case 1:
-        value[value.length - 1] |= encoded[i] << 8
-        break
-      case 2:
-        value[value.length - 1] |= encoded[i] << 16
-        break
-      case 3:
-        value[value.length - 1] |= encoded[i] << 24
-        break
-    }
-  }
-
-  while (value.length < 64) {
-    value.push(0)
-  }
+  const value = Array(length)
+    .fill(0)
+    .map((_, i) => encoded[i] ?? 0)
 
   return {
     value
   }
 }
 
-export const decodeName = (encoded: { value: number[] }): string => {
-  let result: number[] = []
+export const decodeName = ({ value }: { value: number[] }): string => {
+  let result = utils.bytes.utf8.decode(Uint8Array.from(value))
+  const nuller = utils.bytes.utf8.decode(Uint8Array.from([0]))
 
-  for (let i of encoded.value) {
-    result.push(i % 256)
-    result.push((i >> 8) % 256)
-    result.push((i >> 16) % 256)
-    result.push((i >> 24) % 256)
+  while (result[result.length - 1] == nuller[0]) {
+    result = result.slice(0, -1)
   }
 
-  while (result[result.length - 1] === 0) {
-    result.pop()
-  }
-
-  return utils.bytes.utf8.decode(Buffer.from(result))
+  return result
 }
 
 type BNN = InstanceType<typeof BN>

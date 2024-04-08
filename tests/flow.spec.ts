@@ -12,7 +12,7 @@ import {
   decodeKey,
   decodeName,
   encodeKey,
-  encodeName,
+  encodeString,
   getAcceptedOfferAddress,
   getBoughtShipmentAddress,
   getCarrierAddress,
@@ -71,7 +71,7 @@ describe('protocol', () => {
 
   it('register shipper', async () => {
     await program.methods
-      .registerShipper(encodeName('Alice'))
+      .registerShipper(encodeString('Alice'))
       .accounts({
         shipper: shipperAddress,
         signer: shipper.publicKey
@@ -97,12 +97,12 @@ describe('protocol', () => {
           latitude: 0,
           longitude: 0
         },
-        fromName: encodeName('Krakow, main square'),
+        fromName: encodeString('Kraków, main square'),
         to: {
           latitude: 0,
           longitude: 0
         },
-        toName: encodeName('Warsaw, main square')
+        toName: encodeString('Warsaw, main square')
       },
       dimensions: {
         weight: 0,
@@ -127,7 +127,7 @@ describe('protocol', () => {
     })
 
     await program.methods
-      .createShipment(shipmentPrice, encodeName('Just a pair of socks'), shipmentData)
+      .createShipment(shipmentPrice, encodeString('Just a pair of socks'), shipmentData)
       .accounts({
         shipment: shipmentAddress,
         shipper: shipperAddress,
@@ -151,7 +151,7 @@ describe('protocol', () => {
     expect(shipmentAccount.shipment.penalty.eq(shipmentData.penalty)).true
     expect(shipmentAccount.shipment.geography.from).to.deep.equal(shipmentData.geography.from)
     expect(shipmentAccount.shipment.geography.to).to.deep.equal(shipmentData.geography.to)
-    expect(decodeName(shipmentAccount.shipment.geography.fromName)).eq('Krakow, main square')
+    expect(decodeName(shipmentAccount.shipment.geography.fromName)).eq('Kraków, main square')
     expect(decodeName(shipmentAccount.shipment.geography.toName)).eq('Warsaw, main square')
 
     expect(shipmentAccount.shipment.details).to.deep.equal(shipmentData.details)
@@ -176,12 +176,12 @@ describe('protocol', () => {
           latitude: 1,
           longitude: 1
         },
-        fromName: encodeName('Kielce'),
+        fromName: encodeString('Kielce'),
         to: {
           latitude: 1,
           longitude: 1
         },
-        toName: encodeName('Mielno')
+        toName: encodeString('Mielno')
       },
       dimensions: {
         weight: 1,
@@ -206,7 +206,7 @@ describe('protocol', () => {
     })
 
     await program.methods
-      .createShipment(shipmentPrice, encodeName('Some pretty rocks'), shipmentData)
+      .createShipment(shipmentPrice, encodeString('Some pretty rocks'), shipmentData)
       .accounts({
         shipment: shipmentAddress,
         shipper: shipperAddress,
@@ -245,7 +245,7 @@ describe('protocol', () => {
 
   it('register forwarder', async () => {
     await program.methods
-      .registerForwarder(encodeName('Bob'))
+      .registerForwarder(encodeString('Bob'))
       .accounts({
         forwarder: forwarderAddress,
         signer: forwarder.publicKey,
@@ -317,11 +317,11 @@ describe('protocol', () => {
         latitude: 43,
         longitude: 44
       },
-      locationName: encodeName('Krakow')
+      locationName: encodeString('Krakow')
     }
 
     await program.methods
-      .registerCarrier(encodeName('Carol'), availability)
+      .registerCarrier(encodeString('Carol'), availability)
       .accounts({
         carrier: carrierAddress,
         signer: carrier.publicKey,
@@ -475,7 +475,7 @@ describe('protocol', () => {
       .map((_, i) => shared[i] ?? 0)
 
     await program.methods
-      .sendMessage({ value }, encodeName(encrypted))
+      .sendMessage({ value }, encodeString(encrypted, 256))
       .accounts({
         shipment: shipmentAddress,
         signer: carrier.publicKey

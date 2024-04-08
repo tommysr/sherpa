@@ -61,7 +61,7 @@ pub mod protocol {
         actions::channel::open_channel::handler(ctx, key)
     }
 
-    pub fn send_message(ctx: Context<SendMessage>, key: Public, message: Name) -> Result<()> {
+    pub fn send_message(ctx: Context<SendMessage>, key: Public, message: Message) -> Result<()> {
         actions::channel::send_message::handler(ctx, key, message)
     }
 

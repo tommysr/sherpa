@@ -1,6 +1,6 @@
 use anchor_lang::prelude::*;
 
-use crate::Name;
+use crate::Message;
 
 #[event]
 pub struct ShipmentTransferred {
@@ -37,7 +37,7 @@ pub struct MessageSent {
     pub from: Pubkey,
     pub to: Pubkey,
     pub about: Pubkey,
-    pub message: Name,
+    pub message: Message,
 }
 
 #[event]

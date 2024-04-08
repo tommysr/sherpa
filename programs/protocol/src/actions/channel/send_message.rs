@@ -1,6 +1,6 @@
 use anchor_lang::prelude::*;
 
-use crate::{Error, MessageSent, Name, Public, Shipment};
+use crate::{Error, Message, MessageSent, Public, Shipment};
 
 #[derive(Accounts)]
 pub struct SendMessage<'info> {
@@ -13,7 +13,7 @@ pub struct SendMessage<'info> {
     pub payer: Signer<'info>,
 }
 
-pub fn handler(ctx: Context<SendMessage>, key: Public, message: Name) -> Result<()> {
+pub fn handler(ctx: Context<SendMessage>, key: Public, message: Message) -> Result<()> {
     let shipment = &mut ctx.accounts.shipment.load_mut()?;
     let signer = ctx.accounts.signer.key;
 

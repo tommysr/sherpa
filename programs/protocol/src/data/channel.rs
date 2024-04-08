@@ -4,7 +4,7 @@ use anchor_lang::prelude::{
 };
 use uint::construct_uint;
 
-use crate::Name;
+use crate::Message;
 
 construct_uint! {
     pub struct Key(4); // 4 * 64bit = 256 bit
@@ -21,7 +21,7 @@ pub struct Public {
 pub struct Channel {
     pub shipper: Public,
     pub carrier: Public,
-    pub data: Name,
+    pub data: Message,
 }
 
 impl Default for Public {
