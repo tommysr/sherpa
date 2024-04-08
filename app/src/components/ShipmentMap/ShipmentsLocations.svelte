@@ -1,8 +1,8 @@
 <script lang="ts">
-	import type { ApiShipmentAccount, Geography } from '$src/utils/account/shipment';
+	import type { ApiShipmentAccount } from '$src/utils/account/shipment';
 	import clsx from 'clsx';
 	import { LngLatBounds } from 'maplibre-gl';
-	import { createEventDispatcher, getContext } from 'svelte';
+	import { getContext } from 'svelte';
 	import { GeoJSON as GeoJson, LineLayer, Marker } from 'svelte-maplibre';
 	import type { MapContext } from 'svelte-maplibre/context.svelte';
 
@@ -40,7 +40,7 @@
 		map = $store;
 	}
 
-	const onMarkerClick = (shipment: ApiShipmentAccount)  => {
+	const onMarkerClick = (shipment: ApiShipmentAccount) => {
 		selectedShipment = shipment;
 	};
 
@@ -65,7 +65,6 @@
 	{@const location = shipment.account.shipment.geography}
 	{@const selectedKey = selectedShipment?.publicKey}
 	{@const currentKey = shipment.publicKey}
-
 
 	<Marker
 		on:click={() => onMarkerClick(shipment)}

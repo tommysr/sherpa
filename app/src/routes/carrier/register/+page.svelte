@@ -181,7 +181,7 @@
 
 <Modal
 	{showModal}
-	closeHandler={() => history.back()}
+	closeHandler={() => goto('/carrier')}
 	on:backdropClick={() => goto('/carrier')}
 	showCloseButton={true}
 >
