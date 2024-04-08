@@ -146,22 +146,40 @@
 		</div>
 	</div>
 
-	<div class="grid grid-cols-3 justify-items-center gap-y-4">
-		<div
-			class="col-span-3 grid grid-cols-3 opacity-80 items-center justify-items-center w-full text-white py-2 rounded-lg bg-gradient-to-r from-primary to-secondary"
-		>
-			<div>Weight</div>
-			<div class="col-span-2">Depth x Height x Width</div>
-		</div>
+	<div class="grid grid-cols-2 justify-items-center gap-y-4">
+		{#if shipment.dimensions.isMetricTon}
+			<div
+				class="col-span-2 grid grid-cols-2 opacity-80 items-center justify-items-center w-full text-white py-2 rounded-lg bg-gradient-to-r from-primary to-secondary"
+			>
+				<div>Weight</div>
+				<div>Volume</div>
+			</div>
 
-		<div>
-			{shipment.dimensions.weight}
-			{shipment.dimensions.weightMetrics}
-		</div>
-		<div class="col-span-2">
-			{shipment.dimensions.width} x {shipment.dimensions.height} x {shipment.dimensions.depth}
-			{shipment.dimensions.distanceMetrics}
-		</div>
+			<div>
+				{shipment.dimensions.weight}
+				{shipment.dimensions.weightMetrics}
+			</div>
+			<div>
+				{shipment.dimensions.volume}
+				{shipment.dimensions.distanceMetrics}<sup>3</sup>
+			</div>
+		{:else}
+			<div
+				class="col-span-3 grid grid-cols-3 opacity-80 items-center justify-items-center w-full text-white py-2 rounded-lg bg-gradient-to-r from-primary to-secondary"
+			>
+				<div>Weight</div>
+				<div class="col-span-2">Depth x Height x Width</div>
+			</div>
+
+			<div>
+				{shipment.dimensions.weight}
+				{shipment.dimensions.weightMetrics}
+			</div>
+			<div class="col-span-2">
+				{shipment.dimensions.width} x {shipment.dimensions.height} x {shipment.dimensions.depth}
+				{shipment.dimensions.distanceMetrics}
+			</div>
+		{/if}
 	</div>
 
 	<div class="grid grid-cols-2 justify-items-center gap-y-4">

@@ -27,9 +27,9 @@ export const getShipmentSummary = (shipmentData: ParsedShipment) => {
 		},
 		dimensions: {
 			distanceMetrics: 'm',
-			isMetricTon: false,
+			isMetricTon: shipmentData.shipment.dimensions.height == 0 ? true : false,
 			weightMetrics: 'kg',
-			volume: undefined,
+			volume: shipmentData.shipment.dimensions.width,
 
 			depth: shipmentData.shipment.dimensions.depth,
 			height: shipmentData.shipment.dimensions.height,
