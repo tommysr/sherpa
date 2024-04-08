@@ -1,18 +1,19 @@
 <script lang="ts">
-	import { get } from 'svelte/store';
-	import Modal from './Modal.svelte';
-	import { PublicKey } from '@solana/web3.js';
+	import { getMakeOfferTx } from '$lib/forwarder';
 	import { anchorStore } from '$src/stores/anchor';
+	import { awaitedConfirmation } from '$src/stores/confirmationAwait';
 	import { walletStore } from '$src/stores/wallet';
 	import { web3Store } from '$src/stores/web3';
-	import { useSignAndSendTransaction } from '$src/utils/wallet/singAndSendTx';
-	import { getMakeOfferTx } from '$lib/forwarder';
 	import type { ApiCarrierAccount } from '$src/utils/account/carrier';
-	import { BN } from 'bn.js';
-	import { forwardedShipments, type ForwardedShipment } from '$src/stores/forwarderShipments';
-	import { createNotification, removeNotification } from '../Notification/notificationsStore';
-	import { awaitedConfirmation } from '$src/stores/confirmationAwait';
 	import type { ApiShipmentAccount } from '$src/utils/account/shipment';
+	import { useSignAndSendTransaction } from '$src/utils/wallet/singAndSendTx';
+	import { PublicKey } from '@solana/web3.js';
+	import { BN } from 'bn.js';
+	import { get } from 'svelte/store';
+	import Button from '../Buttons/Button.svelte';
+	import DecimalInput from '../Inputs/DecimalInput.svelte';
+	import { createNotification, removeNotification } from '../Notification/notificationsStore';
+	import Modal from './Modal.svelte';
 
 	export let showModal: boolean;
 	export let carrierAccount: ApiCarrierAccount;
@@ -69,8 +70,12 @@
 			createNotification({ text: 'Tx send', type: 'success', removeAfter: 5000, signature });
 			removeNotification(id);
 
-			const confirmation = createNotification({ text: 'waiting for confirmation', type: 'loading', removeAfter: 30000});
-			awaitedConfirmation.set(confirmation)
+			const confirmation = createNotification({
+				text: 'waiting for confirmation',
+				type: 'loading',
+				removeAfter: 30000
+			});
+			awaitedConfirmation.set(confirmation);
 		} catch (err) {
 			createNotification({ text: 'Signing', type: 'failed', removeAfter: 5000 });
 			removeNotification(id);
@@ -78,35 +83,33 @@
 	}
 </script>
 
-<Modal bind:showModal>
-	<div class="w-full flex flex-col space-y-7">
-		<div class="my-10 flex justify-center">
-			<h2
-				class="bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent font-bold text-3xl"
-			>
-				{carrierAccount.account.name}
-			</h2>
-		</div>
+<Modal bind:showModal on:backdropClick={() => (showModal = false)}>
+	<div class="text-neutral-600">
+		<h2
+			class="font-bold text-xl bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent"
+		>
+			{carrierAccount.account.name}
+		</h2>
+		<p class="text-neutral-600 text-sm max-w-sm mt-2">Make offer for carrier.</p>
 
-		<span>
-			<input
-				class="w-full p-4 rounded-xl border border-primary-200 mt-4"
+		<div class="px-6 space-y-4 mt-8">
+			<DecimalInput
+				name="price"
 				type="number"
 				bind:value={price}
-				placeholder="enter amount you want to offer"
+				placeholder="Enter amount you want to offer"
 			/>
-		</span>
-		<span>
-			<input
-				class="w-full p-4 rounded-xl border border-primary-200 mt-4"
+
+			<DecimalInput
+				name="time"
 				type="number"
 				bind:value={time}
-				placeholder="time in minutes after offer will be invalid"
+				placeholder="Time in minutes after offer will be invalid"
 			/>
-		</span>
-
-		<div class="text-center pt-20">
-			<button on:click={handleMakeOfferClick}>Make offer</button>
 		</div>
-	</div></Modal
->
+
+		<div class="flex justify-center space-x-5 mt-8">
+			<Button class="uppercase tracking-widest" on:click={handleMakeOfferClick}>Make offer</Button>
+		</div>
+	</div>
+</Modal>
