@@ -122,7 +122,7 @@ describe('protocol', () => {
     }
 
     const subscriptionId = program.addEventListener('ShipmentCreated', event => {
-      expect(event.shipper.equals(shipperAddress)).true
+      expect(event.shipper.equals(shipper.publicKey)).true
       expect(event.shipment.equals(shipmentAddress)).true
     })
 
@@ -201,7 +201,7 @@ describe('protocol', () => {
     }
 
     const subscriptionId = program.addEventListener('ShipmentCreated', event => {
-      expect(event.shipper.equals(shipperAddress)).true
+      expect(event.shipper.equals(shipper.publicKey)).true
       expect(event.shipment.equals(shipmentAddress)).true
     })
 
@@ -268,8 +268,8 @@ describe('protocol', () => {
     const balanceBefore = await connection.getBalance(forwarder.publicKey)
 
     const subscriptionId = program.addEventListener('ShipmentTransferred', event => {
-      expect(event.seller.equals(shipperAddress)).true
-      expect(event.buyer.equals(forwarderAddress)).true
+      expect(event.seller.equals(shipper.publicKey)).true
+      expect(event.buyer.equals(forwarder.publicKey)).true
       expect(event.shipment.equals(shipmentAddress)).true
       expect(event.forwarded.equals(forwardedShipmentAddress)).true
     })

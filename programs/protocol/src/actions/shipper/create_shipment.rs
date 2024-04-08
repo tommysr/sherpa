@@ -42,7 +42,7 @@ pub fn handler(ctx: Context<CreateShipment>, price: u64, name: Name, shipment: S
         shipper.count += 1;
 
         emit!(ShipmentCreated { 
-            shipper: ctx.accounts.shipper.key(), 
+            shipper: account.shipper, 
             shipment: ctx.accounts.shipment.key()
         });
     }

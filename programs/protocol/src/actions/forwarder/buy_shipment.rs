@@ -64,8 +64,8 @@ pub fn handler(ctx: Context<BuyShipment>) -> Result<()> {
         forwarder.count += 1;
 
         emit!(ShipmentTransferred {
-            seller: ctx.accounts.shipper.key(),
-            buyer: ctx.accounts.forwarder.key(),
+            seller: shipment.shipper,
+            buyer: shipment.forwarder,
             shipment: ctx.accounts.shipment.key(),
             forwarded: ctx.accounts.bought.key(),
         });
