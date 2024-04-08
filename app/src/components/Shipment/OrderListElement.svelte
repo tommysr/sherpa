@@ -11,6 +11,7 @@
 	export let shipmentAccount: ApiShipmentAccount;
 	export let selectedAccount: string | undefined = undefined;
 	export let showStatus = false;
+	export let acceptCallback: () => void = () => {};
 
 	let viewMessage = false;
 	const dispatch = createEventDispatcher();
@@ -173,6 +174,10 @@
 
 			<button class="text-sm xl:text-md text-accent font-medium mx-4" on:click={handleShowClick}
 				>Show</button
+			>
+
+			<button class="text-sm xl:text-md text-accent font-medium" on:click={acceptCallback}
+				>Confirm</button
 			>
 		</div>
 	</div>

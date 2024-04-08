@@ -4,7 +4,8 @@ import {
 	getCarrierAddress,
 	getForwarderAddress,
 	getOfferAddress,
-	getShipperAddress
+	getShipperAddress,
+	getStateAddress
 } from '$sdk/sdk';
 import type { Protocol } from '$src/utils/idl/types/protocol';
 import type { BN, Program } from '@coral-xyz/anchor';
@@ -30,7 +31,7 @@ export const getRegisterForwarderIx = async (
 		.accounts({
 			forwarder,
 			signer,
-			payer: signer,
+			payer: signer
 		})
 		.instruction();
 
@@ -106,7 +107,7 @@ export const getMakeOfferTx = async (
 			forwarder,
 			carrier,
 			signer,
-			payer: signer,
+			payer: signer
 		})
 		.instruction();
 
