@@ -5,7 +5,7 @@
 	import Modal from '$src/components/Modals/Modal.svelte';
 	import {
 		createNotification,
-		removeNotification
+		updateNotification
 	} from '$src/components/Notification/notificationsStore';
 	import DatesForm from '$src/components/ShipmentForm/DatesForm.svelte';
 	import DetailsForm from '$src/components/ShipmentForm/DetailsForm.svelte';
@@ -26,47 +26,6 @@
 	import { userStore } from '$stores/user';
 	import { useSignAndSendTransaction } from '$utils/wallet/singAndSendTx';
 	import { get } from 'svelte/store';
-
-	const forms = {
-		name: {
-			component: NameForm,
-			props: {
-				header: 'Shipper name',
-				text: "You're not registered as a shipper, enter desired shipper name."
-			}
-		},
-		shipmentName: {
-			component: NameForm,
-			props: { header: 'Shipment Name', text: 'Enter short name describing your shipment.' }
-		},
-		price: {
-			component: PriceForm,
-			props: {}
-		},
-		dates: {
-			component: DatesForm,
-			props: {}
-		},
-		dimensions: {
-			component: DimensionsForm,
-			props: {}
-		},
-		details: {
-			component: DetailsForm,
-			props: {}
-		},
-		locations: {
-			component: LocationsForm,
-			props: {}
-		},
-
-		summary: {
-			component: SummaryForm,
-			props: {}
-		}
-	};
-
-	let startForm = $userStore.shipper.registered ? FormStage.ShipmentName : FormStage.Name;
 
 	let states: CreateShipmentFormInterface = {
 		name: {
@@ -105,6 +64,48 @@
 			sourceName: 'default'
 		}
 	};
+
+	const forms = {
+		name: {
+			component: NameForm,
+			props: {
+				header: 'Shipper name',
+				text: "You're not registered as a shipper, enter desired shipper name."
+			}
+		},
+		shipmentName: {
+			component: NameForm,
+			props: { header: 'Shipment Name', text: 'Enter short name describing your shipment.' }
+		},
+		price: {
+			component: PriceForm,
+			props: {}
+		},
+		dates: {
+			component: DatesForm,
+			props: {}
+		},
+		dimensions: {
+			component: DimensionsForm,
+			props: {}
+		},
+		details: {
+			component: DetailsForm,
+			props: {}
+		},
+		locations: {
+			component: LocationsForm,
+			props: {}
+		},
+
+		summary: {
+			component: SummaryForm,
+			props: { states: states }
+		}
+	};
+
+	let startForm = $userStore.shipper.registered ? FormStage.ShipmentName : FormStage.Name;
+
 	let showModal = true;
 
 	$: form = $page.state.form ?? startForm;
@@ -162,7 +163,7 @@
 			width = shitCheck(dimensions.volume);
 		}
 
-		const id = createNotification({ text: 'signing', type: 'loading', removeAfter: undefined });
+		const id = createNotification({ text: 'Signing', type: 'loading', removeAfter: undefined });
 
 		const tx = await getCreateShipmentTx(
 			program,
@@ -202,8 +203,12 @@
 		try {
 			const signature = await useSignAndSendTransaction(connection, wallet, tx);
 
-			createNotification({ text: 'Tx send', type: 'success', removeAfter: 5000, signature });
-			removeNotification(id);
+			updateNotification(id, {
+				text: 'Creating shipment',
+				type: 'success',
+				removeAfter: 5000,
+				signature
+			});
 
 			const confirmation = createNotification({
 				text: 'waiting for confirmation',
@@ -212,8 +217,7 @@
 			});
 			awaitedConfirmation.set(confirmation);
 		} catch (err) {
-			createNotification({ text: 'Signing', type: 'failed', removeAfter: 5000 });
-			removeNotification(id);
+			updateNotification(id, { text: 'Creating shipment', type: 'failed', removeAfter: 5000 });
 		}
 	}
 
@@ -226,6 +230,7 @@
 
 			if (form == FormStage.Locations) {
 				summarizeState();
+				console.log(states);
 			}
 			states = states;
 			pushState('', { form: nextStage(form), showModal: true, carrierForm: CarrierFormStage.Name });
