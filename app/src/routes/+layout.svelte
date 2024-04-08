@@ -143,12 +143,12 @@
 
 				const shipper = event.shipper;
 
-				if (shipper.toString() === $walletStore.publicKey?.toString()) {
+				if ($walletStore.publicKey && shipper.toString() === $walletStore.publicKey.toString()) {
 					const id = $awaitedConfirmation;
 					if (id) {
 						removeNotification(id);
 					}
-					createNotification({ text: 'shipment', type: 'success', removeAfter: 5000 });
+					createNotification({ text: 'Create', type: 'success', removeAfter: 5000 });
 				}
 
 				searchableShipments.extend({
@@ -161,21 +161,19 @@
 		const unsubscribeForwardedShipment = program.addEventListener(
 			'ShipmentTransferred',
 			async (event) => {
-				console.log(event.buyer.toString());
-
 				const forwardedShipmentPublicKey = event.forwarded;
 
 				const forwardedShipment: FetchedForwardedShipment =
 					await program.account.forwardedShipment.fetch(forwardedShipmentPublicKey);
 
-				const parsedShipment: ApiForwardedShipmentAccount = {
+				const parsedForwardedShipment: ApiForwardedShipmentAccount = {
 					publicKey: forwardedShipmentPublicKey.toString(),
 					account: parseForwardedShipmentToApiForwardedShipment(forwardedShipment)
 				};
 
 				const buyer = event.buyer;
 
-				if (buyer.toString() === $walletStore.publicKey?.toString()) {
+				if ($walletStore.publicKey && buyer.toString() === $walletStore.publicKey.toString()) {
 					const id = $awaitedConfirmation;
 					if (id) {
 						removeNotification(id);
@@ -184,20 +182,19 @@
 				}
 
 				forwardedShipmentsMeta.update((meta) => {
-					meta.push(parsedShipment);
+					meta.push(parsedForwardedShipment);
 					return meta;
 				});
 
-				// TODO: change in searchableOrders
+				searchableShipments.update(s => {
+					const shipmentIndex = s.data.findIndex(a => a.publicKey === event.shipment.toString())
 
-				// const { data } = get(searchableShipments);
-				// const shipmentToRemoveIndex = data.findIndex(
-				// 	(shipment) => shipment.publicKey === shipmentToRemove
-				// );
+					const shipmentToChange = s.data[shipmentIndex];
+					shipmentToChange.account.status = 2;
+					shipmentToChange.account.forwarder = event.buyer.toString();
 
-				// if (shipmentToRemoveIndex !== -1) {
-				// 	searchableShipments.shrink(shipmentToRemoveIndex);
-				// }
+					return s;
+				})
 			}
 		);
 

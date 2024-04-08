@@ -11,7 +11,6 @@
 	export let shipmentAccount: ApiShipmentAccount;
 	export let selectedAccount: string | undefined = undefined;
 
-
 	let viewMessage = false;
 	const dispatch = createEventDispatcher();
 	const handleShowClick = (e: MouseEvent) => {
@@ -27,12 +26,14 @@
 	$: isViewerShipper =
 		$walletStore.publicKey && $walletStore.publicKey.toString() === shipmentData.shipper;
 
+	$: messageNeeded = isViewerShipper && shipmentData.status >= 4;
+
 	function getDecryptionKey(localStorageKey: string) {
 		try {
 			const privateKey = getLocalStorage<string>(localStorageKey);
 
 			if (privateKey) {
-				return Buffer.from(privateKey, 'hex')
+				return Buffer.from(privateKey, 'hex');
 			} else {
 				return null;
 			}
@@ -43,18 +44,18 @@
 
 	let message = 'will be visible after accepting';
 
-
-
-	$: if (isViewerShipper && shipmentData.status == 4 && viewMessage) {
-		message = 'decrypting'
+	$: if (messageNeeded && viewMessage) {
+		message = 'decrypting';
 		const privateKey = getDecryptionKey(`shipper${shipmentAccount.publicKey}`);
 
 		if (privateKey) {
 			const dh = createDiffieHellman(DF_MODULUS);
-			dh.setPrivateKey(privateKey)
+			dh.setPrivateKey(privateKey);
 			dh.generateKeys();
-	
-			const secret = dh.computeSecret(Buffer.from(Uint8Array.from(shipmentAccount.account.channel.carrier)));
+
+			const secret = dh.computeSecret(
+				Buffer.from(Uint8Array.from(shipmentAccount.account.channel.carrier))
+			);
 
 			message = decodeDecrypted(
 				AES.decrypt(shipmentAccount.account.channel.data, secret.toString('hex')).words
@@ -135,11 +136,15 @@
 				<br />
 				&#x2022; Status:
 				<span class={clsx('font-semibold')}>{status}</span>
-
-				{#if isViewerShipper && !viewMessage}
-				<button on:click|once={() => viewMessage=true}>view message</button>
-				{:else if isViewerShipper && viewMessage}
-					<span class={clsx('font-semibold')}>{message}</span>
+				<br />
+				{#if messageNeeded}
+					{#if !viewMessage}
+						<button class="underline" on:click|once={() => (viewMessage = true)}
+							>view message</button
+						>
+					{:else}
+						<span class={clsx('font-semibold')}>{message}</span>
+					{/if}
 				{/if}
 			</p>
 
