@@ -22,8 +22,7 @@ import type {
 } from '@solana/web3.js';
 import { get, writable } from 'svelte/store';
 import { getLocalStorage, setLocalStorage } from '../utils/wallet/localStorage';
-// import { loadStrategies } from './strategyStore';
-// import { clearUserStore, createUserStore, loadUserStoreAccounts } from './userStore';
+
 
 interface Wallet {
 	adapter: Adapter;
@@ -348,6 +347,7 @@ function onConnect() {
 		connected: adapter.connected
 	});
 }
+
 
 function onDisconnect() {
 	walletStore.resetWallet();

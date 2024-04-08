@@ -1,8 +1,15 @@
-<script>
+<script lang="ts">
+	import { createEventDispatcher } from 'svelte';
+	const dispatch = createEventDispatcher();
+
 	export let showModal; // boolean
 	export let showCloseButton = true; // boolean
 
 	let dialog; // HTMLDialogElement
+
+	const onBackdropClick = () => {
+		dispatch('backdropClick');
+	};
 
 	export let closeHandler = () => {
 		showModal = false;
@@ -16,6 +23,7 @@
 <dialog
 	bind:this={dialog}
 	on:close={() => (showModal = false)}
+	on:click|self={() => onBackdropClick()}
 	class="z-index-30 rounded-3xl p-4 bg-white shadow-lg max-w-sm xl:max-w-md w-full overflow-visible"
 >
 	{#if showCloseButton}

@@ -25,8 +25,8 @@ export const detailsFormSchema: yup.ObjectSchema<DetailsFormInterface> = yup.obj
 	access: yup
 		.number()
 		.transform((value) => (isNaN(value) ? 0 : value))
-		.required('can not be empty')
-		.test('is-zero', 'you have to pick access', (val) => val > 0),
+		.required('Can not be empty')
+		.test('is-zero', 'You have to pick access', (val) => val > 0),
 	priority: yup.number().required(),
 	fragility: yup.number().required()
 });
@@ -37,16 +37,16 @@ export const dimensionsFormSchema: yup.ObjectSchema<DimensionsFormInterface> = y
 		.mixed<number>()
 		.test('number', 'Must be a number', (value) => !Number.isNaN(value))
 		.transform((value) => parseInt(value, 10))
-		.required('can not be empty')
-		.test('is-zero', 'weight must be greater than 0', (val) => val > 0),
+		.required('Can not be empty')
+		.test('is-zero', 'Weight must be greater than 0', (val) => val > 0),
 
 	volume: yup.mixed<number>().when('isMetricTon', ([isMetricTon], schema) => {
 		return isMetricTon
 			? schema
 					.test('number', 'Must be a number', (value) => !Number.isNaN(value))
 					.transform((value) => parseInt(value, 10))
-					.required('can not be empty')
-					.test('is-zero', 'volume must be greater than 0', (val) => val > 0)
+					.required('Can not be empty')
+					.test('is-zero', 'Volume must be greater than 0', (val) => val > 0)
 			: schema;
 	}),
 	width: yup.mixed<number>().when('isMetricTon', ([isMetricTon], schema) => {
@@ -54,8 +54,8 @@ export const dimensionsFormSchema: yup.ObjectSchema<DimensionsFormInterface> = y
 			? schema
 					.test('number', 'Must be a number', (value) => !Number.isNaN(value))
 					.transform((value) => parseInt(value, 10))
-					.required('can not be empty')
-					.test('is-zero', 'width must be greater than 0', (val) => val > 0)
+					.required('Can not be empty')
+					.test('is-zero', 'Width must be greater than 0', (val) => val > 0)
 			: schema;
 	}),
 	depth: yup.mixed<number>().when('isMetricTon', ([isMetricTon], schema) => {
@@ -64,8 +64,8 @@ export const dimensionsFormSchema: yup.ObjectSchema<DimensionsFormInterface> = y
 
 					.test('number', 'Must be a number', (value) => !Number.isNaN(value))
 					.transform((value) => parseInt(value, 10))
-					.required('can not be empty')
-					.test('is-zero', 'depth must be greater than 0', (val) => val > 0)
+					.required('Can not be empty')
+					.test('is-zero', 'Depth must be greater than 0', (val) => val > 0)
 			: schema;
 	}),
 	height: yup.mixed<number>().when('isMetricTon', ([isMetricTon], schema) => {
@@ -73,8 +73,8 @@ export const dimensionsFormSchema: yup.ObjectSchema<DimensionsFormInterface> = y
 			? schema
 					.test('number', 'Must be a number', (value) => !Number.isNaN(value))
 					.transform((value) => parseInt(value, 10))
-					.required('can not be empty')
-					.test('is-zero', 'height must be greater than 0', (val) => val > 0)
+					.required('Can not be empty')
+					.test('is-zero', 'Height must be greater than 0', (val) => val > 0)
 			: schema;
 	}),
 	distanceMetrics: yup.string<'ft' | 'm'>().required(),

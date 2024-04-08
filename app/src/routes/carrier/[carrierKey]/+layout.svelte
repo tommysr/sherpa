@@ -1,20 +1,21 @@
 <script lang="ts">
 	import { page } from '$app/stores';
-	import { get } from 'svelte/store';
+	import LayoutListWrapper from '$src/components/LayoutListWrapper.svelte';
+	import { acceptedShipmentsOffersMeta } from '$src/stores/acceptedOffers';
 	import { anchorStore } from '$src/stores/anchor';
 	import type { ApiShipmentOfferAccount, ShipmentOffer } from '$src/utils/account/offer';
 	import { parseOfferToApiOffer } from '$src/utils/parse/offer';
-	import { acceptedShipmentsOffersMeta } from '$src/stores/acceptedOffers';
+
 	import { shipmentsOffersMeta } from '$src/stores/offers';
+	import { walletStore } from '$src/stores/wallet';
 	import type {
 		AcceptedShipmentOffer,
 		ApiAcceptedShipmentOfferAccount
 	} from '$src/utils/account/acceptedOffer';
 	import { parseAcceptedOfferToApiAcceptedOffer } from '$src/utils/parse/acceptedOffer';
-	import { onMount } from 'svelte';
-	import { walletStore } from '$src/stores/wallet';
-	import LayoutListWrapper from '$src/components/LayoutListWrapper.svelte';
 	import clsx from 'clsx';
+	import { onMount } from 'svelte';
+	import { get } from 'svelte/store';
 	const { program } = get(anchorStore);
 
 	let isMobileOpen = false;
@@ -98,11 +99,13 @@
 
 <LayoutListWrapper bind:isMobileOpen>
 	{#if !isWalletConnected}
-		<p
-			class="mt-1 text-center text-xl bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent w-2/3"
-		>
-			Connect your wallet to view shipments
-		</p>
+		<div class="w-full flex justify-center items-center">
+			<p
+				class="text-center text-xl bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent w-2/3"
+			>
+				Connect your wallet to view shipments
+			</p>
+		</div>
 	{:else}
 		<div class="h-full flex w-full flex-col items-center">
 			<div class="inline-flex shadow-sm bg-white rounded-lg m-4 flex-none">
@@ -128,4 +131,3 @@
 		</div>
 	{/if}
 </LayoutListWrapper>
-

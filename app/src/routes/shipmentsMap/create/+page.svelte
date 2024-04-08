@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { pushState } from '$app/navigation';
+	import { goto, pushState } from '$app/navigation';
 	import { page } from '$app/stores';
 	import { CarrierFormStage } from '$src/components/CarrierForm/carrierFormStage';
 	import Modal from '$src/components/Modals/Modal.svelte';
@@ -240,7 +240,12 @@
 	}
 </script>
 
-<Modal {showModal} showCloseButton={false} closeHandler={() => history.back()}>
+<Modal
+	{showModal}
+	on:backdropClick={() => goto('/shipmentsMap')}
+	showCloseButton={false}
+	closeHandler={() => history.back()}
+>
 	<svelte:component
 		this={forms[form].component}
 		{onSubmit}

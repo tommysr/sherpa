@@ -46,12 +46,53 @@
 		removeNotification
 	} from '$src/components/Notification/notificationsStore';
 	import { awaitedConfirmation } from '$src/stores/confirmationAwait';
+	import { web3Store } from '$src/stores/web3';
 
 	let wallets: Adapter[];
+	let shouldAirdrop = true;
 	// it's a solana devnet cluster, but consider changing it to more performant provider
 	const network = clusterApiUrl('devnet');
 	const localStorageKey = 'walletAdapter';
 	const { program } = get(anchorStore);
+
+	const airDropSol = async () => {
+		const SOL_IN_LAMPORTS = 1000000000;
+		const { connection } = get(web3Store);
+		const { publicKey } = get(walletStore);
+
+		const signature = await connection.requestAirdrop(publicKey!, 2 * SOL_IN_LAMPORTS);
+
+		const latestBlockHash = await connection.getLatestBlockhash();
+
+		await connection.confirmTransaction({
+			blockhash: latestBlockHash.blockhash,
+			lastValidBlockHeight: latestBlockHash.lastValidBlockHeight,
+			signature
+		});
+
+		return signature;
+	};
+
+	$: if ($walletStore.publicKey) {
+		// Trigger airdrop logic whenever the wallet changes
+		shouldAirdrop = true;
+	}
+
+	$: if (shouldAirdrop && $walletStore.publicKey) {
+		shouldAirdrop = false;
+
+		airDropSol()
+			.then((signature) =>
+				createNotification({ text: 'airdrop', type: 'success', removeAfter: 5000, signature })
+			)
+			.catch(() => {
+				createNotification({ text: 'airdrop', type: 'failed', removeAfter: 3000 });
+				createNotification({ text: 'retrying', type: 'unknown', removeAfter: 5000 });
+				setTimeout(() => {
+					shouldAirdrop = true;
+				}, 5000);
+			});
+	}
 
 	// check if user is registered as forwarder, shipper or carrier
 	// this is done on wallet sign in/sign out, when user changes wallet
@@ -83,7 +124,6 @@
 		const unsubscribeShipmentCreated = program.addEventListener(
 			'ShipmentCreated',
 			async (event) => {
-
 				const shipmentPublicKey = event.shipment;
 
 				const shipment: FetchedShipment = await program.account.shipment.fetch(shipmentPublicKey);

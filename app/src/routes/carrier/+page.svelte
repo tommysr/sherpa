@@ -14,17 +14,27 @@
 	{@const offersCount = account.offersCount}
 	{@const acceptedCount = account.tasksCount}
 
-	<Marker
-		lngLat={[location.longitude, location.latitude]}
-		class="flex justify-center items-center text-center h-14 w-14 place-items-center rounded-full border border-yellow-200 bg-red-300 text-black shadow-2xl focus:outline-2 focus:outline-black"
-	>
-		<span>
-			{name}
-		</span>
+	<Marker lngLat={[location.longitude, location.latitude]}>
+		<div class="pin-carrier cursor-pointer bounce-a"></div>
 
-		<Popup openOn="hover" offset={[0, -10]}>
-			<div class="text-lg font-bold">offers: {offersCount}</div>
-			<div class="text-lg font-bold">accepted: {acceptedCount}</div>
+		<Popup openOn="hover" offset={[-5, -10]}>
+			<div class="flex flex-col px-2 justify-center items-center">
+				<div
+					class="bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent text-base font-bold"
+				>
+					{name}
+				</div>
+				<div
+					class="mt-2 bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent text-sm"
+				>
+					offers: {offersCount}
+				</div>
+				<div
+					class="bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent text-sm"
+				>
+					accepted: {acceptedCount}
+				</div>
+			</div>
 		</Popup></Marker
 	>
 {/each}
