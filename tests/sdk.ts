@@ -187,24 +187,6 @@ export const decodeKey = (encoded: { value: BNN[] }) => {
   return result
 }
 
-export const encrypt = (plain: string, key: BNN) => {
-  const encoded = encodeName(plain)
-  let multiplier = new BN(1)
-
-  const r = new BN(0)
-
-  while (encoded.value.length > 0) {
-    r.add(new BN(encoded.value.pop()!).mul(multiplier))
-    multiplier = multiplier.muln(256)
-  }
-
-  if (r.gte(DF_MODULUS)) {
-    throw new Error('message too large')
-  }
-
-  return encodeKey(r.add(DF_MODULUS).add(key).mod(DF_MODULUS))
-}
-
 export const decodeDecrypted = (words: number[]): string => {
   let result: number[] = []
 
