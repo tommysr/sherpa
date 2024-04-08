@@ -3,7 +3,7 @@ import { Protocol } from '../target/types/protocol'
 import * as anchor from '@coral-xyz/anchor'
 import { Connection, Keypair, clusterApiUrl } from '@solana/web3.js'
 import {
-  encodeName,
+  encodeString,
   getCarrierAddress,
   getForwarderAddress,
   getShipmentAddress,
@@ -44,7 +44,7 @@ const run = async () => {
   if (!shipperExists) {
     console.log('Creating shipper account')
     await program.methods
-      .registerShipper(encodeName('Andrew'))
+      .registerShipper(encodeString('Andrew'))
       .accounts({
         shipper: shipperAddress,
         signer: shipper.publicKey
@@ -63,7 +63,7 @@ const run = async () => {
   if (!shipmentExists) {
     const shipmentPrice = new BN(5).mul(ONE_SOL)
     await program.methods
-      .createShipment(shipmentPrice, encodeName('Świerze Boróweczki'), crateFromSchoolToAirport)
+      .createShipment(shipmentPrice, encodeString('Świerze Boróweczki'), crateFromSchoolToAirport)
       .accounts({
         shipment: shipmentAddress,
         shipper: shipperAddress,
@@ -90,10 +90,10 @@ const run = async () => {
         latitude: 43,
         longitude: 44
       },
-      locationName: encodeName('Lagiewniki, Krakow')
+      locationName: encodeString('Lagiewniki, Krakow')
     }
     await program.methods
-      .registerCarrier(encodeName('Igor'), availability)
+      .registerCarrier(encodeString('Igor'), availability)
       .accounts({
         carrier: carrierAddress,
         signer: carrier.publicKey
@@ -115,7 +115,7 @@ const run = async () => {
   if (!unavailableCarrierExists) {
     console.log('Creating unavailable carrier account')
     await program.methods
-      .registerCarrier(encodeName('Zdzich'), null)
+      .registerCarrier(encodeString('Zdzich'), null)
       .accounts({
         carrier: unavailableCarrierAddress,
         signer: unavailableCarrier.publicKey
@@ -140,7 +140,7 @@ const run = async () => {
   if (!forwarderExists) {
     console.log('Creating forwarder account')
     await program.methods
-      .registerForwarder(encodeName('Jacob'))
+      .registerForwarder(encodeString('Jacob'))
       .accounts({
         forwarder: forwarderAddress,
         signer: forwarder.publicKey
