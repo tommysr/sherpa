@@ -1,5 +1,5 @@
 import {
-	encodeName,
+	encodeString,
 	getBoughtShipmentAddress,
 	getCarrierAddress,
 	getForwarderAddress,
@@ -8,7 +8,7 @@ import {
 } from '$sdk/sdk';
 import type { Protocol } from '$src/utils/idl/types/protocol';
 import type { BN, Program } from '@coral-xyz/anchor';
-import { Transaction, PublicKey, type TransactionInstruction, Connection } from '@solana/web3.js';
+import { Transaction, PublicKey, type TransactionInstruction } from '@solana/web3.js';
 
 export const fetchForwarderAccount = async (program: Program<Protocol>, owner: PublicKey) => {
 	const forwarder = getForwarderAddress(program, owner);
@@ -26,7 +26,7 @@ export const getRegisterForwarderIx = async (
 	name: string
 ): Promise<TransactionInstruction> => {
 	const registerShipperIx = await program.methods
-		.registerForwarder(encodeName(name))
+		.registerForwarder(encodeString(name))
 		.accounts({
 			forwarder,
 			signer,
@@ -70,7 +70,6 @@ export const getBuyShipmentTx = async (
 			shipment,
 			forwarder,
 			bought,
-			shipmentOwner,
 			signer,
 			payer: signer
 		})

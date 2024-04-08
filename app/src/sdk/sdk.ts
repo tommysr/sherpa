@@ -1,7 +1,6 @@
-import * as anchor from '@coral-xyz/anchor';
 import { Program, utils, BN } from '@coral-xyz/anchor';
 import { PublicKey } from '@solana/web3.js';
-import { Protocol } from '../target/types/protocol';
+import type { Protocol } from '$utils/idl/types/protocol';
 
 export const STATE_SEED = 'state';
 export const SHIPPER_SEED = 'shipper';

@@ -7,7 +7,6 @@ import type { ApiProgramAccount } from './common';
 // u64 max cause someone set deadline to u64 max
 export interface OfferDetails<BigNumber, U64MAX> {
 	payment: BigNumber;
-	collateral: BigNumber;
 	deadline: U64MAX;
 }
 

@@ -5,7 +5,6 @@ import type { ShipmentOffer, ApiShipmentOffer, OfferDetails } from '../account/o
 export function parseOfferDetails(details: OfferDetails<BN, BN>): OfferDetails<number, string> {
 	return {
 		payment: details.payment.toNumber(),
-		collateral: details.collateral.toNumber(),
 		deadline: details.deadline.toString()
 	};
 }

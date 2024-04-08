@@ -4,5 +4,9 @@ export type ApiProgramAccount<T> = {
 };
 
 export type AccountName = {
-	value: number[];
+	value: number[]; // 64
 };
+
+export type Message = {
+	value: number[]; // 256
+}
