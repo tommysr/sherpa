@@ -157,7 +157,7 @@
 			</div>
 			<div class="col-span-2">
 				{#if dimensions}
-					{dimensions[0][1]} x {dimensions[1][1]} x {dimensions[2][1]} cm
+					{dimensions[0][1]} x {dimensions[1][1]} x {dimensions[2][1]} m
 				{:else}
 					<p>No dimensions</p>
 				{/if}

@@ -7,7 +7,7 @@
 
 <button
 	class={clsx(
-		'inline-block rounded-xl py-2 px-6 text-sm font-medium bg-gradient-to-b from-primary to-secondary-200 font-bold text-white shadow-2xl duration-1000 ease-out hover:bg-gradient-to-r',
+		'inline-block py-1.5 px-4 text-md text-primary-700 border-b-2 border-white hover:border-primary',
 		className
 	)}
 	disabled={$$props.disabled}

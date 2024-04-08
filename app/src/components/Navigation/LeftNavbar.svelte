@@ -3,22 +3,27 @@
 
 	import { page } from '$app/stores';
 
-	import WalletMultiButton from '../Wallet/WalletMultiButton.svelte';
-	import BoxIcon from './NavbarIcons/BoxIcon.svelte';
-	import HomeIcon from './NavbarIcons/HomeIcon.svelte';
-	import PlusIcon from './NavbarIcons/PlusIcon.svelte';
-	import SendIcon from './NavbarIcons/SendIcon.svelte';
-	import TrackIcon from './NavbarIcons/TrackIcon.svelte';
 	import { userStore } from '$src/stores/user';
 	import { walletStore } from '$src/stores/wallet';
+	import WalletMultiButton from '../Wallet/WalletMultiButton.svelte';
+	import BoxIcon from './NavbarIcons/BoxIcon.svelte';
+	import DashboardIcon from './NavbarIcons/DashboardIcon.svelte';
+	import HomeIcon from './NavbarIcons/HomeIcon.svelte';
+	import IssuedIcon from './NavbarIcons/IssuedIcon.svelte';
+	import PlusIcon from './NavbarIcons/PlusIcon.svelte';
+	import RegisterIcons from './NavbarIcons/RegisterIcons.svelte';
+	import SendIcon from './NavbarIcons/SendIcon.svelte';
+	import TrackIcon from './NavbarIcons/TrackIcon.svelte';
 
 	$: currentPage = $page.url.pathname;
 	$: isNavbarOpen = false;
 
-	$: isUserCarrier = $userStore.carrier.registered
-	$: walletKey = $walletStore.publicKey;
+	$: carrierRoute =
+		$userStore.carrier.registered && $walletStore.publicKey
+			? $walletStore.publicKey.toString()
+			: 'register';
 
-	const navigation = [
+	$: navigation = [
 		{
 			name: 'Home',
 			link: '/',
@@ -30,18 +35,13 @@
 			svg: BoxIcon,
 			routes: [
 				{
+					name: 'Issued',
+					link: '/shipmentsMap/issued',
+					svg: IssuedIcon
+				},
+				{
 					name: 'Create',
 					link: '/shipmentsMap/create',
-					svg: PlusIcon
-				},
-				{
-					name: 'Buy',
-					link: '/shipmentsMap/bought',
-					svg: PlusIcon
-				},
-				{
-					name: 'Buy',
-					link: '/shipmentsMap/bought',
 					svg: PlusIcon
 				}
 			]
@@ -58,14 +58,14 @@
 			routes: [
 				{
 					name: 'Dashboard',
-					link: `/carrier/${isUserCarrier ? walletKey : 'register'}` ,
-					svg: PlusIcon
+					link: `/carrier/${carrierRoute}/incoming`,
+					svg: DashboardIcon
 				},
 				{
-					name: 'Buy',
+					name: 'Register',
 					link: '/carrier/register',
-					svg: PlusIcon
-				},
+					svg: RegisterIcons
+				}
 			]
 		}
 	];
@@ -73,9 +73,9 @@
 
 <nav class="hidden md:block">
 	<div
-		class="fixed left-5 w-10 z-10 bg-white rounded-full top-1/2 transform -translate-y-1/2 py-3 px-7 shadow-lg"
+		class="fixed left-5 w-10 z-10 bg-white rounded-full top-1/2 transform -translate-y-1/2 py-1.5 px-7 shadow-lg"
 	>
-		<div class="flex flex-col items-center justify-center space-y-4">
+		<div class="flex flex-col items-center justify-center space-y-3">
 			{#each navigation as { name, link, svg, routes }}
 				<div
 					class={clsx(
@@ -87,7 +87,10 @@
 						<a href={link}
 							><svelte:component
 								this={svg}
-								className={clsx(currentPage === link ? 'fill-primary' : 'fill-gray-500')}
+								className={clsx(
+									'hover:scale-125 transition-all ease-in-out duration-150',
+									currentPage === link ? 'fill-primary' : 'fill-gray-500'
+								)}
 							/></a
 						>
 						<span
@@ -103,11 +106,14 @@
 								<a href={link}
 									><svelte:component
 										this={svg}
-										className={clsx(currentPage === link ? 'fill-primary' : 'fill-gray-500')}
+										className={clsx(
+											'hover:scale-125 transition-all ease-in-out duration-150',
+											currentPage === link ? 'fill-primary' : 'fill-gray-500'
+										)}
 									/></a
 								>
 								<span
-									class="opacity-0 group-hover:opacity-100 duration-300 bg-white absolute left-12 -top-3 p-2 rounded-lg shadow"
+									class="opacity-0 group-hover:opacity-100 duration-300 bg-white absolute left-11 -top-3 p-2 rounded-lg shadow"
 								>
 									{name}
 								</span>

@@ -1,6 +1,6 @@
 <script lang="ts">
-	import clsx from 'clsx';
 	import type { ApiCarrierAccount } from '$src/utils/account/carrier';
+	import clsx from 'clsx';
 	import BoughtShipmentShowModal from '../Modals/BoughtShipmentShowModal.svelte';
 
 	export let carrierAccount: ApiCarrierAccount;
@@ -25,7 +25,7 @@
 <li
 	on:click
 	class={clsx(
-		'mt-4 rounded-lg shadow cursor-pointer',
+		'rounded-lg shadow cursor-pointer',
 		selectedCarrier == carrierId ? 'bg-secondary-100' : 'bg-white'
 	)}
 >
