@@ -143,7 +143,7 @@
 				><DecimalInput
 					data-felte-keep-on-remove
 					bind:value={depth}
-					name="length"
+					name="depth"
 					placeholder="length"
 					required
 				/></span
