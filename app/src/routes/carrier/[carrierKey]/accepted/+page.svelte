@@ -5,17 +5,25 @@
 	import AcceptedOfferListElement from '$src/components/AcceptedOffer/AcceptedOfferListElement.svelte';
 	import ShipmentsLocations from '$src/components/ShipmentMap/ShipmentsLocations.svelte';
 	import type { ApiShipmentAccount } from '$src/utils/account/shipment';
+	import { walletStore } from '$src/stores/wallet';
 
 	let showShipmentDetailsModal = false;
 	let selectedAcceptedOffer: AcceptedShipment | undefined = undefined;
 	let selectedShipment: ApiShipmentAccount | undefined = undefined;
+	$: isWalletConnected = $walletStore.publicKey != null;
+
+	// not disappear until accepted
+	$: myAcceptedShipments = isWalletConnected
+		? $acceptedShipmentOffers.filter(
+				(s) => s.shipment.account.carrier.toString() === $walletStore.publicKey?.toString()
+			)
+		: [];
 
 	$: shipments = $acceptedShipmentOffers.map((offerWithShipment) => offerWithShipment.shipment);
 
-
 	function onElementSelect(offer: AcceptedShipment) {
 		selectedAcceptedOffer = offer;
-		selectedShipment= offer.shipment
+		selectedShipment = offer.shipment;
 	}
 
 	function onShowClicked(offer: AcceptedShipment) {
@@ -27,10 +35,10 @@
 
 <svelte:head><title>Accepted offers</title></svelte:head>
 
-{#if $acceptedShipmentOffers.length != 0}
+{#if myAcceptedShipments.length != 0}
 	<div class="flex-1 flex w-full flex-col overflow-y-auto px-4 mt-5">
 		<ul class="w-full flex-1 space-y-4">
-			{#each $acceptedShipmentOffers as offer, i}
+			{#each myAcceptedShipments as offer, i}
 				<AcceptedOfferListElement
 					acceptedOffer={offer}
 					on:click={() => onElementSelect(offer)}
@@ -58,6 +66,5 @@
 		bind:showModal={showShipmentDetailsModal}
 	/>
 {/if}
-
 
 <ShipmentsLocations {shipments} bind:selectedShipment />

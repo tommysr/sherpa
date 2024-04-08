@@ -15,13 +15,20 @@
 	import type { ApiShipmentAccount } from '$src/utils/account/shipment';
 	import AcceptShipmentModal from '$src/components/Modals/AcceptShipmentModal.svelte';
 
-
 	let selectedOffer: OfferedShipment | undefined = undefined;
 	let selectedShipment: ApiShipmentAccount | undefined = undefined;
 	let showShipmentDetailsModal = false;
 	let showAcceptOfferModal = false;
+	$: isWalletConnected = $walletStore.publicKey != null;
 
-	$: shipments = $shipmentOffers.map((offerWithShipment) => offerWithShipment.shipment);
+	// not disappear until accepted
+	$: myOfferedShipments = isWalletConnected
+		? $shipmentOffers.filter(
+				(s) => s.shipment.account.carrier.toString() === $walletStore.publicKey?.toString()
+			)
+		: [];
+
+	$: shipments = myOfferedShipments.map((offerWithShipment) => offerWithShipment.shipment);
 
 	function onElementSelect(offer: OfferedShipment) {
 		selectedShipment = offer.shipment;
@@ -37,10 +44,10 @@
 
 <svelte:head><title>Incoming offers</title></svelte:head>
 
-{#if $shipmentOffers.length != 0}
+{#if myOfferedShipments.length != 0}
 	<div class="flex-1 flex w-full flex-col overflow-y-auto px-4 mt-5">
 		<ul class="w-full flex-1 space-y-4">
-			{#each $shipmentOffers as offer, i}
+			{#each myOfferedShipments as offer, i (offer.meta.publicKey)}
 				<OfferListElement
 					offerAccount={offer}
 					on:click={() => onElementSelect(offer)}
