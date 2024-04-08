@@ -49,18 +49,34 @@
 	import { web3Store } from '$src/stores/web3';
 
 	let wallets: Adapter[];
-	let shouldAirdrop = true;
 	// it's a solana devnet cluster, but consider changing it to more performant provider
 	const network = clusterApiUrl('devnet');
 	const localStorageKey = 'walletAdapter';
 	const { program } = get(anchorStore);
+	const SOL_IN_LAMPORTS = 1000000000;
+	const SHOULD_REQUEST_AIRDROP = false;
+	$: isWalletConnected = $walletStore.publicKey !== null;
 
-	const airDropSol = async () => {
-		const SOL_IN_LAMPORTS = 1000000000;
+	const requiresAirdrop = async () => {
 		const { connection } = get(web3Store);
 		const { publicKey } = get(walletStore);
 
-		const signature = await connection.requestAirdrop(publicKey!, 2 * SOL_IN_LAMPORTS);
+		const balance = await connection.getBalance(publicKey!);
+
+		if (balance >= SOL_IN_LAMPORTS) {
+			return false;
+		}
+
+		return true;
+	};
+
+	const airDropSol = async () => {
+		const { connection } = get(web3Store);
+		const { publicKey } = get(walletStore);
+
+		const signature = await connection.requestAirdrop(publicKey!, SOL_IN_LAMPORTS);
+
+		console.log(signature)
 
 		const latestBlockHash = await connection.getLatestBlockhash();
 
@@ -73,25 +89,17 @@
 		return signature;
 	};
 
-	$: if ($walletStore.publicKey) {
-		// Trigger airdrop logic whenever the wallet changes
-		shouldAirdrop = true;
-	}
 
-	$: if (shouldAirdrop && $walletStore.publicKey) {
-		shouldAirdrop = false;
-
-		airDropSol()
-			.then((signature) =>
-				createNotification({ text: 'airdrop', type: 'success', removeAfter: 5000, signature })
-			)
-			.catch(() => {
-				createNotification({ text: 'airdrop', type: 'failed', removeAfter: 3000 });
-				createNotification({ text: 'retrying', type: 'unknown', removeAfter: 5000 });
-				setTimeout(() => {
-					shouldAirdrop = true;
-				}, 5000);
-			});
+	$: if (isWalletConnected && SHOULD_REQUEST_AIRDROP) {
+		requiresAirdrop().then((res) => {
+			if (res) {
+				airDropSol().then((signature) => {
+					createNotification({ text: 'airdrop', type: 'success', removeAfter: 5000, signature })
+				}).catch(() => {
+					createNotification({ text: 'airdrop', type: 'failed', removeAfter: 3000 });
+				})
+			}
+		});
 	}
 
 	// check if user is registered as forwarder, shipper or carrier
