@@ -1,18 +1,19 @@
 <script lang="ts">
-	import type { ApiShipmentAccount, ShipmentDimensions } from '$src/utils/account/shipment';
-	import type { Entries } from '$src/utils/types/object';
-	import { get } from 'svelte/store';
-	import Modal from './Modal.svelte';
-	import { PublicKey } from '@solana/web3.js';
+	import { getBuyShipmentTx } from '$lib/forwarder';
 	import { anchorStore } from '$src/stores/anchor';
+	import { awaitedConfirmation } from '$src/stores/confirmationAwait';
+	import { userStore } from '$src/stores/user';
 	import { walletStore } from '$src/stores/wallet';
 	import { web3Store } from '$src/stores/web3';
+	import type { ApiShipmentAccount } from '$src/utils/account/shipment';
+	import { getShipmentSummary } from '$src/utils/utils';
 	import { useSignAndSendTransaction } from '$src/utils/wallet/singAndSendTx';
-	import { getBuyShipmentTx } from '$lib/forwarder';
-	import { userStore } from '$src/stores/user';
+	import { PublicKey } from '@solana/web3.js';
+	import { get } from 'svelte/store';
+	import Button from '../Buttons/Button.svelte';
 	import { createNotification, removeNotification } from '../Notification/notificationsStore';
-	import { createEventDispatcher } from 'svelte';
-	import { awaitedConfirmation } from '$src/stores/confirmationAwait';
+	import SummaryWrapper from '../SummaryWrapper.svelte';
+	import Modal from './Modal.svelte';
 
 	export let showModal: boolean;
 	export let shipmentAccount: ApiShipmentAccount;
@@ -20,9 +21,6 @@
 	export let shipmentBuyInProgress: string | undefined;
 
 	$: shipmentData = shipmentAccount.account;
-	$: dimensions = Object.entries(shipmentData.shipment.dimensions) as Entries<ShipmentDimensions>;
-	$: locations = shipmentData.shipment.geography;
-	// // $: properties = Object.entries(shipmentData.shipment.details) as Entries<ShipmentDetails>;
 
 	function isAccountNameValid(name: string | null): boolean {
 		if (!name || name.length == 0 || name.length > 64) {
@@ -32,8 +30,8 @@
 	}
 
 	const notifyBuy = () => {
-		shipmentBuyInProgress = shipmentAccount.publicKey
-	}
+		shipmentBuyInProgress = shipmentAccount.publicKey;
+	};
 
 	async function handleBuyClick() {
 		const { program } = get(anchorStore);
@@ -70,101 +68,51 @@
 			removeNotification(id);
 			createNotification({ text: 'Tx send', type: 'success', removeAfter: 5000, signature });
 
-			const confirmation = createNotification({ text: 'waiting for confirmation', type: 'loading', removeAfter: 30000});
-			awaitedConfirmation.set(confirmation)
+			const confirmation = createNotification({
+				text: 'waiting for confirmation',
+				type: 'loading',
+				removeAfter: 30000
+			});
+			awaitedConfirmation.set(confirmation);
 
-			notifyBuy()
+			notifyBuy();
 		} catch (err) {
 			removeNotification(id);
 			createNotification({ text: 'Signing', type: 'failed', removeAfter: 5000 });
 		}
 	}
+
+	$: summaryData = getShipmentSummary(shipmentData);
 </script>
 
-<Modal bind:showModal>
-	<div class="w-full flex flex-col space-y-7">
-		<div class="my-10 flex justify-center">
-			<h2
-				class="bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent font-bold text-3xl"
-			>
-				{shipmentData.price / 10 ** 9} SOL
-			</h2>
-		</div>
-
-		<div class="grid grid-cols-3 justify-items-center gap-y-4">
-			<div
-				class="col-span-3 grid grid-cols-3 opacity-80 items-center justify-items-center w-full text-white py-2 rounded-lg bg-gradient-to-r from-primary to-secondary"
-			>
-				<div class="">When</div>
-				<div class="">Deadline</div>
-				<div class="">Priority</div>
-			</div>
-
-			<div>
-				<span>{new Date(shipmentData.shipment.when).toLocaleDateString()}</span>
-			</div>
-			<div>
-				<span>{new Date(shipmentData.shipment.deadline).toLocaleDateString()}</span>
-			</div>
-			<div>
-				<span>High</span>
-			</div>
-		</div>
-
-		<div class="grid grid-cols-3 justify-items-center gap-y-4">
-			<div
-				class="col-span-3 grid items-center opacity-80 justify-items-center w-full text-white py-2 rounded-lg bg-gradient-to-r from-primary to-secondary"
-			>
-				<div class="col-span-3">Locations</div>
-			</div>
-
-			<div class="col-span-3">
-				{locations.fromName + ' → ' + locations.toName}
-			</div>
-		</div>
-
-		<div class="grid grid-cols-3 justify-items-center gap-y-4">
-			<div
-				class="col-span-3 grid grid-cols-3 opacity-80 items-center justify-items-center w-full text-white py-2 rounded-lg bg-gradient-to-r from-primary to-secondary"
-			>
-				<div>Weight</div>
-				<div class="col-span-2">Depth x Height x Width</div>
-			</div>
-
-			<div>
-				{#if dimensions}
-					{dimensions[3][1]} kg
-				{:else}
-					<p>No dimensions</p>
-				{/if}
-			</div>
-			<div class="col-span-2">
-				{#if dimensions}
-					{dimensions[0][1]} x {dimensions[1][1]} x {dimensions[2][1]} m
-				{:else}
-					<p>No dimensions</p>
-				{/if}
-			</div>
-		</div>
-	</div>
+<Modal bind:showModal on:backdropClick={() => (showModal = false)}>
+	<h2
+		class="text-2xl bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent text-center my-7"
+	>
+		Buy Shipment
+	</h2>
+	<SummaryWrapper shipment={summaryData} />
 
 	{#if !$userStore.forwarder.registered}
-		<p>
-			You are not registered as a forwarder. Please enter your name to be registered as a forwarder.
-			This will allow you to buy shipment.
-		</p>
+		<hr class="my-6" />
+		<div class="px-4 text-neutral-600">
+			<p class="px-3 text-center">
+				You are not registered as a forwarder. Please enter your name to be registered as a
+				forwarder.
+			</p>
 
-		<input
-			class="w-full p-4 rounded-xl border border-primary-200 mt-4"
-			type="text"
-			bind:value={$userStore.forwarder.name}
-			placeholder="enter forwarder name to be registered"
-		/>
+			<input
+				class="w-full p-4 rounded-xl border border-primary-200 mt-2"
+				type="text"
+				bind:value={$userStore.forwarder.name}
+				placeholder="enter forwarder name to be registered"
+			/>
+		</div>
 	{/if}
 
 	{#if shipmentAccount.publicKey != shipmentBuyInProgress}
-		<div class="text-center pt-20">
-			<button on:click={handleBuyClick}>Buy</button>
+		<div class="text-center pt-8">
+			<Button class="text-lg uppercase tracking-widest" on:click={handleBuyClick}>Buy</Button>
 		</div>
 	{/if}
 </Modal>
