@@ -7,34 +7,21 @@
 	import { web3Store } from '$src/stores/web3';
 	import { useSignAndSendTransaction } from '$src/utils/wallet/singAndSendTx';
 	import { getMakeOfferTx } from '$lib/forwarder';
-	import Pending from '../Statuses/Pending.svelte';
-	import Empty from '../Statuses/Empty.svelte';
-	import Error from '../Statuses/Error.svelte';
-	import TransactionSent from '../Statuses/TransactionSent.svelte';
 	import type { ApiCarrierAccount } from '$src/utils/account/carrier';
-
 	import { BN } from 'bn.js';
 	import { forwardedShipments, type ForwardedShipment } from '$src/stores/forwarderShipments';
+	import { createNotification, removeNotification } from '../Notification/notificationsStore';
+	import { awaitedConfirmation } from '$src/stores/confirmationAwait';
+	import type { ApiShipmentAccount } from '$src/utils/account/shipment';
 
 	export let showModal: boolean;
 	export let carrierAccount: ApiCarrierAccount;
-	export let selectedLocation: number | undefined;
+	export let shipmentAccount: ApiShipmentAccount;
 
 	let time: number;
 	let price: number;
 
-	let shipment: ForwardedShipment | undefined;
-
-	$: if (selectedLocation) {
-		shipment = $forwardedShipments.at(selectedLocation);
-	}
-
 	$: timeInSecs = time * 60;
-
-	let status = {
-		component: Empty,
-		statusString: ''
-	};
 
 	const areMakeOfferParamsValid = () => {
 		if (!price || !time || price < 0 || time < 30) {
@@ -44,11 +31,6 @@
 		return true;
 	};
 
-	function showError(error: string) {
-		status.component = Error;
-		status.statusString = error;
-	}
-
 	async function handleMakeOfferClick() {
 		const { program } = get(anchorStore);
 		const wallet = get(walletStore);
@@ -56,41 +38,43 @@
 
 		if (!$walletStore.publicKey) {
 			showModal = false;
+
+			createNotification({ text: 'wallet not connected', type: 'failed', removeAfter: 5000 });
+
 			walletStore.openModal();
 
 			return;
 		}
 
 		if (!areMakeOfferParamsValid()) {
-			showError('price must be higher than zero and time greater than 30 minutes');
+			createNotification({ text: 'Invalid price', type: 'failed', removeAfter: 5000 });
+
 			return;
 		}
 
-		status.component = Pending;
-		status.statusString = 'signing transaction, follow wallet instruction';
+		const id = createNotification({ text: 'signing', type: 'loading', removeAfter: undefined });
 
 		const tx = await getMakeOfferTx(
 			program,
 			new BN(price * 10 ** 9),
 			timeInSecs,
 			$walletStore.publicKey!,
-			new PublicKey(shipment?.shipment.publicKey as string), // TODO: handle it
+			new PublicKey(shipmentAccount.publicKey),
 			new PublicKey(carrierAccount.account.authority)
 		);
 
 		try {
-			const sig = await useSignAndSendTransaction(connection, wallet, tx);
+			const signature = await useSignAndSendTransaction(connection, wallet, tx);
 
-			status.component = TransactionSent;
-			status.statusString = sig;
-			console.log(sig);
+			createNotification({ text: 'Tx send', type: 'success', removeAfter: 5000, signature });
+			removeNotification(id);
+
+			const confirmation = createNotification({ text: 'waiting for confirmation', type: 'loading', removeAfter: 30000});
+			awaitedConfirmation.set(confirmation)
 		} catch (err) {
-			showError('signing failed');
+			createNotification({ text: 'Signing', type: 'failed', removeAfter: 5000 });
+			removeNotification(id);
 		}
-	}
-
-	async function getLocationFromCoords(lat: number, long: number): Promise<string> {
-		return `Kraków, Poland`;
 	}
 </script>
 
@@ -120,8 +104,6 @@
 				placeholder="time in minutes after offer will be invalid"
 			/>
 		</span>
-
-		<svelte:component this={status.component} status={status.statusString} />
 
 		<div class="text-center pt-20">
 			<button on:click={handleMakeOfferClick}>Make offer</button>

@@ -20,7 +20,7 @@
 
 	$: carrierRoute =
 		$userStore.carrier.registered && $walletStore.publicKey
-			? $walletStore.publicKey.toString()
+			? `${$walletStore.publicKey.toString()}/incoming`
 			: 'register';
 
 	$: navigation = [
@@ -48,9 +48,10 @@
 		},
 		{
 			name: 'Forwarders',
-			link: '/forwarder',
+			link: '/forwarder/bought',
 			svg: SendIcon
-		},
+		}, 
+
 		{
 			name: 'Carriers',
 			link: '/carrier',
@@ -58,14 +59,14 @@
 			routes: [
 				{
 					name: 'Dashboard',
-					link: `/carrier/${carrierRoute}/incoming`,
+					link: `/carrier/${carrierRoute}`,
 					svg: DashboardIcon
 				},
-				{
-					name: 'Register',
-					link: '/carrier/register',
-					svg: RegisterIcons
-				}
+				// {
+				// 	name: 'Register',
+				// 	link: '/carrier/register',
+				// 	svg: RegisterIcons
+				// }
 			]
 		}
 	];

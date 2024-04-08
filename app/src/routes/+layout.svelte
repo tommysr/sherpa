@@ -41,32 +41,85 @@
 	} from '$src/utils/account/forwardedShipment';
 	import { parseForwardedShipmentToApiForwardedShipment } from '$src/utils/parse/forwardedShipment';
 	import { forwardedShipmentsMeta } from '$src/stores/forwarderShipments';
+	import {
+		createNotification,
+		removeNotification
+	} from '$src/components/Notification/notificationsStore';
+	import { awaitedConfirmation } from '$src/stores/confirmationAwait';
+	import { web3Store } from '$src/stores/web3';
 
 	let wallets: Adapter[];
 	// it's a solana devnet cluster, but consider changing it to more performant provider
 	const network = clusterApiUrl('devnet');
 	const localStorageKey = 'walletAdapter';
 	const { program } = get(anchorStore);
+	const SOL_IN_LAMPORTS = 1000000000;
+	const SHOULD_REQUEST_AIRDROP = false;
+	$: isWalletConnected = $walletStore.publicKey !== null;
+
+	const requiresAirdrop = async () => {
+		const { connection } = get(web3Store);
+		const { publicKey } = get(walletStore);
+
+		const balance = await connection.getBalance(publicKey!);
+
+		if (balance >= SOL_IN_LAMPORTS) {
+			return false;
+		}
+
+		return true;
+	};
+
+	const airDropSol = async () => {
+		const { connection } = get(web3Store);
+		const { publicKey } = get(walletStore);
+
+		const signature = await connection.requestAirdrop(publicKey!, SOL_IN_LAMPORTS);
+
+		console.log(signature)
+
+		const latestBlockHash = await connection.getLatestBlockhash();
+
+		await connection.confirmTransaction({
+			blockhash: latestBlockHash.blockhash,
+			lastValidBlockHeight: latestBlockHash.lastValidBlockHeight,
+			signature
+		});
+
+		return signature;
+	};
+
+
+	$: if (isWalletConnected && SHOULD_REQUEST_AIRDROP) {
+		requiresAirdrop().then((res) => {
+			if (res) {
+				airDropSol().then((signature) => {
+					createNotification({ text: 'airdrop', type: 'success', removeAfter: 5000, signature })
+				}).catch(() => {
+					createNotification({ text: 'airdrop', type: 'failed', removeAfter: 3000 });
+				})
+			}
+		});
+	}
 
 	// check if user is registered as forwarder, shipper or carrier
 	// this is done on wallet sign in/sign out, when user changes wallet
 	$: if ($walletStore.publicKey) {
-
 		fetchForwarderAccount(program, $walletStore.publicKey).then(({ account, accountKey }) => {
 			if (account) {
-				userStore.registerForwarder(decodeName(account.name));
+				userStore.registerForwarder(decodeName(account.name), accountKey.toString());
 			}
 		});
 
 		fetchShipperAccount(program, $walletStore.publicKey).then(({ account, accountKey }) => {
 			if (account) {
-				userStore.registerShipper(decodeName(account.name));
+				userStore.registerShipper(decodeName(account.name), accountKey.toString());
 			}
 		});
 
 		fetchCarrierAccount(program, $walletStore.publicKey).then(({ account, accountKey }) => {
 			if (account) {
-				userStore.registerCarrier(decodeName(account.name));
+				userStore.registerCarrier(decodeName(account.name), accountKey.toString());
 			}
 		});
 	} else {
@@ -79,7 +132,6 @@
 		const unsubscribeShipmentCreated = program.addEventListener(
 			'ShipmentCreated',
 			async (event) => {
-				console.log(event);
 				const shipmentPublicKey = event.shipment;
 
 				const shipment: FetchedShipment = await program.account.shipment.fetch(shipmentPublicKey);
@@ -88,6 +140,16 @@
 					publicKey: shipmentPublicKey.toString(),
 					account: parseShipmentToApiShipment(shipment)
 				};
+
+				const shipper = event.shipper;
+
+				if (shipper.toString() === $userStore.shipper.key) {
+					const id = $awaitedConfirmation;
+					if (id) {
+						removeNotification(id);
+					}
+					createNotification({ text: 'shipment', type: 'success', removeAfter: 5000 });
+				}
 
 				searchableShipments.extend({
 					...parsedShipment,
@@ -99,8 +161,7 @@
 		const unsubscribeForwardedShipment = program.addEventListener(
 			'ShipmentTransferred',
 			async (event) => {
-				console.log(event);
-				const shipmentToRemove = event.shipment.toString();
+				console.log(event.buyer.toString());
 
 				const forwardedShipmentPublicKey = event.forwarded;
 
@@ -111,6 +172,16 @@
 					publicKey: forwardedShipmentPublicKey.toString(),
 					account: parseForwardedShipmentToApiForwardedShipment(forwardedShipment)
 				};
+
+				const buyer = event.buyer;
+
+				if (buyer.toString() === $userStore.forwarder.key) {
+					const id = $awaitedConfirmation;
+					if (id) {
+						removeNotification(id);
+					}
+					createNotification({ text: 'Buy', type: 'success', removeAfter: 5000 });
+				}
 
 				forwardedShipmentsMeta.update((meta) => {
 					meta.push(parsedShipment);
@@ -132,7 +203,6 @@
 
 		return [unsubscribeForwardedShipment, unsubscribeShipmentCreated];
 	}
-
 
 	onMount(() => {
 		wallets = [

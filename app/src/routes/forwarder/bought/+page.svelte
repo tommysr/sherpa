@@ -1,0 +1,94 @@
+<script lang="ts">
+	import OrderListElement from '$src/components/Shipment/OrderListElement.svelte';
+	import CarriersLocations from '$src/components/ShipmentMap/CarriersLocations.svelte';
+	import ShipmentsLocations from '$src/components/ShipmentMap/ShipmentsLocations.svelte';
+	import { forwardedShipments, forwardedShipmentsMeta } from '$src/stores/forwarderShipments';
+	import ShipmentInformationModal from '$src/components/Modals/ShipmentInformationModal.svelte';
+	import { walletStore } from '$src/stores/wallet';
+	import type { ApiShipmentAccount } from '$src/utils/account/shipment';
+	import type { PageData } from './$types';
+	import MakeOfferModal from '$src/components/Modals/MakeOfferModal.svelte';
+	import type { ApiCarrierAccount } from '$src/utils/account/carrier';
+
+	export let data: PageData;
+
+	let selectedShipment: ApiShipmentAccount | undefined = undefined;
+	let selectedCarrier: ApiCarrierAccount | undefined = undefined;
+	let showShipmentDetailsModal = false;
+	let showMakeOfferModal = false;
+
+	$: carriers = data.carriers;
+	$: isWalletConnected = $walletStore.publicKey != null;
+
+	$: myForwarderShipments = isWalletConnected
+		? $forwardedShipments.filter(
+				(s) => s.meta.account.forwarder.toString() === $walletStore.publicKey?.toString()
+			)
+		: [];
+
+	function onSelectShipment(shipment: ApiShipmentAccount) {
+		//TODO
+		// if (isMobileOpen) {
+		// 	isMobileOpen = false;
+		// }
+
+		selectedShipment = shipment;
+	}
+
+	function onShowClicked(shipment: ApiShipmentAccount) {
+		onSelectShipment(shipment);
+
+		showShipmentDetailsModal = true;
+	}
+</script>
+
+{#if myForwarderShipments.length != 0}
+	<div class="flex-1 flex w-full flex-col overflow-y-auto px-4 mt-5">
+		<ul class="w-full flex-1 space-y-4">
+			{#each myForwarderShipments as { meta, shipment }, i (meta.publicKey)}
+				<OrderListElement
+					on:click={() => onSelectShipment(shipment)}
+					on:buttonClicked={() => onShowClicked(shipment)}
+					shipmentAccount={shipment}
+					selectedAccount={selectedShipment?.publicKey}
+				/>
+			{/each}
+		</ul>
+	</div>
+{:else}
+	<div class="flex-1 flex items-center">
+		<p
+			class="mb-5 text-center text-xl bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent"
+		>
+			Nothing found
+		</p>
+	</div>
+{/if}
+
+{#if isWalletConnected}
+	<ShipmentsLocations
+		shipments={myForwarderShipments.map((el) => el.shipment)}
+		bind:selectedShipment
+	/>
+{/if}
+
+{#if selectedShipment}
+	<CarriersLocations
+		{carriers}
+		bind:selectedCarrier
+		on:makeOfferClick={() => (showMakeOfferModal = true)}
+	/>
+
+	<ShipmentInformationModal
+		shipmentAccount={selectedShipment}
+		bind:showModal={showShipmentDetailsModal}
+	/>
+{/if}
+
+{#if selectedShipment && selectedCarrier}
+	<MakeOfferModal
+		shipmentAccount={selectedShipment}
+		carrierAccount={selectedCarrier}
+		bind:showModal={showMakeOfferModal}
+	/>
+{/if}

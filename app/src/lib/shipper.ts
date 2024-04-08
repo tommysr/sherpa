@@ -64,7 +64,7 @@ export const getCreateShipmentTx = async (
 
 	const ix = await program.methods
 		.createShipment(new BN(price * 10 ** 9), encodeString(name), {
-			deadline: new BN(deadline.valueOf()),
+			deadline: new BN(deadline.valueOf() / 1000),
 			details,
 			collateral: new BN(collateral),
 			penalty: new BN(penalty),
@@ -79,7 +79,7 @@ export const getCreateShipmentTx = async (
 				fromName: encodeString(geography.fromName),
 				toName: encodeString(geography.toName)
 			},
-			when: new BN(when.valueOf())
+			when: new BN(Math.floor(when.valueOf() / 1000)),
 		})
 		.accounts({
 			shipper,

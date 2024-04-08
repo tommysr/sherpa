@@ -7,7 +7,6 @@ import type { PublicKey, TransactionInstruction } from '@solana/web3.js';
 
 export const fetchCarrierAccount = async (program: Program<Protocol>, owner: PublicKey) => {
 	const carrier = getCarrierAddress(program, owner);
-	console.log(carrier.toString())
 
 	return {
 		account: await program.account.carrier.fetchNullable(carrier),

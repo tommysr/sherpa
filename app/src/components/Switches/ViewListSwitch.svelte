@@ -5,7 +5,7 @@
 	export let left: string;
 	export let right: string;
 
-	$: console.log(isRight);
+
 </script>
 
 <div class="flex justify-center">

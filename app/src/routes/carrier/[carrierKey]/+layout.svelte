@@ -3,21 +3,21 @@
 	import LayoutListWrapper from '$src/components/LayoutListWrapper.svelte';
 	import { acceptedShipmentsOffersMeta } from '$src/stores/acceptedOffers';
 	import { anchorStore } from '$src/stores/anchor';
+	import type { ApiShipmentOfferAccount, ShipmentOffer } from '$src/utils/account/offer';
+	import { parseOfferToApiOffer } from '$src/utils/parse/offer';
+
 	import { shipmentsOffersMeta } from '$src/stores/offers';
 	import { walletStore } from '$src/stores/wallet';
 	import type {
 		AcceptedShipmentOffer,
 		ApiAcceptedShipmentOfferAccount
 	} from '$src/utils/account/acceptedOffer';
-	import type { ApiShipmentOfferAccount, ShipmentOffer } from '$src/utils/account/offer';
 	import { parseAcceptedOfferToApiAcceptedOffer } from '$src/utils/parse/acceptedOffer';
-	import { parseOfferToApiOffer } from '$src/utils/parse/offer';
 	import clsx from 'clsx';
 	import { onMount } from 'svelte';
 	import { get } from 'svelte/store';
 	const { program } = get(anchorStore);
 
-	let selectedNav: number = 0;
 	let isMobileOpen = false;
 	$: isWalletConnected = $walletStore.publicKey != null;
 
@@ -95,7 +95,6 @@
 	$: url = $page.url.pathname;
 	$: carrierPage = url.split('/').at(-1);
 
-	$: console.log(carrierPage);
 </script>
 
 <LayoutListWrapper bind:isMobileOpen>
@@ -132,5 +131,3 @@
 		</div>
 	{/if}
 </LayoutListWrapper>
-
-<!-- <slot /> -->

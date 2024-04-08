@@ -1,74 +1,58 @@
 <script lang="ts">
 	import LayoutListWrapper from '$src/components/LayoutListWrapper.svelte';
+	import ShipmentInformationModal from '$src/components/Modals/ShipmentInformationModal.svelte';
 	import OrderListElement from '$src/components/Shipment/OrderListElement.svelte';
-	import { forwardedShipmentsMeta } from '$src/stores/forwarderShipments';
-	import { notForwardedShipments } from '$src/stores/searchableShipments';
+	import ShipmentsLocations from '$src/components/ShipmentMap/ShipmentsLocations.svelte';
+	import { searchableShipments } from '$src/stores/searchableShipments';
+	import type { ApiShipmentAccount } from '$src/utils/account/shipment';
 	import { walletStore } from '$stores/wallet';
 	import clsx from 'clsx';
 
-	enum OperationMode {
-		VIEW,
-		SELL
-	}
-
-	$: if ($walletStore.publicKey) {
-		// TODO: make it custom
-		forwardedShipmentsMeta.update((s) => {
-			s.filter((s) => s.account.forwarder === $walletStore.publicKey?.toString());
-
-			return s;
-		});
-	}
-
-	$: isWalletConnected = $walletStore.publicKey != null;
-
-	let selectedLocation: number | undefined = undefined;
-	let selectedCarrier: number | undefined = undefined;
+	let selectedShipment: ApiShipmentAccount | undefined = undefined;
+	let showShipmentDetailsModal = false;
 	let isMobileOpen = false;
 	let selectedNav: number = 0;
 
-	function onShipmentElementSelect(i: number) {
-		selectedLocation = i;
 
-		if (isMobileOpen) {
-			isMobileOpen = false;
-		}
-	}
+	$: isWalletConnected = $walletStore.publicKey != null;
 
-	function onCarrierElementSelect(i: number) {
-		selectedCarrier = i;
 
-		if (isMobileOpen) {
-			isMobileOpen = false;
-		}
-	}
+	$: myAllShipments = $searchableShipments.data.filter(
+		(el) => el.account.shipper.toString() == $walletStore.publicKey?.toString()
+	);
 
-	function onMarkerClick(i: number) {
-		selectedLocation = i;
+	$: processingShipments = myAllShipments.filter((el) => el.account.status != 1);
+	$: deliveredShipments = myAllShipments.filter((el) => el.account.status == 5);
 
-		if (isMobileOpen) {
-			isMobileOpen = false;
-		}
-	}
-
-	function onCarrierMarkerClick(i: number) {
-		selectedCarrier = i;
-	}
-
-	const insideNavData = [
+	$: insideNavData = [
 		{
 			name: 'Everything',
-			data: []
+			data: myAllShipments
 		},
 		{
 			name: 'Processing',
-			data: []
+			data: processingShipments
 		},
 		{
 			name: 'Delivered',
-			data: ['data']
+			data: deliveredShipments
 		}
 	];
+
+	function onSelectShipment(shipment: ApiShipmentAccount) {
+		if (isMobileOpen) {
+			isMobileOpen = false;
+		}
+
+		selectedShipment = shipment;
+	}
+
+
+	function onShowClicked(shipment: ApiShipmentAccount) {
+		onSelectShipment(shipment);
+
+		showShipmentDetailsModal = true;
+	}
 </script>
 
 <LayoutListWrapper bind:isMobileOpen>
@@ -104,12 +88,12 @@
 			{#if insideNavData[selectedNav] && insideNavData[selectedNav].data.length != 0}
 				<div class="flex-1 flex w-full flex-col overflow-y-auto px-4 mt-5">
 					<ul class="w-full flex-1 space-y-4">
-						{#each $notForwardedShipments as account, i (account.publicKey)}
+						{#each insideNavData[selectedNav].data as account, i (account.publicKey)}
 							<OrderListElement
-								on:click={() => {}}
+								on:click={() => onSelectShipment(account)}
+								on:buttonClicked={() => onShowClicked(account)}
 								shipmentAccount={account}
-								{selectedLocation}
-								shipmentId={i}
+								selectedAccount={selectedShipment?.publicKey}
 							/>
 						{/each}
 					</ul>
@@ -126,13 +110,17 @@
 		</div>
 	{/if}
 </LayoutListWrapper>
-<!-- 
+
+{#if selectedShipment}
+	<ShipmentInformationModal
+		shipmentAccount={selectedShipment}
+		bind:showModal={showShipmentDetailsModal}
+	/>
+{/if}
+
 {#if isWalletConnected}
 	<ShipmentsLocations
-		locations={locationsOnMap}
-		{onMarkerClick}
-		{selectedLocation}
-		exclusive={isExclusiveMode}
-		isMobile={false}
+		shipments={insideNavData[selectedNav].data}
+		bind:selectedShipment
 	/>
-{/if} -->
+{/if}

@@ -18,10 +18,14 @@
 	import { Transaction } from '@solana/web3.js';
 	import { get } from 'svelte/store';
 
-	import { createNotification } from '$src/components/Notification/notificationsStore';
+	import {
+		createNotification,
+		removeNotification
+	} from '$src/components/Notification/notificationsStore';
 
 	import SummaryForm from '$src/components/CarrierForm/SummaryForm.svelte';
 	import { FormStage } from '$src/components/ShipmentForm/formStage';
+	import { getCarrierAddress } from '$src/sdk/sdk';
 
 	const forms = {
 		name: {
@@ -104,11 +108,49 @@
 			const signature = await useSignAndSendTransaction(connection, wallet, tx);
 
 			createNotification({
-				text: 'Transaction send',
+				text: 'Transaction',
 				type: 'success',
 				removeAfter: 10000,
 				signature
 			});
+
+			const latestBlockHash = await connection.getLatestBlockhash();
+
+			const confirmId = createNotification({
+				text: 'confirm',
+				type: 'loading',
+				removeAfter: undefined
+			});
+
+			const confirmation = await connection.confirmTransaction({
+				blockhash: latestBlockHash.blockhash,
+				lastValidBlockHeight: latestBlockHash.lastValidBlockHeight,
+				signature
+			});
+
+			removeNotification(confirmId);
+			if (confirmation.value.err) {
+				createNotification({
+					text: 'create',
+					type: 'failed',
+					removeAfter: 5000
+				});
+			} else {
+				createNotification({
+					text: 'create',
+					type: 'success',
+					removeAfter: 5000
+				});
+
+				createNotification({
+					text: 'redirecting',
+					type: 'loading',
+					removeAfter: 5000
+				});
+
+				// redirect but its kind of shit, cause route has to wait 
+				setTimeout(() => goto(`/carrier/${$walletStore.publicKey}/incoming`), 15000);
+			}
 		} catch (e) {
 			createNotification({ text: 'Transaction send', type: 'failed', removeAfter: 10000 });
 		}
