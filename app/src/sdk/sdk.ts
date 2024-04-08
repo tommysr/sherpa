@@ -1,7 +1,7 @@
 import * as anchor from '@coral-xyz/anchor';
 import { Program, utils, BN } from '@coral-xyz/anchor';
 import { PublicKey } from '@solana/web3.js';
-import type { Protocol } from '../utils/idl/types/protocol';
+import { Protocol } from '../target/types/protocol';
 
 export const STATE_SEED = 'state';
 export const SHIPPER_SEED = 'shipper';
@@ -111,6 +111,10 @@ export const getOfferAddress = (program, carrier: PublicKey, index: number) => {
 	return offerAddress;
 };
 
+export const getOfferAddresses = (program, carrier: PublicKey, count: number) => {
+	return Array.from({ length: count }, (_, i) => getOfferAddress(program, carrier, i));
+};
+
 export const getAcceptedOfferAddress = (program, carrier: PublicKey, index: number) => {
 	const indexBuffer = Buffer.alloc(4);
 	indexBuffer.writeInt32LE(index);
@@ -121,6 +125,10 @@ export const getAcceptedOfferAddress = (program, carrier: PublicKey, index: numb
 	);
 
 	return offerAddress;
+};
+
+export const getAcceptedOfferAddresses = (program, carrier: PublicKey, count: number) => {
+	return Array.from({ length: count }, (_, i) => getAcceptedOfferAddress(program, carrier, i));
 };
 
 export const encodeString = (utf8Name: string, length: 64 | 256 = 64) => {
