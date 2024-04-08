@@ -11,6 +11,7 @@
 	export let shipmentAccount: ApiShipmentAccount;
 	export let selectedAccount: string | undefined = undefined;
 	export let showStatus = false;
+	export let acceptCallback: () => void = () => {};
 
 	let viewMessage = false;
 	const dispatch = createEventDispatcher();
@@ -44,7 +45,8 @@
 
 	let message = 'decrypting...';
 
-	$: if (messageNeeded && viewMessage) {
+	$: if (isViewerShipper && shipmentData.status == 4 && viewMessage) {
+		message = 'decrypting';
 		const privateKey = getDecryptionKey(`shipper${shipmentAccount.publicKey}`);
 
 		if (privateKey) {
@@ -153,26 +155,19 @@
 				&#x2022; Insurance:
 				<span>{shipmentAccount.account.shipment.collateral / 10 ** 9} SOL</span>
 
-				{#if showStatus}
-					<br />
-					&#x2022; Status:
-					<span class={clsx('font-semibold')}>{status}</span>
-				{/if}
-				<br />
-				{#if messageNeeded}
-					<br />
-					{#if !viewMessage}
-						<button class="underline" on:click|once={() => (viewMessage = true)}
-							>view message</button
-						>
-					{:else}
-						<span>Message: {message}</span>
-					{/if}
+				{#if isViewerShipper && !viewMessage}
+					<button on:click|once={() => (viewMessage = true)}>view message</button>
+				{:else if isViewerShipper && viewMessage}
+					<span class={clsx('font-semibold')}>{message}</span>
 				{/if}
 			</p>
 
 			<button class="text-sm xl:text-md text-accent font-medium mx-4" on:click={handleShowClick}
 				>Show</button
+			>
+
+			<button class="text-sm xl:text-md text-accent font-medium" on:click={acceptCallback}
+				>Confirm</button
 			>
 		</div>
 	</div>

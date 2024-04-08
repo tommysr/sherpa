@@ -1,4 +1,10 @@
-import { encodeString, getShipmentAddress, getShipperAddress } from '$sdk/sdk';
+import {
+	encodeString,
+	getCarrierAddress,
+	getShipmentAddress,
+	getShipperAddress,
+	getStateAddress
+} from '$sdk/sdk';
 import type { ShipmentData } from '$src/utils/account/shipment';
 import type { Protocol } from '$src/utils/idl/types/protocol';
 import type { Program } from '@coral-xyz/anchor';
@@ -90,4 +96,44 @@ export const getCreateShipmentTx = async (
 	tx.add(ix);
 
 	return tx;
+};
+
+export const confirmShipmentTx = async (
+	program: Program<Protocol>,
+	signer: PublicKey,
+	shipment: PublicKey,
+	shipperOwner: PublicKey,
+	forwarderOwner: PublicKey,
+	carrierOwner: PublicKey,
+	task: PublicKey
+): Promise<Transaction> => {
+	const carrier = getCarrierAddress(program, signer);
+	const carrierAccount = await program.account.carrier.fetchNullable(carrier);
+
+	if (!carrierAccount) {
+		throw 'Carrier account not found';
+	}
+
+	// const offer = getOfferAddress(program, carrierAuthority, carrierAccount.offersCount);
+	// const forwarder = getForwarderAddress(program, signer);
+
+	const shipper = getShipperAddress(program, shipperOwner);
+	const state = getStateAddress(program);
+
+	const ix = await program.methods
+		.confirmDelivery()
+		.accounts({
+			shipment,
+			shipper,
+			task,
+			signer,
+			payer: signer,
+			shipperOwner,
+			forwarderOwner,
+			carrierOwner,
+			state
+		})
+		.instruction();
+
+	return new Transaction().add(ix);
 };

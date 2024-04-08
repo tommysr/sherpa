@@ -126,6 +126,8 @@ describe('protocol', () => {
       expect(event.shipment.equals(shipmentAddress)).true
     })
 
+    const balanceBefore = await connection.getBalance(shipper.publicKey)
+
     await program.methods
       .createShipment(shipmentPrice, encodeString('Just a pair of socks'), shipmentData)
       .accounts({
@@ -163,6 +165,9 @@ describe('protocol', () => {
     const shipperAccount = await program.account.shipper.fetch(shipperAddress)
     expect(shipperAccount.authority.equals(shipper.publicKey)).true
     expect(shipperAccount.count).eq(1)
+
+    const balanceAfter = await connection.getBalance(shipper.publicKey)
+    expect(balanceBefore - balanceAfter).gt(shipmentPrice.toNumber())
   })
 
   it('create second shipment', async () => {
@@ -396,6 +401,7 @@ describe('protocol', () => {
     })
 
     const offerAccount = await program.account.shipmentOffer.fetch(offerAddress)
+    const balanceBefore = await connection.getBalance(carrier.publicKey)
 
     await program.methods
       .acceptOffer()
@@ -427,6 +433,9 @@ describe('protocol', () => {
     expect(taskAccount.details.payment.eq(offerAccount.details.payment)).true
     expect(taskAccount.details.deadline.eq(offerAccount.details.deadline)).true
     expect(taskAccount.no).eq(0)
+
+    const balanceAfter = await connection.getBalance(carrier.publicKey)
+    expect(balanceBefore - balanceAfter).gt(shipmentAccount.shipment.collateral.toNumber())
 
     program.removeEventListener(subscriptionId)
   })
