@@ -14,6 +14,7 @@
 	import ShipmentsLocations from '$src/components/ShipmentMap/ShipmentsLocations.svelte';
 	import type { ApiShipmentAccount } from '$src/utils/account/shipment';
 	import AcceptShipmentModal from '$src/components/Modals/AcceptShipmentModal.svelte';
+	import { getAcceptedOfferAddresses, getCarrierAddress, getOfferAddresses } from '$sdk/sdk';
 
 	let selectedOffer: OfferedShipment | undefined = undefined;
 	let selectedShipment: ApiShipmentAccount | undefined = undefined;
@@ -21,12 +22,16 @@
 	let showAcceptOfferModal = false;
 	$: isWalletConnected = $walletStore.publicKey != null;
 
+	$: offerAddresses = getOfferAddresses($anchorStore.program, $walletStore.publicKey!, 100).map(
+		(p) => p.toString()
+	);
+
 	// not disappear until accepted
 	$: myOfferedShipments = isWalletConnected
-		? $shipmentOffers.filter(
-				(s) => s.shipment.account.carrier.toString() === $walletStore.publicKey?.toString()
-			)
+		? $shipmentOffers.filter((s) => offerAddresses.includes(s.meta.publicKey))
 		: [];
+
+	$: console.log('gg', offerAddresses, $shipmentOffers, myOfferedShipments);
 
 	$: shipments = myOfferedShipments.map((offerWithShipment) => offerWithShipment.shipment);
 

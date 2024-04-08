@@ -7,7 +7,9 @@ import { Protocol } from '../target/types/protocol'
 import * as anchor from '@coral-xyz/anchor'
 import { Connection, Keypair } from '@solana/web3.js'
 import {
+  decodeName,
   getCarrierAddress,
+  getOfferAddresses,
   getShipmentAddresses,
   getShipperAddress,
   getStateAddress
@@ -65,8 +67,41 @@ const run = async () => {
   // console.log('Jacob forwarder', forwarderAddress.toBase58(), forwarderAccount)
 
   // Shipments
-  const shipments = await program.account.shipment.all()
-  console.log('Shipments', shipments.length)
+  // const offers = await program.account.shipmentOffer.all()
+  // const shipments = await program.account.shipment.all()
+
+  // const named = offers.map(o => {
+  //   return { ...o, ship: shipments.find(s => s.publicKey.equals(o.account.shipment))! }
+  // })
+
+  // console.log(
+  //   'Shipments',
+  //   named.map(
+  //     o =>
+  //       decodeName(o.ship.account.name) +
+  //       ' ' +
+  //       o.ship.account.status +
+  //       ' ' +
+  //       o.ship.account.forwarder.toString() +
+
+  //       ' ->  ' +
+
+  //       o.account.
+  //   )
+  // )
+
+  const carriers = await program.account.carrier.all()
+
+  const a = await Promise.all(
+    carriers
+      .map(carriers =>
+        getOfferAddresses(program, carriers.account.creator, carriers.account.offersCount)
+      )
+      .map(a => program.account.shipmentOffer.fetchMultiple(a))
+  )
+  console.log(a)
+
+  const c = getOfferAddresses(program, carriers[0].publicKey, 0)
 
   console.log('Carriers', (await program.account.carrier.all()).length)
   console.log('Forwarders', (await program.account.forwarder.all()).length)
