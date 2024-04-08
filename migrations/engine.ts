@@ -7,7 +7,7 @@ import { Protocol } from '../target/types/protocol'
 import * as anchor from '@coral-xyz/anchor'
 import { Connection, Keypair, clusterApiUrl } from '@solana/web3.js'
 import {
-  encodeName,
+  encodeString,
   getCarrierAddress,
   getForwarderAddress,
   getShipmentAddress,
@@ -34,7 +34,7 @@ const run = async () => {
       const shipper = getShipperAddress(program, keypair.publicKey)
 
       await program.methods
-        .registerShipper(encodeName(shipperName))
+        .registerShipper(encodeString(shipperName))
         .accounts({
           shipper,
           signer: keypair.publicKey
@@ -51,7 +51,7 @@ const run = async () => {
       const forwarder = getForwarderAddress(program, keypair.publicKey)
 
       await program.methods
-        .registerForwarder(encodeName(forwarderName))
+        .registerForwarder(encodeString(forwarderName))
         .accounts({
           forwarder,
           signer: keypair.publicKey
@@ -79,12 +79,12 @@ const run = async () => {
         location = {
           time: when,
           location: { latitude: gotLocation.lat, longitude: gotLocation.lon },
-          locationName: encodeName(gotLocation.parsedName)
+          locationName: encodeString(gotLocation.parsedName)
         }
       }
 
       await program.methods
-        .registerCarrier(encodeName(carrierName), location)
+        .registerCarrier(encodeString(carrierName), location)
         .accounts({
           carrier,
           signer: keypair.publicKey
@@ -146,12 +146,12 @@ const run = async () => {
             latitude: from.latitude,
             longitude: from.longitude
           },
-          fromName: encodeName(from.parsedName),
+          fromName: encodeString(from.parsedName),
           to: {
             latitude: to.latitude,
             longitude: to.longitude
           },
-          toName: encodeName(to.parsedName)
+          toName: encodeString(to.parsedName)
         },
         dimensions,
         details: {
@@ -171,7 +171,7 @@ const run = async () => {
       console.log('Creating shipment', shipmentData)
 
       await program.methods
-        .createShipment(shipmentPrice, encodeName(randomFrom(names.shipments)), shipmentData)
+        .createShipment(shipmentPrice, encodeString(randomFrom(names.shipments)), shipmentData)
         .accounts({
           shipment: shipmentAddress,
           shipper: shipperAddress,

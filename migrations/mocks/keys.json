@@ -2,138 +2,78 @@
   "keys": [
     {
       "type": "shipper",
-      "name": "Daniela Network",
-      "secret": "YT7v/+MAgUgrgZq9SGuGgqn9Ts3b33K7kI8xlnq5tP9ib83v3H9J4RAidEpE87XJJ0t4cU5r/AzqvhL2D7Wx8w=="
+      "name": "Daniela Commerce",
+      "secret": "UCGGRzJ3s9K0J8COWhOvBcBbbKKQTDPPHfUzKYdD/mehY02/0f4rSiknzDcRhY8B6jP5Jp6UaNU1LZeZV/qSyA=="
     },
     {
       "type": "forwarder",
-      "name": "Petra Forwarding",
-      "secret": "9VAiqtKikNhm9wzctiZSf+6n86qXHITqawjIHFd1fD+JnLS9sLcBzWBZQ8K2eSm6qGlsID1UXr8kC7mSlbzDHw=="
-    },
-    {
-      "type": "shipper",
-      "name": "Laura Network",
-      "secret": "v6uJg0QnI1f5Ksc/Et0Y0tpgCefkFmw7s/QcYXIOrs/Eo4jxF7GymbpFy6m+uzpcOxsw6g8NCaEsrqQ2qgDupg=="
-    },
-    {
-      "type": "shipper",
-      "name": "Jan Online",
-      "secret": "HBPutkybadob56CaCJou3QJHtebTfgukXB82dh3l/xjM5de1/EIwOuTMhnvuBzXIyZb+iHEv7CR+gRcX42T1nQ=="
-    },
-    {
-      "type": "shipper",
-      "name": "Wojciech Network",
-      "secret": "3yy0cF97TFXAnf7khGttrVZMKGme41KAgx1O9xfpPPVGvxpzc+CqKqYPpeEN5VIK/3geaePT4WamCm8txlrs4g=="
-    },
-    {
-      "type": "shipper",
-      "name": "Joanna Link",
-      "secret": "vd45D2/KYD42jvqfGqyXO7wdU+8YP9kd/00a8qNk5GQR36b6ZSJFHLI3zAIgjiuZFEDkdMyMDzJyRkWPbqGKcw=="
+      "name": "Fabian Freight",
+      "secret": "u/qsnOzt4YCX32Zu7CD8LBsYJwxxfpejw2I0WCjy6s3XKO7cLMTEfta+lkHGjZys1AaGu7DZtPA8QIObVsgnCQ=="
     },
     {
       "type": "forwarder",
-      "name": "Beata Express",
-      "secret": "I5SAt4OP5MqqAQiKnQrEOOtppokpu2ltLfWxxIy7EixZdsjPJocROfGg/qE4ahmpcVUqQx/hcBsQmU8+/7gfIw=="
-    },
-    {
-      "type": "forwarder",
-      "name": "Tanja Forwarding",
-      "secret": "PKohriMmbsNYHtqdkRzUx0+62iXcnVp4WVlM01AFbwFzKXg8b/OIz+ZG5zw6B/h86a+ftQSLDwHawMApzRWBbA=="
-    },
-    {
-      "type": "shipper",
-      "name": "Marta Network",
-      "secret": "EdthDyI9/C1EhfBOSvxJ0flIIiP3YVWqb1TG5m+3Hggc91QzdQWPo7BFm7Av3MZrscDkS8uoJqeMOC8KCN6QTA=="
+      "name": "Dorota Expedition",
+      "secret": "6TsT4zzttjASTmvMvKEHzOdsBIQtNQr8ntrHISjvAQhxSyeDGvaD3xRECo5+THBkCngXHAQMN+tPceh/KpbqJw=="
     },
     {
       "type": "carrier",
-      "name": "Beata Freight",
-      "secret": "C0jDFLxLS+X8R1ncCfRnWpRbxA7jF4ToRHrTbKk5rfbNIMmSGLIa2LfaCG8/TlJtcuc1ui1IN8bKRQiErYJCfA=="
-    },
-    {
-      "type": "shipper",
-      "name": "Bartosz Direct",
-      "secret": "m/eRZdDora9yw8gbuUK1kjl2aBOIkinm1POZ0O7P3LSRfBWeD+CzRuK85DOVqXPBYCuF2oPgCf1LVEvK7mjuaw=="
-    },
-    {
-      "type": "shipper",
-      "name": "Nico Tech",
-      "secret": "gKDY2cNLS8o0iUItx3dB4CnOZPn7A4bdEBHtsyyvinhCya+oiaggIAGTT8XSzyAVl3xCywQcgShmL9ykV8NOgg=="
-    },
-    {
-      "type": "shipper",
-      "name": "Michael Market",
-      "secret": "BR78ZC24udbOBcsdBrZB0rhmpKdnkXW3HPDH5SKqqdqIZZzi9X0/EvFAh5EcvmhX81pexgoI9TQQJOZb6i3Dvw=="
-    },
-    {
-      "type": "shipper",
-      "name": "Benjamin Supply",
-      "secret": "FBhiN6//4r66guT7eKrWpdCfa7/9h5qzrNmOpdknLr/3iPqd6G8juUcycUbh4IdllIGSi0kIiBJ7cyLWtNcJzA=="
-    },
-    {
-      "type": "shipper",
-      "name": "Fabian Worldwide",
-      "secret": "pC6X6ejEQyu5MBtdugpKg7kFmwOzLncuBkLmQJFCWlrW3hMQAMyuOsv8CVIzBapcUTY7abmVhhZRHAsiiTfFsw=="
-    },
-    {
-      "type": "shipper",
-      "name": "Jan Commerce",
-      "secret": "ddX6Cb/mSE/FZrsX776rXcDlJd8asC7kJW+ji5VlilRnCzpPSJtWtXbuaLlcPAlmaA/oYT1+WzWmoN6xjsdJ5w=="
+      "name": "Petra Distribution",
+      "secret": "JUcKE+AVz5/MrzxQ7T2n12+VXOfgx7Pp8mwEUjeVwb3Fej4nSggOTpVw4ahYuWAlJRod0LvlOjt0nGPtcCqU1g=="
     },
     {
       "type": "carrier",
-      "name": "Marcel Freight",
-      "secret": "EdX6A09s3WNQHEmL8k0ASsX0i1Uvko1f1K5Td6QFNSRbCWpHTYTxGJ3b8AxpJQ86FNpUI2PbuqaD811dTo2SdA=="
+      "name": "Joanna Logistics",
+      "secret": "txo+QDHcpd05DV5lPqHhLUGuRg+ZG6C73LuqzM8LprLpTpoECNwt1fVgcFMMcI2aRnjdT2LJ/FiLOldtteihCA=="
     },
     {
       "type": "shipper",
-      "name": "Marcin Network",
-      "secret": "oN9+Uqb+n739fteHoYzX71+8vMRaJuBNsdcTKtQPmC19EZtQlvJEMmwHWNE5BQPTgVRycvlacBzL4ztmFtbIVw=="
+      "name": "Hanna Market",
+      "secret": "PiC/KgaV+14nKHuxH2JQ+RiL/hTlkyPVlxUaKjL52egEig7z0dCIaPFnPRpAyny1kB2y9BaORezVb/Z6OxQUWg=="
     },
     {
       "type": "carrier",
-      "name": "Jan Delivery",
-      "secret": "EjzZc7vLYOEI++P1pPtcNQj5+f5qXsW2kBRdKa2HNWwF2wWkqygwHRdTburwj9pR9xekUNXsSrZZCbS4xehJnw=="
-    },
-    {
-      "type": "forwarder",
-      "name": "Sabrina Logistics",
-      "secret": "fnz42NAAwqR4G0KJjRgW9DJak+oLWctUrSQ2tbE5Ksz1kFb3yW8uOhmC2PXxLejgYfAMKyH6HpnbBITJSFtppg=="
+      "name": "Jan Shipment",
+      "secret": "XfkTL1HIJimK9b/LIs3AnnZtIpfKkJeD6mjRu18yqPFhfllGjVX/VYqfKVU6XrvcbmgPoe3lNflpQ4giWheyHQ=="
     },
     {
       "type": "shipper",
-      "name": "Elisabeth Express",
-      "secret": "AYmOgAURapjXUJGH7DJWPFmEcO2HymAouBdqj+oD5I44TOYbxjUysAWJ/vBbB+RCRT30sFucw48nIQGU30VLwg=="
-    },
-    {
-      "type": "shipper",
-      "name": "Łukasz Direct",
-      "secret": "U9rtSUQ/t94pxkTqZ5w66W6zgi5fNsUkq5A95DkvKlF/rT1kNXFU94XrC+4eASd+Wy6HWtx+1q3kqVXek5pscw=="
-    },
-    {
-      "type": "forwarder",
-      "name": "Renata Express",
-      "secret": "xuMNRj3Zhp6dyV1Sa3y2ee55Chja1vc8Ws2SN5Ibv6mg+jBC3ebm1w+YgGq8IXeAJGZ8ZTVPfBoStCYisdZv6g=="
-    },
-    {
-      "type": "shipper",
-      "name": "Laura Store",
-      "secret": "2q6somY5Y1ilCent2PzaMgzRBZOWjff6a0SbxkhcssmoODn5jXkgZKf8UJvMxRdUmiFSnd8Y0UwX76EOD2zrNg=="
+      "name": "Marek Online",
+      "secret": "kSP9jdi6/37O0LKcOUjYCRiu5uXAH7TnIah0oIvnOyNgrmncCgQ988a0mVcTq9wEjDSd1q0O/89zpjVdoIAIOA=="
     },
     {
       "type": "carrier",
-      "name": "Piotr Dispatch",
-      "secret": "v4zIJTlP+gTG13oR9fZB1GkK7rzo1soYUg6kEhe9CTdTzSH2rcOdycyBw5H5GVwf6AWGhu6zU0lP12Obg24/aw=="
-    },
-    {
-      "type": "shipper",
-      "name": "Grzegorz Shop",
-      "secret": "iuTx6VCMNhVd3MobrhJExo0g64HaEyZEX0iHENWl1JelPctJ1mDqCS4rAcqpgquFoWIaF2vIaPc78oqxCIFMdQ=="
+      "name": "Sebastian Shipment",
+      "secret": "JSYKN4vh1n0w3YaJ/uinJQgDkoOIUUI2o9Gagry8vQ1DvOJuFaGYBa/qLDkuN71GJ4cZanh+sCp7j65uUqMEsg=="
     },
     {
       "type": "carrier",
-      "name": "Kevin Supply",
-      "secret": "xcqTojd9xP/iV1fRsPPTw4vmdZrOFSaDy0wRyNcCON9Wm2us1lNcTQPyvyx4/vhNlm4p4wOCqhfuFahIx98uTg=="
+      "name": "Łukasz Delivery",
+      "secret": "aMySSCn15AiJ37OlVFXfgWmlyNli2wEtm/liziC4g2eu62+v2ylteyzmKSaHXDUxGqPAh5ZZY9b3+HmEjM5qqg=="
+    },
+    {
+      "type": "shipper",
+      "name": "Michał Shop",
+      "secret": "I89Pc3YAYz4FCP0PcCHxHebMabZMlXZwGiOjXju6k8muVmZDaBXAFgTx0tDPDeQMxMo1ZHlwzYtmMWDaoCzUCQ=="
+    },
+    {
+      "type": "carrier",
+      "name": "Benjamin Cargo",
+      "secret": "9mcJBSxPJRw8z9+O4Y1ltMbq1F68z1w3nGJox1y/CVxW2/zz0E/bx2O8OcGJhNRcVT8o/cWBDulkr+orAzySVg=="
+    },
+    {
+      "type": "shipper",
+      "name": "Tomasz Trade",
+      "secret": "aYniLefie9hpKoywGys6U1+W4ZCZIWLGpyiEucY1ceZSivCyk9EheAZSR3CebZLM8f3lpEFr3Zz6kMvOmb24aA=="
+    },
+    {
+      "type": "carrier",
+      "name": "Lukas Supply",
+      "secret": "LcNDQqSWOeGPv+N29Lw9e+4jyvQS0/p08HDbrD0mhHU/0AIIpwHPEkyTetXLGmi9EbWGefEIXyFzCh9UvYi+QQ=="
+    },
+    {
+      "type": "shipper",
+      "name": "Elisabeth Online",
+      "secret": "+lRKmR1glDCbTluhIjSwP8qU6OKssDTb2O+fF/7kedwp/xOT8LlvZg+Hu7TUz+HY0goxyifWrFNscaSgCPTaJA=="
     }
   ]
 }
