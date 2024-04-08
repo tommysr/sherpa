@@ -8,7 +8,7 @@ export function parseAcceptedOfferToApiAcceptedOffer(
 	return {
 		...acceptedOfferAccount,
 		owner: acceptedOfferAccount.owner.toString(),
-		accepted: acceptedOfferAccount.accepted.toNumber(),
+		accepted: new Date(acceptedOfferAccount.accepted.toNumber() * 1000).toISOString(),
 		shipment: acceptedOfferAccount.shipment.toString(),
 		details: parseOfferDetails(acceptedOfferAccount.details)
 	};

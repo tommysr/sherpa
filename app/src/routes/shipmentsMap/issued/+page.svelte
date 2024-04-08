@@ -13,20 +13,22 @@
 	let isMobileOpen = false;
 	let selectedNav: number = 0;
 
-
 	$: isWalletConnected = $walletStore.publicKey != null;
-
 
 	$: myAllShipments = $searchableShipments.data.filter(
 		(el) => el.account.shipper.toString() == $walletStore.publicKey?.toString()
 	);
-	$: processingShipments = myAllShipments.filter((el) => el.account.status != 1);
+
+	$: unprocessedShipments = myAllShipments.filter((el) => el.account.status == 1);
+	$: processingShipments = myAllShipments.filter(
+		(el) => el.account.status > 1 && el.account.status < 5
+	);
 	$: deliveredShipments = myAllShipments.filter((el) => el.account.status == 5);
 
 	$: insideNavData = [
 		{
-			name: 'Everything',
-			data: myAllShipments
+			name: 'Unprocessed',
+			data: unprocessedShipments
 		},
 		{
 			name: 'Processing',
@@ -45,7 +47,6 @@
 
 		selectedShipment = shipment;
 	}
-
 
 	function onShowClicked(shipment: ApiShipmentAccount) {
 		onSelectShipment(shipment);
@@ -89,6 +90,7 @@
 					<ul class="w-full flex-1 space-y-4">
 						{#each insideNavData[selectedNav].data as account, i (account.publicKey)}
 							<OrderListElement
+								showStatus
 								on:click={() => onSelectShipment(account)}
 								on:buttonClicked={() => onShowClicked(account)}
 								shipmentAccount={account}
@@ -118,8 +120,5 @@
 {/if}
 
 {#if isWalletConnected}
-	<ShipmentsLocations
-		shipments={insideNavData[selectedNav].data}
-		bind:selectedShipment
-	/>
+	<ShipmentsLocations shipments={insideNavData[selectedNav].data} bind:selectedShipment />
 {/if}

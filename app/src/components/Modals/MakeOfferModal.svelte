@@ -76,6 +76,8 @@
 				removeAfter: 30000
 			});
 			awaitedConfirmation.set(confirmation);
+
+			showModal = false;
 		} catch (err) {
 			createNotification({ text: 'Signing', type: 'failed', removeAfter: 5000 });
 			removeNotification(id);

@@ -18,8 +18,6 @@
 	export let showModal: boolean;
 	export let shipmentAccount: ApiShipmentAccount;
 
-	export let shipmentBuyInProgress: string | undefined;
-
 	$: shipmentData = shipmentAccount.account;
 
 	function isAccountNameValid(name: string | null): boolean {
@@ -28,10 +26,6 @@
 		}
 		return true;
 	}
-
-	const notifyBuy = () => {
-		shipmentBuyInProgress = shipmentAccount.publicKey;
-	};
 
 	async function handleBuyClick() {
 		const { program } = get(anchorStore);
@@ -52,7 +46,7 @@
 			return;
 		}
 
-		const id = createNotification({ text: 'signing', type: 'loading', removeAfter: undefined });
+		const id = createNotification({ text: 'Signing', type: 'loading', removeAfter: undefined });
 
 		const tx = await getBuyShipmentTx(
 			program,
@@ -66,16 +60,16 @@
 			const signature = await useSignAndSendTransaction(connection, wallet, tx);
 
 			removeNotification(id);
-			createNotification({ text: 'Tx send', type: 'success', removeAfter: 5000, signature });
+			createNotification({ text: 'Transaction', type: 'success', removeAfter: 5000, signature });
 
 			const confirmation = createNotification({
-				text: 'waiting for confirmation',
+				text: 'Confirmation',
 				type: 'loading',
-				removeAfter: 30000
+				removeAfter: 15000
 			});
-			awaitedConfirmation.set(confirmation);
 
-			notifyBuy();
+			awaitedConfirmation.set(confirmation);
+			showModal = false;
 		} catch (err) {
 			removeNotification(id);
 			createNotification({ text: 'Signing', type: 'failed', removeAfter: 5000 });
@@ -110,9 +104,7 @@
 		</div>
 	{/if}
 
-	{#if shipmentAccount.publicKey != shipmentBuyInProgress}
-		<div class="text-center pt-8">
-			<Button class="text-lg uppercase tracking-widest" on:click={handleBuyClick}>Buy</Button>
-		</div>
-	{/if}
+	<div class="text-center pt-8">
+		<Button class="text-lg uppercase tracking-widest" on:click={handleBuyClick}>Buy</Button>
+	</div>
 </Modal>

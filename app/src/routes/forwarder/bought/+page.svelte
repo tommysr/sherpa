@@ -9,6 +9,7 @@
 	import type { PageData } from './$types';
 	import MakeOfferModal from '$src/components/Modals/MakeOfferModal.svelte';
 	import type { ApiCarrierAccount } from '$src/utils/account/carrier';
+	import { searchableShipments } from '$src/stores/searchableShipments';
 
 	export let data: PageData;
 
@@ -21,19 +22,14 @@
 	$: isWalletConnected = $walletStore.publicKey != null;
 
 
-	// TODO: filter out offered
-	$: myForwarderShipments = isWalletConnected
-		? $forwardedShipments.filter(
-				(s) => s.meta.account.forwarder.toString() === $walletStore.publicKey?.toString() 
+	// not disappear until accepted
+	$: myForwardedShipments = isWalletConnected
+		? $searchableShipments.data.filter(
+				(s) => s.account.forwarder.toString() === $walletStore.publicKey?.toString() && s.account.status < 4
 			)
 		: [];
 
 	function onSelectShipment(shipment: ApiShipmentAccount) {
-		//TODO
-		// if (isMobileOpen) {
-		// 	isMobileOpen = false;
-		// }
-
 		selectedShipment = shipment;
 	}
 
@@ -44,10 +40,10 @@
 	}
 </script>
 
-{#if myForwarderShipments.length != 0}
+{#if myForwardedShipments.length != 0}
 	<div class="flex-1 flex w-full flex-col overflow-y-auto px-4 mt-5">
 		<ul class="w-full flex-1 space-y-4">
-			{#each myForwarderShipments as { meta, shipment }, i (meta.publicKey)}
+			{#each myForwardedShipments as shipment, i (shipment.publicKey)}
 				<OrderListElement
 					on:click={() => onSelectShipment(shipment)}
 					on:buttonClicked={() => onShowClicked(shipment)}
@@ -69,7 +65,7 @@
 
 {#if isWalletConnected}
 	<ShipmentsLocations
-		shipments={myForwarderShipments.map((el) => el.shipment)}
+		shipments={myForwardedShipments}
 		bind:selectedShipment
 	/>
 {/if}

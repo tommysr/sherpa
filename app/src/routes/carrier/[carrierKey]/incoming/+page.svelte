@@ -15,18 +15,16 @@
 	import type { ApiShipmentAccount } from '$src/utils/account/shipment';
 	import AcceptShipmentModal from '$src/components/Modals/AcceptShipmentModal.svelte';
 
-	let isMobileOpen = false;
+
 	let selectedOffer: OfferedShipment | undefined = undefined;
+	let selectedShipment: ApiShipmentAccount | undefined = undefined;
 	let showShipmentDetailsModal = false;
 	let showAcceptOfferModal = false;
 
 	$: shipments = $shipmentOffers.map((offerWithShipment) => offerWithShipment.shipment);
 
 	function onElementSelect(offer: OfferedShipment) {
-		if (isMobileOpen) {
-			isMobileOpen = false;
-		}
-
+		selectedShipment = offer.shipment;
 		selectedOffer = offer;
 	}
 
@@ -44,14 +42,14 @@
 		<ul class="w-full flex-1 space-y-4">
 			{#each $shipmentOffers as offer, i}
 				<OfferListElement
-					offerAccount={offer.meta}
+					offerAccount={offer}
 					on:click={() => onElementSelect(offer)}
 					on:acceptClick={async () => {
 						onElementSelect(offer);
 						showAcceptOfferModal = true;
 					}}
 					on:buttonClick={() => onShowClicked(offer)}
-					selectedAccount={selectedOffer?.meta.publicKey}
+					selectedShipment={selectedShipment?.publicKey}
 				/>
 			{/each}
 		</ul>
@@ -76,4 +74,4 @@
 	<AcceptShipmentModal offer={selectedOffer} bind:showModal={showAcceptOfferModal} />
 {/if}
 
-<ShipmentsLocations {shipments} selectedShipment={selectedOffer?.shipment} />
+<ShipmentsLocations {shipments} bind:selectedShipment />

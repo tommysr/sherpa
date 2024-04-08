@@ -10,6 +10,7 @@
 
 	export let shipmentAccount: ApiShipmentAccount;
 	export let selectedAccount: string | undefined = undefined;
+	export let showStatus = false;
 
 	let viewMessage = false;
 	const dispatch = createEventDispatcher();
@@ -41,10 +42,9 @@
 		}
 	}
 
-	let message = 'will be visible after accepting';
+	let message = 'decrypting...';
 
 	$: if (messageNeeded && viewMessage) {
-		message = 'decrypting';
 		const privateKey = getDecryptionKey(`shipper${shipmentAccount.publicKey}`);
 
 		if (privateKey) {
@@ -143,19 +143,30 @@
 				<br />
 				&#x2022; Destination: <span class="font-semibold">{locations.toName}</span>
 				<br />
+				<br />
 				&#x2022; Priority:
 				<span class={clsx('font-semibold', priority.color)}>{priority.name}</span>
 				<br />
-				&#x2022; Status:
-				<span class={clsx('font-semibold')}>{status}</span>
+				&#x2022; Penalty:
+				<span>{shipmentAccount.account.shipment.penalty / 10 ** 9} SOL</span>
+				<br />
+				&#x2022; Insurance:
+				<span>{shipmentAccount.account.shipment.collateral / 10 ** 9} SOL</span>
+
+				{#if showStatus}
+					<br />
+					&#x2022; Status:
+					<span class={clsx('font-semibold')}>{status}</span>
+				{/if}
 				<br />
 				{#if messageNeeded}
+					<br />
 					{#if !viewMessage}
 						<button class="underline" on:click|once={() => (viewMessage = true)}
 							>view message</button
 						>
 					{:else}
-						<span class={clsx('font-semibold')}>{message}</span>
+						<span>Message: {message}</span>
 					{/if}
 				{/if}
 			</p>

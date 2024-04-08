@@ -10,7 +10,6 @@
 
 	let selectedShipment: ApiShipmentAccount | undefined = undefined;
 	let showBuyShipmentModal = false;
-	let shipmentBuyInProgress: string | undefined = undefined;
 	let isMobileOpen = false;
 
 	$: isWalletConnected = $walletStore.publicKey != null;
@@ -68,6 +67,5 @@
 	<ShipmentBuyModal
 		shipmentAccount={selectedShipment}
 		bind:showModal={showBuyShipmentModal}
-		bind:shipmentBuyInProgress
 	/>
 {/if}
