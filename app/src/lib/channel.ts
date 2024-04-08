@@ -2,7 +2,7 @@ import { DF_BASE, DF_MODULUS, encodeString } from '$src/sdk/sdk';
 import type { Protocol } from '$src/utils/idl/types/protocol';
 import type { Program } from '@coral-xyz/anchor';
 import { TransactionInstruction, type PublicKey } from '@solana/web3.js';
-import { DiffieHellman, KeyObject, createDiffieHellman, diffieHellman, generateKey } from 'diffie-hellman';
+import {  createDiffieHellman } from 'diffie-hellman';
 import { AES } from 'crypto-ts';
 
 const getSharedKeyFromAccount = async (
@@ -27,12 +27,13 @@ export const getSendMessageIx = async (
 	program: Program<Protocol>,
 	shipment: PublicKey,
 	signer: PublicKey,
-	privateKey: string,
-	otherPublic: string,
+	privateKey: Buffer,
+	otherPublic: Buffer,
 	message: string
 ): Promise<TransactionInstruction> => {
-	const dh = createDiffieHellman(privateKey, 'base64');
-	const secret = dh.computeSecret(otherPublic, 'base64');
+	const dh = createDiffieHellman(privateKey);
+
+	const secret = dh.computeSecret(otherPublic);
 	const shared = Uint8Array.from(dh.getPublicKey());
 	const encryptedMessage = AES.encrypt(message, secret.toString('hex')).toString();
 
@@ -53,9 +54,9 @@ export const getOpenChannelIx = async (
 	program: Program<Protocol>,
 	shipment: PublicKey,
 	signer: PublicKey,
-	sharedKey: string
+	sharedKey: Buffer
 ): Promise<TransactionInstruction> => {
-	const shared = new Uint8Array(Buffer.from(sharedKey, 'base64'));
+	const shared = new Uint8Array(sharedKey);
 
 	const value = Array(256)
 		.fill(0)

@@ -2581,6 +2581,13 @@
   dependencies:
     "@types/ms" "*"
 
+"@types/diffie-hellman@^5.0.3":
+  version "5.0.3"
+  resolved "https://registry.yarnpkg.com/@types/diffie-hellman/-/diffie-hellman-5.0.3.tgz#3dac1ff056f590dd8836deaeb9d67da4b2b0bbfe"
+  integrity sha512-GuqClazP8JyM1ZxohC9UGU0QVPc7C6oIoFXwuX1EzFdXISsKudQ5DaGNxajW9Sthny4iT5SYC4Q0eVzPZ9RRbA==
+  dependencies:
+    "@types/node" "*"
+
 "@types/eslint-scope@^3.7.3":
   version "3.7.7"
   resolved "https://registry.yarnpkg.com/@types/eslint-scope/-/eslint-scope-3.7.7.tgz#3108bd5f18b0cdb277c867b3dd449c9ed7079ac5"

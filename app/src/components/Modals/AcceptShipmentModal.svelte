@@ -30,7 +30,7 @@
 		program: Program<Protocol>,
 		signer: PublicKey,
 		shipment: PublicKey,
-		shipperSharedKey: string,
+		shipperSharedKey: Buffer,
 		message: string
 	) {
 		const { privateKey, sharedKey } = generateKeys();
@@ -40,15 +40,15 @@
 		return await getSendMessageIx(program, shipment, signer, privateKey, shipperSharedKey, message);
 	}
 
-	function generateKeys(): { privateKey: string; sharedKey: string } {
-		let dh = createDiffieHellman(DF_MODULUS, DF_BASE.toString());
+	function generateKeys() {
+		let dh = createDiffieHellman(DF_MODULUS);
 		dh.generateKeys();
-		const privateKey = dh.getPrivateKey('base64');
-		const sharedKey = dh.getPublicKey('base64');
+		const privateKey = dh.getPrivateKey();
+		const sharedKey = dh.getPublicKey();
 
 		return { privateKey, sharedKey };
 	}
-
+	
 	const handleAcceptOfferClick = async (message: string) => {
 		const { program } = get(anchorStore);
 		const wallet = get(walletStore);
@@ -78,7 +78,7 @@
 			program,
 			$walletStore.publicKey!,
 			new PublicKey(offer.shipment.publicKey),
-			offer.shipment.account.channel.shipper,
+			Buffer.from(offer.shipment.account.channel.shipper),
 			message
 		);
 
@@ -101,7 +101,7 @@
 	const { form, data } = createForm<yup.InferType<typeof schema>>({
 		extend: [reporter, validator({ schema })],
 		onSubmit: async (values) => {
-			handleAcceptOfferClick;
+			handleAcceptOfferClick(values.message)
 		},
 		initialValues: { message: '' }
 	});

@@ -134,10 +134,10 @@
 	}
 
 	function generateKeys() {
-		let dh = createDiffieHellman(DF_MODULUS, DF_BASE.toString());
+		let dh = createDiffieHellman(DF_MODULUS);
 		dh.generateKeys();
-		const privateKey = dh.getPrivateKey('base64');
-		const sharedKey = dh.getPublicKey('base64');
+		const privateKey = dh.getPrivateKey();
+		const sharedKey = dh.getPublicKey();
 
 		return { privateKey, sharedKey };
 	}
