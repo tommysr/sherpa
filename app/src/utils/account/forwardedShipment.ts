@@ -1,6 +1,5 @@
 import type { BN, ProgramAccount } from '@coral-xyz/anchor';
 import type { ApiProgramAccount } from './common';
-import type { ShipmentData } from './shipment';
 import type { PublicKey } from '@solana/web3.js';
 
 export interface ForwardedShipment<Price, Key> {
@@ -8,7 +7,7 @@ export interface ForwardedShipment<Price, Key> {
 	shipment: Key;
 	resellPrice: Price;
 	no: number;
-	reserved: number[];
+	reserved: number[]; //4
 }
 
 export type FetchedForwardedShipment = ForwardedShipment<BN, PublicKey>;

@@ -4,16 +4,16 @@ use anchor_lang::prelude::{
 };
 use uint::construct_uint;
 
-use crate::Name;
+use crate::Message;
 
 construct_uint! {
     pub struct Key(4); // 4 * 64bit = 256 bit
 }
 
 #[zero_copy]
-#[derive(Debug, Default, PartialEq, BorshSerialize, BorshDeserialize, Eq)]
+#[derive(Debug, PartialEq, BorshSerialize, BorshDeserialize, Eq)]
 pub struct Public {
-    pub value: [u64; 4], // 256 bit
+    pub value: [u8; 256],
 }
 
 #[zero_copy]
@@ -21,5 +21,11 @@ pub struct Public {
 pub struct Channel {
     pub shipper: Public,
     pub carrier: Public,
-    pub data: Name,
+    pub data: Message,
+}
+
+impl Default for Public {
+    fn default() -> Self {
+        Public { value: [0; 256] }
+    }
 }

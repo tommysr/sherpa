@@ -10,7 +10,7 @@ use events::*;
 
 use anchor_lang::prelude::*;
 
-declare_id!("SynkXxnhyVSK66ewC6i7onyf2sn5VKxiYc8a7tWmZRp");
+declare_id!("D6na56Wd31BXMmMUziNTsScQUnUVe6QVmxrpDJG7azpT");
 
 #[program]
 pub mod protocol {
@@ -61,7 +61,11 @@ pub mod protocol {
         actions::channel::open_channel::handler(ctx, key)
     }
 
-    pub fn send_message(ctx: Context<SendMessage>, key: Public, message: Name) -> Result<()> {
+    pub fn send_message(ctx: Context<SendMessage>, key: Public, message: Message) -> Result<()> {
         actions::channel::send_message::handler(ctx, key, message)
+    }
+
+    pub fn confirm_delivery(ctx: Context<Confirm>) -> Result<()> {
+        actions::shipper::confirm::handler(ctx)
     }
 }

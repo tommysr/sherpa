@@ -43,6 +43,8 @@ pub struct Geography {
 #[zero_copy]
 #[derive(Debug, Default, PartialEq, BorshSerialize, BorshDeserialize)]
 pub struct ShipmentData {
+    pub collateral: u64,
+    pub penalty: u64,
     pub geography: Geography,
     pub details: ShipmentDetails,
     pub dimensions: ShipmentDimensions,

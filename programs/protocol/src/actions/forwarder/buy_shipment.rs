@@ -1,6 +1,6 @@
 use anchor_lang::{prelude::*, solana_program::system_instruction};
 
-use crate::{ForwardedShipment, Error, Forwarder, Shipment, ShipmentTransferred, Shipper};
+use crate::{Error, ForwardedShipment, Forwarder, Shipment, ShipmentStatusUpdated, ShipmentTransferred, Shipper};
 
 #[derive(Accounts)]
 pub struct BuyShipment<'info> {
@@ -26,57 +26,61 @@ pub struct BuyShipment<'info> {
     pub signer: Signer<'info>,
     #[account(mut)]
     pub payer: Signer<'info>,
-    #[account(mut,
-        constraint = shipment_owner.key() == shipment.load().unwrap().shipper @ Error::InvalidShipperAccount,
-    )]
-    /// CHECK: The account of the shipper
-    pub shipment_owner: AccountInfo<'info>,
     pub system_program: Program<'info, System>,
 }
 
 pub fn handler(ctx: Context<BuyShipment>) -> Result<()> {
-    let forwarded = &mut ctx.accounts.bought.load_init()?;
-    let shipment = &mut ctx.accounts.shipment.load_mut()?;
-    let forwarder = &mut ctx.accounts.forwarder.load_mut()?;
+    let penalty = {
+        let forwarded = &mut ctx.accounts.bought.load_init()?;
+        let shipment = &mut ctx.accounts.shipment.load_mut()?;
+        let forwarder = &mut ctx.accounts.forwarder.load_mut()?;
 
-    // Check if the shipment is for sale
-    require_neq!(shipment.forwarder, shipment.shipper , Error::ShipmentNotForSale);
-    require_eq!(shipment.forwarder, Pubkey::default(), Error::ShipmentSold);
-    require_eq!(shipment.carrier, Pubkey::default(), Error::ShipmentSold);
+        // Check if the shipment is for sale
+        require_neq!(shipment.forwarder, shipment.shipper , Error::ShipmentNotForSale);
+        require_eq!(shipment.forwarder, Pubkey::default(), Error::ShipmentSold);
+        require_eq!(shipment.carrier, Pubkey::default(), Error::ShipmentSold);
 
-    // Update owner
-    shipment.forwarder = forwarder.creator;
+        // Update owner
+        shipment.forwarder = forwarder.creator;
+        shipment.status = 2;
 
-    // Check if the buyer has enough funds
-    require_gte!(ctx.accounts.signer.get_lamports(), shipment.price, Error::NotEnoughFunds);
+        emit!(ShipmentStatusUpdated {
+            shipment: ctx.accounts.shipment.key(),
+            status: shipment.status,
+        });
 
-    // Create forwarded shipment
-    **forwarded = ForwardedShipment {
-        forwarder: forwarder.creator,
-        shipment: ctx.accounts.shipment.key(),
-        resell_price: u64::MAX,
-        no: forwarder.count,
-        reserved: [0; 4],
+        // Check if the buyer has enough funds
+        require_gte!(ctx.accounts.signer.get_lamports(), shipment.price, Error::NotEnoughFunds);
+
+        // Create forwarded shipment
+        **forwarded = ForwardedShipment {
+            forwarder: forwarder.creator,
+            shipment: ctx.accounts.shipment.key(),
+            resell_price: u64::MAX,
+            no: forwarder.count,
+            reserved: [0; 4],
+        };
+
+        forwarder.count += 1;
+
+        emit!(ShipmentTransferred {
+            seller: shipment.shipper,
+            buyer: shipment.forwarder,
+            shipment: ctx.accounts.shipment.key(),
+            forwarded: ctx.accounts.bought.key(),
+        });
+
+        shipment.shipment.penalty
     };
-
-    forwarder.count += 1;
-
-    emit!(ShipmentTransferred {
-        seller: ctx.accounts.shipper.key(),
-        buyer: ctx.accounts.forwarder.key(),
-        shipment: ctx.accounts.shipment.key(),
-        forwarded: ctx.accounts.bought.key(),
-    });
 
 
     // Invoke the transfer instruction
-    let transfer_instruction = system_instruction::transfer(ctx.accounts.payer.key, ctx.accounts.shipment_owner.key, shipment.price);
-
+    let transfer_instruction = system_instruction::transfer(ctx.accounts.payer.key, &ctx.accounts.shipment.key(), penalty);
     anchor_lang::solana_program::program::invoke_signed(
         &transfer_instruction,
         &[
             ctx.accounts.payer.to_account_info(),
-            ctx.accounts.shipment_owner.clone(),
+            ctx.accounts.shipment.to_account_info(),
             ctx.accounts.system_program.to_account_info(),
         ],
         &[],
