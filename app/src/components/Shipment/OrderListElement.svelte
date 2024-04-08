@@ -45,8 +45,7 @@
 
 	let message = 'decrypting...';
 
-	$: if (isViewerShipper && shipmentData.status == 4 && viewMessage) {
-		message = 'decrypting';
+	$: if (messageNeeded && viewMessage) {
 		const privateKey = getDecryptionKey(`shipper${shipmentAccount.publicKey}`);
 
 		if (privateKey) {
@@ -155,10 +154,21 @@
 				&#x2022; Insurance:
 				<span>{shipmentAccount.account.shipment.collateral / 10 ** 9} SOL</span>
 
-				{#if isViewerShipper && !viewMessage}
-					<button on:click|once={() => (viewMessage = true)}>view message</button>
-				{:else if isViewerShipper && viewMessage}
-					<span class={clsx('font-semibold')}>{message}</span>
+				{#if showStatus}
+					<br />
+					&#x2022; Status:
+					<span class={clsx('font-semibold')}>{status}</span>
+				{/if}
+				<br />
+				{#if messageNeeded}
+					<br />
+					{#if !viewMessage}
+						<button class="underline" on:click|once={() => (viewMessage = true)}
+							>view message</button
+						>
+					{:else}
+						<span>Message: {message}</span>
+					{/if}
 				{/if}
 			</p>
 
