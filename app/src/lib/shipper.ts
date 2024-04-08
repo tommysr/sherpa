@@ -70,8 +70,8 @@ export const getCreateShipmentTx = async (
 		.createShipment(new BN(price * 10 ** 9), encodeString(name), {
 			deadline: new BN(deadline.valueOf() / 1000),
 			details,
-			collateral: new BN(collateral),
-			penalty: new BN(penalty),
+			collateral: new BN(collateral * 1e9),
+			penalty: new BN(penalty * 1e9),
 			dimensions: {
 				depth: dimensions.depth * 1000,
 				height: dimensions.height * 1000,
