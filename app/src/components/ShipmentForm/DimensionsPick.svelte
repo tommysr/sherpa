@@ -112,7 +112,7 @@
 	>
 		<div class="">Width</div>
 		<div class="">Height</div>
-		<div class="">Depth</div>
+		<div class="">Length</div>
 		<div class="">Weight</div>
 	</div>
 	<div class="grid grid-cols-4 gap-3 items-center justify-items-center w-full text-primary py-2">
@@ -143,8 +143,8 @@
 				><DecimalInput
 					data-felte-keep-on-remove
 					bind:value={depth}
-					name="depth"
-					placeholder="depth"
+					name="length"
+					placeholder="length"
 					required
 				/></span
 			>
