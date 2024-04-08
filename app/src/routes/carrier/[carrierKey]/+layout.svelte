@@ -28,9 +28,6 @@
 		{
 			name: 'accepted'
 		}
-		// {
-		// 	name: 'Delivered'
-		// }
 	];
 
 	function subscribeToOffersEvents(): number[] {

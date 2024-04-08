@@ -11,28 +11,20 @@
 	import { getBuyShipmentTx } from '$lib/forwarder';
 	import { userStore } from '$src/stores/user';
 	import { createNotification, removeNotification } from '../Notification/notificationsStore';
-	import { createEventDispatcher } from 'svelte';
 	import { awaitedConfirmation } from '$src/stores/confirmationAwait';
 
 	export let showModal: boolean;
 	export let shipmentAccount: ApiShipmentAccount;
 
-	export let shipmentBuyInProgress: string | undefined;
-
 	$: shipmentData = shipmentAccount.account;
 	$: dimensions = Object.entries(shipmentData.shipment.dimensions) as Entries<ShipmentDimensions>;
 	$: locations = shipmentData.shipment.geography;
-	// // $: properties = Object.entries(shipmentData.shipment.details) as Entries<ShipmentDetails>;
 
 	function isAccountNameValid(name: string | null): boolean {
 		if (!name || name.length == 0 || name.length > 64) {
 			return false;
 		}
 		return true;
-	}
-
-	const notifyBuy = () => {
-		shipmentBuyInProgress = shipmentAccount.publicKey
 	}
 
 	async function handleBuyClick() {
@@ -54,7 +46,7 @@
 			return;
 		}
 
-		const id = createNotification({ text: 'signing', type: 'loading', removeAfter: undefined });
+		const id = createNotification({ text: 'Signing', type: 'loading', removeAfter: undefined });
 
 		const tx = await getBuyShipmentTx(
 			program,
@@ -68,12 +60,16 @@
 			const signature = await useSignAndSendTransaction(connection, wallet, tx);
 
 			removeNotification(id);
-			createNotification({ text: 'Tx send', type: 'success', removeAfter: 5000, signature });
+			createNotification({ text: 'Transaction', type: 'success', removeAfter: 5000, signature });
 
-			const confirmation = createNotification({ text: 'waiting for confirmation', type: 'loading', removeAfter: 30000});
-			awaitedConfirmation.set(confirmation)
+			const confirmation = createNotification({
+				text: 'Confirmation',
+				type: 'loading',
+				removeAfter: 15000
+			});
 
-			notifyBuy()
+			awaitedConfirmation.set(confirmation);
+			showModal = false;
 		} catch (err) {
 			removeNotification(id);
 			createNotification({ text: 'Signing', type: 'failed', removeAfter: 5000 });
@@ -162,9 +158,7 @@
 		/>
 	{/if}
 
-	{#if shipmentAccount.publicKey != shipmentBuyInProgress}
-		<div class="text-center pt-20">
-			<button on:click={handleBuyClick}>Buy</button>
-		</div>
-	{/if}
+	<div class="text-center pt-20">
+		<button on:click={handleBuyClick}>Buy</button>
+	</div>
 </Modal>

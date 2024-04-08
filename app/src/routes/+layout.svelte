@@ -47,6 +47,19 @@
 	} from '$src/components/Notification/notificationsStore';
 	import { awaitedConfirmation } from '$src/stores/confirmationAwait';
 	import { web3Store } from '$src/stores/web3';
+	import type {
+		ApiShipmentOffer,
+		ApiShipmentOfferAccount,
+		ShipmentOffer
+	} from '$src/utils/account/offer';
+	import { parseOfferToApiOffer } from '$src/utils/parse/offer';
+	import { shipmentsOffersMeta } from '$src/stores/offers';
+	import type {
+		AcceptedShipmentOffer,
+		ApiAcceptedShipmentOfferAccount
+	} from '$src/utils/account/acceptedOffer';
+	import { parseAcceptedOfferToApiAcceptedOffer } from '$src/utils/parse/acceptedOffer';
+	import { acceptedShipmentOffers, acceptedShipmentsOffersMeta } from '$src/stores/acceptedOffers';
 
 	let wallets: Adapter[];
 	// it's a solana devnet cluster, but consider changing it to more performant provider
@@ -76,7 +89,7 @@
 
 		const signature = await connection.requestAirdrop(publicKey!, SOL_IN_LAMPORTS);
 
-		console.log(signature)
+		console.log(signature);
 
 		const latestBlockHash = await connection.getLatestBlockhash();
 
@@ -89,15 +102,16 @@
 		return signature;
 	};
 
-
 	$: if (isWalletConnected && SHOULD_REQUEST_AIRDROP) {
 		requiresAirdrop().then((res) => {
 			if (res) {
-				airDropSol().then((signature) => {
-					createNotification({ text: 'airdrop', type: 'success', removeAfter: 5000, signature })
-				}).catch(() => {
-					createNotification({ text: 'airdrop', type: 'failed', removeAfter: 3000 });
-				})
+				airDropSol()
+					.then((signature) => {
+						createNotification({ text: 'airdrop', type: 'success', removeAfter: 5000, signature });
+					})
+					.catch(() => {
+						createNotification({ text: 'airdrop', type: 'failed', removeAfter: 3000 });
+					});
 			}
 		});
 	}
@@ -186,19 +200,126 @@
 					return meta;
 				});
 
-				searchableShipments.update(s => {
-					const shipmentIndex = s.data.findIndex(a => a.publicKey === event.shipment.toString())
+				searchableShipments.update((s) => {
+					const shipmentIndex = s.data.findIndex((a) => a.publicKey === event.shipment.toString());
 
 					const shipmentToChange = s.data[shipmentIndex];
 					shipmentToChange.account.status = 2;
 					shipmentToChange.account.forwarder = event.buyer.toString();
 
 					return s;
-				})
+				});
 			}
 		);
 
-		return [unsubscribeForwardedShipment, unsubscribeShipmentCreated];
+		const unsubscribeOfferedShipment = program.addEventListener('OfferMade', async (event) => {
+			const offeredShipmentPublicKey = event.offer;
+
+			const offeredShipment: ShipmentOffer =
+				await program.account.shipmentOffer.fetch(offeredShipmentPublicKey);
+
+			const parsedOfferedShipment: ApiShipmentOfferAccount = {
+				publicKey: offeredShipmentPublicKey.toString(),
+				account: parseOfferToApiOffer(offeredShipment)
+			};
+
+			const offerer = event.from;
+
+			if ($walletStore.publicKey && offerer.toString() === $walletStore.publicKey.toString()) {
+				const id = $awaitedConfirmation;
+				if (id) {
+					removeNotification(id);
+				}
+				createNotification({ text: 'Offer', type: 'success', removeAfter: 5000 });
+			}
+
+			const shipment = event.shipment.toString();
+			forwardedShipmentsMeta.update((meta) => {
+				const forwardIndex = meta.findIndex((f) => f.account.shipment === shipment);
+
+				if (forwardIndex != -1) {
+					meta.splice(forwardIndex, 1);
+				}
+
+				return meta;
+			});
+
+			shipmentsOffersMeta.update((o) => {
+				o.push(parsedOfferedShipment);
+
+				return o;
+			});
+
+			searchableShipments.update((s) => {
+				const shipmentIndex = s.data.findIndex((a) => a.publicKey === event.shipment.toString());
+
+				if (shipmentIndex != -1) {
+					 s.data[shipmentIndex].account.status = 3;
+				}
+
+				return s;
+			});
+		});
+
+		const unsubscribeAcceptedShipment = program.addEventListener('OfferAccepted', async (event) => {
+			const offeredShipmentPublicKey = event.offer;
+
+			const acceptedShipment: AcceptedShipmentOffer =
+				await program.account.acceptedOffer.fetch(offeredShipmentPublicKey);
+
+			const parsedAcceptedShipment: ApiAcceptedShipmentOfferAccount = {
+				publicKey: offeredShipmentPublicKey.toString(),
+				account: parseAcceptedOfferToApiAcceptedOffer(acceptedShipment)
+			};
+
+			const carrier = event.to;
+
+			if ($walletStore.publicKey && carrier.toString() === $walletStore.publicKey.toString()) {
+				const id = $awaitedConfirmation;
+				if (id) {
+					removeNotification(id);
+				}
+				createNotification({ text: 'Accept', type: 'success', removeAfter: 5000 });
+			}
+
+			const shipment = event.shipment.toString();
+			shipmentsOffersMeta.update((meta) => {
+				const offerIndex = meta.findIndex((f) => f.account.shipment === shipment);
+
+				if (offerIndex != -1) {
+					meta.splice(offerIndex, 1);
+				}
+
+				return meta;
+			});
+
+			acceptedShipmentsOffersMeta.update((o) => {
+				o.push(parsedAcceptedShipment);
+
+				return o;
+			});
+
+			const shipmentPublicKey = event.shipment;
+
+			const shipmentAccount: FetchedShipment = await program.account.shipment.fetch(shipmentPublicKey);
+
+			const parsedShipment: ApiShipmentAccount = {
+				publicKey: shipmentPublicKey.toString(),
+				account: parseShipmentToApiShipment(shipmentAccount)
+			};
+
+			searchableShipments.update((s) => {
+				const shipmentIndex = s.data.findIndex((a) => a.publicKey === event.shipment.toString());
+
+				if (shipmentIndex != -1) {
+					s.data[shipmentIndex].account = parsedShipment.account;
+				}
+
+				return s;
+			});
+		});
+
+		return [unsubscribeForwardedShipment, unsubscribeShipmentCreated, unsubscribeOfferedShipment, unsubscribeAcceptedShipment];
 	}
 
 	onMount(() => {

@@ -9,7 +9,7 @@ export interface AcceptedShipmentOfferStruct<Date, BigNumber, Key, U64MAX> {
 	owner: Key;
 	shipment: Key;
 	details: OfferDetails<BigNumber, U64MAX>;
-	accepted: BigNumber;
+	accepted: Date;
 	no: number;
 	reserved: number[]; // 4
 }
