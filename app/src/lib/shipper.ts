@@ -43,8 +43,6 @@ export const getCreateShipmentTx = async (
 	shipmentParams: CreateShipmentParams,
 	shipperName: string
 ): Promise<Transaction> => {
-	console.log(shipmentParams);
-
 	const tx = new Transaction();
 
 	const { account: shipperAccount, accountKey: shipper } = await fetchShipperAccount(
@@ -79,7 +77,7 @@ export const getCreateShipmentTx = async (
 				fromName: encodeString(geography.fromName),
 				toName: encodeString(geography.toName)
 			},
-			when: new BN(Math.floor(when.valueOf() / 1000)),
+			when: new BN(Math.floor(when.valueOf() / 1000))
 		})
 		.accounts({
 			shipper,

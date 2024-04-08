@@ -3,6 +3,7 @@
 	import clsx from 'clsx';
 	import { createForm } from 'felte';
 	import Button from '../Buttons/Button.svelte';
+	import type { CreateShipmentFormInterface } from './interfaces';
 
 	let fragilityMap = {
 		1: 'Very fragile',
@@ -47,19 +48,21 @@
 		[key: string]: UniversalInterface<T>;
 	}
 
-	export let initialValues: UniversalInterface<string | Date | number>;
+	export let initialValues: CreateShipmentFormInterface;
 	export let onSubmit;
 	export let onBack;
 
 	export let showModal = true;
 
-	$: flatStates = Object.entries(initialValues).flatMap(([key, value]) => {
-		return Object.entries(value).map(([nestedKey, nestedValue]) => {
-			return { [nestedKey]: nestedValue };
-		});
-	});
+	// $: console.log(initialValues);
 
-	$: console.log(flatStates);
+	// $: flatStates = Object.entries(initialValues).flatMap(([key, value]) => {
+	// 	return Object.entries(value).map(([nestedKey, nestedValue]) => {
+	// 		return { [nestedKey]: nestedValue };
+	// 	});
+	// });
+
+	// $: console.log(flatStates);
 
 	const { form, data } = createForm({
 		extend: [reporter],
@@ -87,13 +90,13 @@
 				</div>
 
 				<div>
-					<span>{flatStates[0].name}</span>
+					<span>{initialValues.name.name}</span>
 				</div>
 				<div>
-					<span>{flatStates[1].name}</span>
+					<span>{initialValues.shipmentName.name}</span>
 				</div>
 				<div>
-					<span>{flatStates[7].count}</span>
+					<span>{initialValues.details.count}</span>
 				</div>
 			</div>
 
@@ -108,7 +111,7 @@
 					<h2
 						class="bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent font-bold text-3xl"
 					>
-						{Number(flatStates[15].price)} SOL
+						{Number(initialValues.price.price)} SOL
 					</h2>
 				</div>
 			</div>
@@ -123,14 +126,14 @@
 				</div>
 
 				<div class="px-3 text-center">
-					<span>{new Date(flatStates[3].when.toString()).toLocaleString()}</span>
+					<span>{new Date(initialValues.dates.when.toString()).toLocaleString()}</span>
 				</div>
 				<div class="px-3 text-center">
-					<span>{new Date(flatStates[2].deadline.toString()).toLocaleString()}</span>
+					<span>{new Date(initialValues.dates.deadline.toString()).toLocaleString()}</span>
 				</div>
 
-				{#if priorityMap[flatStates[5].priority.toString()]}
-					{@const priority = priorityMap[flatStates[5].priority.toString()]}
+				{#if priorityMap[initialValues.details.priority.toString()]}
+					{@const priority = priorityMap[initialValues.details.priority.toString()]}
 					<div class="self-center">
 						<span class={clsx(priority.color)}>{priority.name}</span>
 					</div>
@@ -145,7 +148,7 @@
 				</div>
 
 				<div class="col-span-3">
-					{flatStates[21].sourceName + ' → ' + flatStates[20].destinationName}
+					{initialValues.locations?.sourceName + ' → ' + initialValues.locations?.destinationName}
 				</div>
 			</div>
 
@@ -158,12 +161,12 @@
 				</div>
 
 				<div>
-					{flatStates[14].weight}
-					{flatStates[9].weightMetrics}
+					{initialValues.dimensions.weight}
+					{initialValues.dimensions.weightMetrics}
 				</div>
 				<div class="col-span-2">
-					{flatStates[11].width} x {flatStates[12].height} x {flatStates[13].depth}
-					{flatStates[10].distanceMetrics}
+					{initialValues.dimensions.width} x {initialValues.dimensions.height} x {initialValues.dimensions.depth}
+					{initialValues.dimensions.distanceMetrics}
 				</div>
 			</div>
 
@@ -176,10 +179,10 @@
 				</div>
 
 				<div>
-					<span>{fragilityMap[flatStates[4].fragility.toString()]}</span>
+					<span>{fragilityMap[initialValues.details.fragility.toString()]}</span>
 				</div>
 				<div>
-					<span>{accessMap[flatStates[6].access.toString()]}</span>
+					<span>{accessMap[initialValues.details.access.toString()]}</span>
 				</div>
 			</div>
 		</div>
