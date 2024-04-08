@@ -3,15 +3,16 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 import { nodePolyfills } from 'vite-plugin-node-polyfills';
 import { defineConfig } from 'vitest/config';
+import vitePluginRequire from "vite-plugin-require";
 
 export default defineConfig({
 	plugins: [
 		sveltekit(),
 		nodePolyfills({
 			globals: {
-				Buffer: true
+				Buffer: true,
 			}
-		})
+		}),
 	],
 	resolve: {
 		alias: {
@@ -21,6 +22,7 @@ export default defineConfig({
 			$utils: path.resolve(path.dirname(fileURLToPath(import.meta.url)), 'src', 'utils')
 		}
 	},
+
 	ssr: {
 		noExternal: ['@coral-xyz/anchor']
 	},

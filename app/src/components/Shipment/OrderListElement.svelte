@@ -1,11 +1,17 @@
 <script lang="ts">
 	import type { ApiShipmentAccount } from '$src/utils/account/shipment';
+	import { getLocalStorage } from '$src/utils/wallet/localStorage';
 	import clsx from 'clsx';
 	import { createEventDispatcher } from 'svelte';
+	import { createDiffieHellman } from 'diffie-hellman';
+	import { AES } from 'crypto-ts';
+	import { walletStore } from '$src/stores/wallet';
+	import { DF_MODULUS, decodeDecrypted, decodeName } from '$src/sdk/sdk';
 
 	export let shipmentAccount: ApiShipmentAccount;
 	export let selectedAccount: string | undefined = undefined;
 
+	let viewMessage = false;
 	const dispatch = createEventDispatcher();
 	const handleShowClick = (e: MouseEvent) => {
 		dispatch('buttonClicked');
@@ -17,6 +23,47 @@
 	$: priorityColor = getPriorityColor(priority);
 	$: statusNumber = shipmentData.status;
 	$: status = getStatusString(statusNumber);
+	$: isViewerShipper =
+		$walletStore.publicKey && $walletStore.publicKey.toString() === shipmentData.shipper;
+
+	$: messageNeeded = isViewerShipper && shipmentData.status >= 4;
+
+	function getDecryptionKey(localStorageKey: string) {
+		try {
+			const privateKey = getLocalStorage<string>(localStorageKey);
+
+			if (privateKey) {
+				return Buffer.from(privateKey, 'hex');
+			} else {
+				return null;
+			}
+		} catch (err) {
+			return null;
+		}
+	}
+
+	let message = 'will be visible after accepting';
+
+	$: if (messageNeeded && viewMessage) {
+		message = 'decrypting';
+		const privateKey = getDecryptionKey(`shipper${shipmentAccount.publicKey}`);
+
+		if (privateKey) {
+			const dh = createDiffieHellman(DF_MODULUS);
+			dh.setPrivateKey(privateKey);
+			dh.generateKeys();
+
+			const secret = dh.computeSecret(
+				Buffer.from(Uint8Array.from(shipmentAccount.account.channel.carrier))
+			);
+
+			message = decodeDecrypted(
+				AES.decrypt(shipmentAccount.account.channel.data, secret.toString('hex')).words
+			);
+		} else {
+			message = 'private key not found';
+		}
+	}
 
 	function getStatusString(status: number) {
 		switch (status) {
@@ -89,6 +136,16 @@
 				<br />
 				&#x2022; Status:
 				<span class={clsx('font-semibold')}>{status}</span>
+				<br />
+				{#if messageNeeded}
+					{#if !viewMessage}
+						<button class="underline" on:click|once={() => (viewMessage = true)}
+							>view message</button
+						>
+					{:else}
+						<span class={clsx('font-semibold')}>{message}</span>
+					{/if}
+				{/if}
 			</p>
 
 			<button class="text-sm xl:text-md text-accent font-medium" on:click={handleShowClick}

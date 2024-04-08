@@ -1,6 +1,6 @@
 import type { PublicKey } from '@solana/web3.js';
 import type { FetchedShipment, ParsedShipment, Public, Shipment, ShipmentData } from '../account/shipment';
-import type { AccountName, Message } from '../account/common';
+import type { AccountName } from '../account/common';
 
 import { decodeName } from '$sdk/sdk';
 import type BN from 'bn.js';
@@ -39,8 +39,8 @@ export function parseShipmentToApiShipment(
 		price: shipmentAcc.price.toNumber(),
 		name: decodeName(shipmentAcc.name),
 		channel: {
-			carrier: decodeName(shipmentAcc.channel.carrier),
-			shipper: decodeName(shipmentAcc.channel.shipper),
+			carrier: shipmentAcc.channel.carrier.value,
+			shipper:  shipmentAcc.channel.shipper.value,
 			data: decodeName(shipmentAcc.channel.data)
 		},
 		shipment: parseShipmentDataToApiShipmentData(shipmentAcc.shipment)

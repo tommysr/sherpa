@@ -1,6 +1,6 @@
 import type { ProgramAccount, BN } from '@coral-xyz/anchor';
 import type { PublicKey } from '@solana/web3.js';
-import type { ApiProgramAccount, AccountName, Message } from './common';
+import type { ApiProgramAccount, AccountName } from './common';
 
 export interface ShipmentDetails {
 	count: number;
@@ -45,6 +45,10 @@ export interface Channel<Public, Message> {
 	data: Message;
 }
 
+export type Message = {
+	value: number[]; // 256
+}
+
 export type Public = {
 	value: number[];
 };
@@ -63,7 +67,7 @@ export interface Shipment<ChannelPublicKey, ChannelMessage, Name, Date, BigNumbe
 }
 
 export type FetchedShipment = Shipment<Public, Message, AccountName, BN, BN, PublicKey>;
-export type ParsedShipment = Shipment<string, string, string, string, number, string>;
+export type ParsedShipment = Shipment<number[], string, string, string, number, string>;
 
 export type ShipmentAccount = ProgramAccount<FetchedShipment>;
 export type ApiShipmentAccount = ApiProgramAccount<ParsedShipment>;

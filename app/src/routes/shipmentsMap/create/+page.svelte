@@ -7,6 +7,7 @@
 		createNotification,
 		removeNotification
 	} from '$src/components/Notification/notificationsStore';
+	import CollateralForm from '$src/components/ShipmentForm/CollateralForm.svelte';
 	import DatesForm from '$src/components/ShipmentForm/DatesForm.svelte';
 	import DetailsForm from '$src/components/ShipmentForm/DetailsForm.svelte';
 	import DimensionsForm from '$src/components/ShipmentForm/DimensionsForm.svelte';
@@ -17,14 +18,21 @@
 	import SummaryForm from '$src/components/ShipmentForm/SummaryForm.svelte';
 	import { FormStage, nextStage } from '$src/components/ShipmentForm/formStage';
 	import type { CreateShipmentFormInterface } from '$src/components/ShipmentForm/interfaces';
-	import { getCreateShipmentTx } from '$src/lib/shipper';
+	import { getOpenChannelIx } from '$src/lib/channel';
+	import { fetchShipperAccount, getCreateShipmentTx } from '$src/lib/shipper';
+	import { DF_BASE, DF_MODULUS, getShipmentAddress } from '$src/sdk/sdk';
 	import { anchorStore } from '$src/stores/anchor';
 	import { awaitedConfirmation } from '$src/stores/confirmationAwait';
 	import { defaultLocation } from '$src/stores/locationsPick';
 	import { walletStore } from '$src/stores/wallet';
 	import { web3Store } from '$src/stores/web3';
+	import type { Protocol } from '$src/utils/idl/types/protocol';
+	import { setLocalStorage } from '$src/utils/wallet/localStorage';
 	import { userStore } from '$stores/user';
 	import { useSignAndSendTransaction } from '$utils/wallet/singAndSendTx';
+	import type { Program } from '@coral-xyz/anchor';
+	import type { PublicKey } from '@solana/web3.js';
+	import { createDiffieHellman } from 'diffie-hellman';
 	import { get } from 'svelte/store';
 
 	const forms = {
@@ -41,6 +49,10 @@
 		},
 		price: {
 			component: PriceForm,
+			props: {}
+		},
+		collateral: {
+			component: CollateralForm,
 			props: {}
 		},
 		dates: {
@@ -75,6 +87,11 @@
 		shipmentName: {
 			name: ''
 		},
+		price: { price: undefined },
+		collateral: {
+			collateral: undefined,
+			penalty: undefined
+		},
 		dates: {
 			deadline: new Date(),
 			when: new Date()
@@ -95,7 +112,6 @@
 			volume: undefined,
 			width: undefined
 		},
-		price: { price: undefined },
 		locations: {
 			destinationLocationLat: defaultLocation.lat,
 			destinationLocationLng: defaultLocation.lng,
@@ -115,6 +131,30 @@
 			endState[key] = states[key];
 		}
 		states[FormStage.Summary] = endState;
+	}
+
+	function generateKeys() {
+		let dh = createDiffieHellman(DF_MODULUS);
+		dh.generateKeys();
+		const privateKey = dh.getPrivateKey();
+		const sharedKey = dh.getPublicKey();
+
+		return { privateKey, sharedKey };
+	}
+
+	async function prepareOpenChannelIx(program: Program<Protocol>, signer: PublicKey) {
+		const { account: shipperAccount, accountKey: shipper } = await fetchShipperAccount(
+			program,
+			signer
+		);
+
+		const shipment = getShipmentAddress(program, signer, shipperAccount ? shipperAccount.count : 0);
+
+		const { privateKey, sharedKey } = generateKeys();
+
+		setLocalStorage<string>(`shipper${shipment.toString()}`, privateKey.toString('hex'));
+
+		return await getOpenChannelIx(program, shipment, signer, sharedKey);
 	}
 
 	async function buyShipment(values: CreateShipmentFormInterface) {
@@ -147,7 +187,8 @@
 			},
 			price: { price },
 			shipmentName,
-			name: { name }
+			name: { name },
+			collateral: { collateral, penalty }
 		} = values;
 
 		// WELCOME TO CIRCUS
@@ -193,11 +234,15 @@
 					fromName: sourceName,
 					toName: destinationName
 				},
-
+				collateral: collateral ?? 0,
+				penalty: penalty ?? 0,
 				price: price ?? 0
 			},
 			shipper.name ?? name
 		);
+
+		const openChannelIx = await prepareOpenChannelIx(program, wallet.publicKey!);
+		tx.add(openChannelIx);
 
 		try {
 			const signature = await useSignAndSendTransaction(connection, wallet, tx);

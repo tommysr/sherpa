@@ -20,9 +20,11 @@
 	$: carriers = data.carriers;
 	$: isWalletConnected = $walletStore.publicKey != null;
 
+
+	// TODO: filter out offered
 	$: myForwarderShipments = isWalletConnected
 		? $forwardedShipments.filter(
-				(s) => s.meta.account.forwarder.toString() === $walletStore.publicKey?.toString()
+				(s) => s.meta.account.forwarder.toString() === $walletStore.publicKey?.toString() 
 			)
 		: [];
 
