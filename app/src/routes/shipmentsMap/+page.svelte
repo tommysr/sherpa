@@ -14,7 +14,6 @@
 
 	$: isWalletConnected = $walletStore.publicKey != null;
 
-
 	function onSelectShipment(shipment: ApiShipmentAccount) {
 		if (isMobileOpen) {
 			isMobileOpen = false;
@@ -55,17 +54,8 @@
 	{/if}
 </LayoutListWrapper>
 
-
-{#if isWalletConnected}
-	<ShipmentsLocations
-		shipments={$notForwardedShipments}
-		bind:selectedShipment
-	/>
-{/if}
+<ShipmentsLocations shipments={$notForwardedShipments} bind:selectedShipment />
 
 {#if selectedShipment}
-	<ShipmentBuyModal
-		shipmentAccount={selectedShipment}
-		bind:showModal={showBuyShipmentModal}
-	/>
+	<ShipmentBuyModal shipmentAccount={selectedShipment} bind:showModal={showBuyShipmentModal} />
 {/if}
