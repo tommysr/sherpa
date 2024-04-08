@@ -1,9 +1,10 @@
 <script lang="ts">
-	import { Marker, Popup } from 'svelte-maplibre';
+	import type { ApiCarrierAccount } from '$src/utils/account/carrier';
 	import clsx from 'clsx';
 	import { createEventDispatcher, getContext } from 'svelte';
+	import { Marker, Popup } from 'svelte-maplibre';
 	import type { MapContext } from 'svelte-maplibre/context.svelte';
-	import type { ApiCarrierAccount } from '$src/utils/account/carrier';
+	import Button from '../Buttons/Button.svelte';
 
 	export let carriers: ApiCarrierAccount[];
 	export let selectedCarrier: ApiCarrierAccount | undefined = undefined;
@@ -64,17 +65,31 @@
 		on:click={() => onMarkerClick({ publicKey, account })}
 		lngLat={[location.longitude, location.latitude]}
 	>
-		<Popup>
-			<div class="flex align-items-center flex-col rounded-lg cursor-pointer">
-				Name: {name}<br />
-				Offers: {offersCount}<br />
-				Tasks: {taskCount}<br />
-				Available on: {new Date(availableTime).toUTCString()}<br />
-				Key: {publicKey}<br />
-				<button
-					class="border rounded-xl border-primary-500 px-2 py-1 text-sm font-md"
-					on:click={onMakeOfferClick}>Make offer</button
-				>
+		<Popup offset={[-5, -10]}>
+			<div class="flex flex-col px-2 justify-center items-start">
+				<div class="w-full text-center">
+					<div
+						class="bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent text-base font-bold"
+					>
+						{name}
+					</div>
+				</div>
+
+				<div class="mt-2 text-neutral-600 text-sm">
+					Offers: {offersCount}
+				</div>
+				<div class="text-neutral-600 text-sm">
+					Tasks: {taskCount}
+				</div>
+				<div class="text-neutral-600 text-sm">
+					Available on: {new Date(availableTime).toLocaleTimeString()}
+				</div>
+
+				<div class="w-full text-center">
+					<Button class="uppercase tracking-widest text-xs mt-2" on:click={onMakeOfferClick}
+						>Make offer</Button
+					>
+				</div>
 			</div>
 		</Popup>
 		<div

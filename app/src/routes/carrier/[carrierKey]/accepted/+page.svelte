@@ -1,9 +1,8 @@
 <script lang="ts">
-	import ShipmentInformationModal from '$src/components/Modals/ShipmentInformationModal.svelte';
-	import ShipmentLocations from '$src/components/ShipmentMap/ShipmentsLocations.svelte';
-	import { acceptedShipmentOffers, type AcceptedShipment } from '$src/stores/acceptedOffers';
 	import AcceptedOfferListElement from '$src/components/AcceptedOffer/AcceptedOfferListElement.svelte';
+	import ShipmentInformationModal from '$src/components/Modals/ShipmentInformationModal.svelte';
 	import ShipmentsLocations from '$src/components/ShipmentMap/ShipmentsLocations.svelte';
+	import { acceptedShipmentOffers, type AcceptedShipment } from '$src/stores/acceptedOffers';
 	import type { ApiShipmentAccount } from '$src/utils/account/shipment';
 	import { walletStore } from '$src/stores/wallet';
 

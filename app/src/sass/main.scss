@@ -146,7 +146,8 @@
 
 body {
 	background-color: var(--background);
-	color: var(--text);
+	--tw-text-opacity: 1;
+    color: rgb(82 82 82 / var(--tw-text-opacity));
 }
 
 *:focus {
@@ -224,7 +225,7 @@ body {
 	top: 50%;
 	margin: -20px 0 0 -20px;
 
-	background: #3f3d41;
+	background: var(--primary-600);
 
 	&:after {
 		content: '';

@@ -31,7 +31,7 @@
 	>
 		Summary
 	</h2>
-	<p class="text-neutral-600 text-sm max-w-sm mt-2">Confirm creation of shipment.</p>
+	<p class="text-neutral-600 text-sm max-w-sm mt-2">Confirm carrier creation.</p>
 
 	<form use:form class="mt-12">
 		<div class="w-full flex flex-col space-y-5">

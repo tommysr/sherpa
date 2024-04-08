@@ -20,8 +20,7 @@
 
 	$: shipmentData = shipmentAccount.account;
 	$: locations = shipmentData.shipment.geography;
-	$: priority = getPriorityName(shipmentData.shipment.details.priority);
-	$: priorityColor = getPriorityColor(priority);
+	$: priority = getPriority(shipmentData.shipment.details.priority);
 	$: statusNumber = shipmentData.status;
 	$: status = getStatusString(statusNumber);
 	$: isViewerShipper =
@@ -82,31 +81,40 @@
 		}
 	}
 
-	function getPriorityName(priority: number) {
+	const getPriority = (priority: number) => {
 		switch (priority) {
+			case 5:
+				return {
+					name: 'Very high',
+					color: 'text-red-800'
+				};
 			case 4:
-				return 'High';
+				return {
+					name: 'High',
+					color: 'text-red-500'
+				};
 			case 3:
-				return 'Medium';
+				return {
+					name: 'Medium',
+					color: 'text-orange-400'
+				};
 			case 2:
-				return 'Low';
+				return {
+					name: 'Low',
+					color: 'text-green-300'
+				};
+			case 1:
+				return {
+					name: 'Very low',
+					color: 'text-green-500'
+				};
 			default:
-				return 'Default';
+				return {
+					name: 'Unknown',
+					color: 'text-gray-600'
+				};
 		}
-	}
-
-	function getPriorityColor(priority: string) {
-		switch (priority) {
-			case 'High':
-				return 'text-red-600';
-			case 'Medium':
-				return 'text-yellow-600';
-			case 'Low':
-				return 'text-green-600';
-			default:
-				return 'text-gray-600';
-		}
-	}
+	};
 </script>
 
 <!-- svelte-ignore a11y-click-events-have-key-events -->
@@ -120,20 +128,24 @@
 >
 	<div class="px-4 py-5 sm:px-6">
 		<div class="flex items-center justify-between">
-			<h3 class="sm:text-md xl:text-lg leading-6 font-medium text-gray-900">{shipmentData.name}</h3>
+			<h3 class="text-base xl:text-lg leading-6 font-medium text-gray-900">
+				{shipmentData.name}
+			</h3>
 			<p
-				class="mt-1 text-md bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent font-bold"
+				class="mt-1 text-base bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent font-bold"
 			>
 				{shipmentData.price / 10 ** 9} SOL
 			</p>
 		</div>
 		<div class="mt-3 xl:mt-5 flex items-center justify-between">
-			<p class="text-xs xl:sm font-medium text-gray-500 mr-6 xl:mr-12">
-				{locations.fromName + ' → ' + locations.toName}
+			<p class="text-xs font-medium text-gray-500 mr-6 xl:mr-12">
+				&#x2022; Starting location: <span class="font-semibold">{locations.fromName}</span>
+				<br />
+				&#x2022; Destination: <span class="font-semibold">{locations.toName}</span>
 				<br />
 				<br />
 				&#x2022; Priority:
-				<span class={clsx('font-semibold', priorityColor)}>{priority}</span>
+				<span class={clsx('font-semibold', priority.color)}>{priority.name}</span>
 				<br />
 				&#x2022; Penalty:
 				<span>{shipmentAccount.account.shipment.penalty / 10 ** 9} SOL</span>
@@ -159,7 +171,7 @@
 				{/if}
 			</p>
 
-			<button class="text-sm xl:text-md text-accent font-medium" on:click={handleShowClick}
+			<button class="text-sm xl:text-md text-accent font-medium mx-4" on:click={handleShowClick}
 				>Show</button
 			>
 		</div>

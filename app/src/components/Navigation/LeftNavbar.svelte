@@ -11,9 +11,10 @@
 	import HomeIcon from './NavbarIcons/HomeIcon.svelte';
 	import IssuedIcon from './NavbarIcons/IssuedIcon.svelte';
 	import PlusIcon from './NavbarIcons/PlusIcon.svelte';
-	import RegisterIcons from './NavbarIcons/RegisterIcons.svelte';
 	import SendIcon from './NavbarIcons/SendIcon.svelte';
 	import TrackIcon from './NavbarIcons/TrackIcon.svelte';
+
+	import logoImage from '$lib/images/logo-small.svg';
 
 	$: currentPage = $page.url.pathname;
 	$: isNavbarOpen = false;
@@ -50,7 +51,7 @@
 			name: 'Forwarders',
 			link: '/forwarder/bought',
 			svg: SendIcon
-		}, 
+		},
 
 		{
 			name: 'Carriers',
@@ -61,18 +62,19 @@
 					name: 'Dashboard',
 					link: `/carrier/${carrierRoute}`,
 					svg: DashboardIcon
-				},
-				// {
-				// 	name: 'Register',
-				// 	link: '/carrier/register',
-				// 	svg: RegisterIcons
-				// }
+				}
 			]
 		}
 	];
 </script>
 
 <nav class="hidden md:block">
+	<div class="fixed left-5 top-5 z-10">
+		<a href="/">
+			<img src={logoImage} alt="logo" class="w-16" />
+		</a>
+	</div>
+
 	<div
 		class="fixed left-5 w-10 z-10 bg-white rounded-full top-1/2 transform -translate-y-1/2 py-1.5 px-7 shadow-lg"
 	>
@@ -175,14 +177,34 @@
 		<div></div>
 		<nav class="">
 			<ul class="flex h-3/4 flex-col items-center space-y-12">
-				{#each navigation as { name, link }}
-					<a
-						href={link}
-						on:click={() => (isNavbarOpen = false)}
-						class={clsx('custome-button', currentPage === link ? 'active-nav' : '')}
+				{#each navigation as { name, link, routes }}
+					<div
+						class={clsx(
+							'p-5 rounded-xl flex flex-col justify-center items-center',
+							routes && currentPage.includes(link) ? 'bg-primary-100' : ''
+						)}
 					>
-						{name}
-					</a>
+						<a
+							href={link}
+							on:click={() => (isNavbarOpen = false)}
+							class={clsx(
+								'text-2xl',
+								currentPage === link
+									? 'bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent'
+									: ''
+							)}
+						>
+							{name}
+						</a>
+
+						{#if routes && currentPage.includes(link)}
+							{#each routes as { name, link, svg }}
+								<div class="mt-5">
+									<a on:click={() => (isNavbarOpen = false)} href={link} class="text-sm">{name}</a>
+								</div>
+							{/each}
+						{/if}
+					</div>
 				{/each}
 			</ul>
 		</nav>

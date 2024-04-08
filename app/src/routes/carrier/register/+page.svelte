@@ -25,7 +25,6 @@
 
 	import SummaryForm from '$src/components/CarrierForm/SummaryForm.svelte';
 	import { FormStage } from '$src/components/ShipmentForm/formStage';
-	import { getCarrierAddress } from '$src/sdk/sdk';
 
 	const forms = {
 		name: {
@@ -148,7 +147,7 @@
 					removeAfter: 5000
 				});
 
-				// redirect but its kind of shit, cause route has to wait 
+				// redirect but its kind of shit, cause route has to wait
 				setTimeout(() => goto(`/carrier/${$walletStore.publicKey}/incoming`), 15000);
 			}
 		} catch (e) {
@@ -182,9 +181,9 @@
 
 <Modal
 	{showModal}
-	closeHandler={() => history.back()}
+	closeHandler={() => goto('/carrier')}
 	on:backdropClick={() => goto('/carrier')}
-	showCloseButton={false}
+	showCloseButton={true}
 >
 	<div class="w-full flex flex-col space-y-7">
 		<svelte:component
